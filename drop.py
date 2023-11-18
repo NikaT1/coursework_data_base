@@ -1,16 +1,11 @@
 import psycopg2
 
-# Modify these variables according to your PostgreSQL configuration.
-DATABASE = "YourDatabaseName"
-USERNAME = "YourUsername"
-PASSWORD = "YourPassword"
-HOST = "localhost"
+DATABASE = "studs"
+HOST = "pg"
 PORT = "5432"
 
 connection = psycopg2.connect(
     dbname=DATABASE,
-    user=USERNAME,
-    password=PASSWORD,
     host=HOST,
     port=PORT
 )
@@ -38,6 +33,7 @@ drop_queries = [
     "DROP TYPE gender;",
     "DROP TYPE case_log_result;",
     "DROP TYPE case_log_status;",
+    "DROP TYPE official_name;",
 ]
 
 for query in drop_queries:

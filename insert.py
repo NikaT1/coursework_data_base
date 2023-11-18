@@ -1,21 +1,15 @@
 import psycopg2
 from datetime import date
-
-# Modify these variables according to your PostgreSQL configuration.
-DATABASE = "YourDatabaseName"
-USERNAME = "YourUsername"
-PASSWORD = "YourPassword"
-HOST = "localhost"
+DATABASE = "studs"
+HOST = "pg"
 PORT = "5432"
 
 connection = psycopg2.connect(
     dbname=DATABASE,
-    user=USERNAME,
-    password=PASSWORD,
     host=HOST,
     port=PORT
 )
-cursor = connection.cursor()z
+cursor = connection.cursor()
 
 # Function to insert data into locality table
 def insert_locality(name, foundation_date):
@@ -391,7 +385,7 @@ for accusation_record in accusation_records:
 # Example data for investigative_cases
 # дата заведения дела
 investigative_cases = [
-    (date(1489, 2, 12), date(1488, 3, 12)),
+    (date(1489, 2, 12), date(1490, 3, 12)),
     (date(1480, 3, 2), date(1480, 3, 22)),
     (date(1481, 5, 22), date(1481, 8, 22)),
     (date(1483, 4, 25), date(1483, 5, 18)),
@@ -413,7 +407,7 @@ accusation_investigative_cases = [
     (5, 5),
     (6, 6),
     (7, 7),
-    (8, 8),
+    (2, 8),
 ]
 
 # Inserting data into accusation_investigative_case table
