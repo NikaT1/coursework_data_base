@@ -31,7 +31,7 @@ CREATE OR REPLACE FUNCTION check_data_for_torture() RETURNS trigger AS $$
 			prev_type = (
 				select type_id from torture_log where case_log_id = NEW.case_log_id order by type_id DESC limit 1
 			);
-			IF NEW.type_id - 1 == prev_type THEN
+			IF NEW.type_id - 1 = prev_type THEN
 				RAISE EXCEPTION 'значение type_id указано неверно';
 				RETURN NULL;
 			END IF;
@@ -52,48 +52,48 @@ CREATE OR REPLACE FUNCTION check_data_for_case_log() RETURNS trigger AS $$
 				select official_name from official where id = new.principal limit 1
 			);
 		
-		IF NEW.case_status == 'Пыточный процесс' THEN
+		IF NEW.case_status = 'Пыточный процесс' THEN
 			IF principal != 'Инквизитор'  THEN
             	RAISE EXCEPTION 'для пыточного процесса principal должен быть инквизитором';
 				RETURN NULL;
 			END IF;
-			IF  NEW.prison_id != NULL THEN
+			IF  NEW.prison_id IS NOT NULL THEN
             	RAISE EXCEPTION 'для пыточного процесса не заполняется поле prison_id';
 				RETURN NULL;
 			END IF;
-			IF  NEW.punishment_id != NULL THEN
+			IF  NEW.punishment_id IS NOT NULL THEN
             	RAISE EXCEPTION 'для пыточного процесса не заполняется поле punishment_id';
 				RETURN NULL;
 			END IF;
         END IF;
-		IF NEW.case_status == 'Исправительная беседа' THEN
+		IF NEW.case_status = 'Исправительная беседа' THEN
 			IF principal != 'Епископ'  THEN
             	RAISE EXCEPTION 'для исправительной беседы principal должен быть епископом';
 				RETURN NULL;
 			END IF;
-			IF  NEW.prison_id != NULL THEN
+			IF  NEW.prison_id IS NOT NULL THEN
             	RAISE EXCEPTION 'для исправительной беседы не заполняется поле prison_id';
 				RETURN NULL;
 			END IF;
-			IF  NEW.punishment_id != NULL THEN
+			IF  NEW.punishment_id IS NOT NULL THEN
             	RAISE EXCEPTION 'для исправительной беседы не заполняется поле punishment_id';
 				RETURN NULL;
 			END IF;
         END IF;
-		IF NEW.case_status == 'Наказание' THEN
+		IF NEW.case_status = 'Наказание' THEN
 			IF  principal != 'Светсткая власть' THEN
             	RAISE EXCEPTION 'для наказания principal должен быть светской властью';
 				RETURN NULL;
 			END IF; 
-			IF  NEW.result != NULL THEN
+			IF  NEW.result IS NOT NULL THEN
             	RAISE EXCEPTION 'для наказания не заполняется поле result';
 				RETURN NULL;
 			END IF;
-			IF  NEW.prison_id == NULL THEN
+			IF  NEW.prison_id IS NULL THEN
             	RAISE EXCEPTION 'для наказания должно быть определено значение поля prison_id';
 				RETURN NULL;
 			END IF;
-			IF  NEW.punishment_id == NULL THEN
+			IF  NEW.punishment_id IS NULL THEN
             	RAISE EXCEPTION 'для наказания должно быть определено значение поля punishment_id';
 				RETURN NULL;
 			END IF;
@@ -109,7 +109,7 @@ CREATE TRIGGER check_data_for_case_log BEFORE INSERT OR UPDATE ON case_log
     FOR EACH ROW EXECUTE FUNCTION check_data_for_case_log();
 
 
-CREATE OR REPLACE FUNCTION check_data_for_case_log() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION check_data_for_accusation() RETURNS trigger AS $$
 	DECLARE
 		official					 official_name;
     BEGIN
