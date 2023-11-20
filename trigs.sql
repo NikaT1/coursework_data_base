@@ -47,12 +47,25 @@ CREATE TRIGGER check_data_for_torture BEFORE INSERT OR UPDATE ON torture_log
 CREATE OR REPLACE FUNCTION check_data_for_case_log() RETURNS trigger AS $$
 	DECLARE
 		principal					 official_name;
+		step						 integer;
     BEGIN
 		principal = (
 				select official_name from official where id = new.principal limit 1
 			);
-		
-		IF NEW.case_status = 'Пыточный процесс' THEN
+		step = 0;
+		IF (select 1 from case_log where case_log.case_id = NEW.case_id and case_log.case_status = 'Исправительная беседа') = 1 THEN
+			step = 1;
+		END IF;
+
+		IF step = 1 and (select 1 from case_log where case_log.case_id = NEW.case_id and case_log.case_status = 'Пыточный процесс') = 1 THEN
+			step = 2;
+		END IF;
+
+		IF step = 2 and (select 1 from case_log where case_log.case_id = NEW.case_id and case_log.case_status = 'Наказание') = 1 THEN
+			step = 3;
+		END IF;
+			
+		IF NEW.case_status = 'Пыточный процесс' and step = 1 THEN
 			IF principal != 'Инквизитор'  THEN
             	RAISE EXCEPTION 'для пыточного процесса principal должен быть инквизитором';
 				RETURN NULL;
@@ -65,8 +78,9 @@ CREATE OR REPLACE FUNCTION check_data_for_case_log() RETURNS trigger AS $$
             	RAISE EXCEPTION 'для пыточного процесса не заполняется поле punishment_id';
 				RETURN NULL;
 			END IF;
+			RETURN NEW;
         END IF;
-		IF NEW.case_status = 'Исправительная беседа' THEN
+		IF NEW.case_status = 'Исправительная беседа' and step = 0 THEN
 			IF principal != 'Епископ'  THEN
             	RAISE EXCEPTION 'для исправительной беседы principal должен быть епископом';
 				RETURN NULL;
@@ -79,8 +93,9 @@ CREATE OR REPLACE FUNCTION check_data_for_case_log() RETURNS trigger AS $$
             	RAISE EXCEPTION 'для исправительной беседы не заполняется поле punishment_id';
 				RETURN NULL;
 			END IF;
+			RETURN NEW;
         END IF;
-		IF NEW.case_status = 'Наказание' THEN
+		IF NEW.case_status = 'Наказание' and step = 2 THEN
 			IF  principal != 'Светсткая власть' THEN
             	RAISE EXCEPTION 'для наказания principal должен быть светской властью';
 				RETURN NULL;
@@ -97,10 +112,11 @@ CREATE OR REPLACE FUNCTION check_data_for_case_log() RETURNS trigger AS $$
             	RAISE EXCEPTION 'для наказания должно быть определено значение поля punishment_id';
 				RETURN NULL;
 			END IF;
+			RETURN NEW;
         END IF;
 		
-		
-        RETURN NEW;
+		RAISE EXCEPTION 'Выбрана неверная стадия развития дела';
+        RETURN NULL;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -173,6 +189,28 @@ $$ LANGUAGE plpgsql;
 		
 
 CREATE OR REPLACE PROCEDURE start_discussion(cur_case_id integer, discription text) language plpgsql    
+as $$
+    DECLARE
+		principal					 integer;
+		locality_id					 integer;
+		new_case_log_id				 integer;
+    BEGIN
+		locality_id = ( select church.locality_id from church 
+							join inquisition_process on church_id = church.id
+							join accusation on accusation.inquisition_process_id = inquisition_process.id
+							join accusation_record on id_accusation = accusation.id 
+							where accusation_record.id in (
+								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
+		principal = get_best_principal(locality_id, 'Епископ'); 
+		
+		INSERT INTO case_log (case_id, case_status, principal, start_time, result, prison_id, finish_time, 
+		punishment_id, description) VALUES (cur_case_id, 'Исправительная беседа', principal, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, description)
+		RETURNING id INTO new_case_log_id;
+        RAISE NOTICE 'Case_log id: %', new_case_log_id;
+	commit;
+    END;$$;
+
+CREATE OR REPLACE PROCEDURE finish_discussion(cur_case_id integer, discription text) language plpgsql    
 as $$
     DECLARE
 		principal					 integer;
