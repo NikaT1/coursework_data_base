@@ -146,6 +146,27 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER check_data_for_accusation BEFORE INSERT OR UPDATE ON accusation
     FOR EACH ROW EXECUTE FUNCTION check_data_for_accusation();
 
+CREATE OR REPLACE FUNCTION check_data_for_inquisition_process() RETURNS trigger AS $$
+	DECLARE
+		old_inquisition_process_id					 integer;
+    BEGIN
+		old_inquisition_process_id = (
+				select id from inquisition_process where church_id = NEW.church_id and finish_time IS NULL
+			);
+		
+		IF old_inquisition_process_id IS NOT NULL  THEN
+           	RAISE EXCEPTION "В этой церкви в данный момент уже проводится инквизиционный процесс с id %", old_inquisition_process_id ;
+			RETURN NULL;
+		END IF;
+		
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER check_data_for_inquisition_process BEFORE INSERT OR UPDATE ON inquisition_process
+    FOR EACH ROW EXECUTE FUNCTION check_data_for_inquisition_process();
+
 
 CREATE OR REPLACE FUNCTION get_best_principal(cur_locality_id integer, cur_official_name official_name) RETURNS integer AS $$
 	DECLARE
@@ -310,3 +331,32 @@ as $$
 		END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION start_inquisition_process(church integer, bible integer)  RETURNS integer   
+as $$
+    DECLARE
+		new_inquisition_process_id				 integer;
+    BEGIN
+			INSERT INTO inquisition_process (start_data, finish_data, church_id, bible_id) VALUES (GETDATE(), NULL, church, bible)
+			RETURNING id INTO new_inquisition_process_id;
+			RETURN new_inquisition_process_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION finish_inquisition_process(inquisition_process_id integer)  RETURNS integer   
+as $$
+DECLARE
+	cur_finish_date					timestamp;
+BEGIN
+	cur_finish_date = (select finish_data from inquisition_process where inquisition_process.id = inquisition_process_id limit 1);
+	IF cur_finish_date IS NULL THEN
+		UPDATE inquisition_process SET finish_data = GETDATE() where id = inquisition_process_id;
+		RETURN cur_case_log_id;
+	ELSE
+		RAISE EXCEPTION 'Процесс уже окончен';
+		RETURN NULL;
+	END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
