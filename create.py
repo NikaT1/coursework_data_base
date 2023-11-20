@@ -116,7 +116,8 @@ CREATE TABLE accusation_record (
  accused integer NOT NULL REFERENCES person(id) ON DELETE RESTRICT,
  date_time timestamp NOT NULL,
  description text,
- id_accusation integer NOT NULL REFERENCES accusation(id) ON DELETE CASCADE
+ id_accusation integer NOT NULL REFERENCES accusation(id) ON DELETE CASCADE, 
+ status accusation_status
 );
 """
 
@@ -151,6 +152,10 @@ CREATE TYPE case_log_result as enum ('Признание вины', 'Отриц�
 
 create_case_log_status_type_query = """
 CREATE TYPE case_log_status as enum ('Пыточный процесс', 'Исправительная беседа', 'Наказание');
+"""
+
+create_accusation_status_type_query = """
+CREATE TYPE accusation_status as enum ('Ложный', 'Легкий', 'Тяжкий');
 """
 
 create_case_log_table_query = """
@@ -226,6 +231,7 @@ queries.extend([
 queries.extend([
     create_case_log_result_type_query,
     create_case_log_status_type_query,
+    create_accusation_status_type_query,
     create_case_log_table_query,
     create_violation_table_query,
     create_torture_type_table_query,

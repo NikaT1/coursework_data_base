@@ -19,3 +19,4 @@ DROP TABLE person;
 DROP TYPE gender;
 DROP TYPE case_log_result;
 DROP TYPE case_log_status;
+DROP TYPE accusation_status
