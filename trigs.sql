@@ -186,7 +186,31 @@ END;
 $$ LANGUAGE plpgsql;
 		
 
-CREATE OR REPLACE PROCEDURE start_discussion(cur_case_id integer, discription text) language plpgsql    
+CREATE OR REPLACE FUNCTION get_best_prison(cur_locality_id integer) RETURNS integer AS $$
+	DECLARE
+		cur_prison_id					 integer;
+	BEGIN
+		 SELECT prison.id INTO cur_prison_id FROM prison
+			WHERE locality_id = cur_locality_id and NOT EXISTS (
+				SELECT 1 FROM case_log WHERE prison_id = prison.id)
+			LIMIT 1;
+
+		IF cur_prison_id IS NOT NULL THEN
+			RETURN cur_prison_id;
+		END IF;
+
+		SELECT case_log.prison_id INTO cur_prison_id FROM case_log
+			JOIN prison on prison_id = prison.id
+			WHERE locality_id = cur_locality_id
+			GROUP BY case_log.prison_id
+			ORDER BY COUNT(*) ASC
+			LIMIT 1;
+
+		RETURN cur_prison_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION start_discussion(cur_case_id integer, discription text)  RETURNS integer   
 as $$
     DECLARE
 		principal					 integer;
@@ -201,22 +225,24 @@ as $$
 								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
 		IF locality_id IS NULL THEN
 			RAISE EXCEPTION 'введенное дело не найдено';
+			RETURN NULL;
 		ELSE
 			principal = get_best_principal(locality_id, 'Епископ'); 
 		
 			INSERT INTO case_log (case_id, case_status, principal, start_time, result, prison_id, finish_time, 
 			punishment_id, description) VALUES (cur_case_id, 'Исправительная беседа', principal, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, description)
 			RETURNING id INTO new_case_log_id;
-			RAISE NOTICE 'Case_log id: %', new_case_log_id;
+			RETURN new_case_log_id;
 		END IF;
-	commit;
-    END;$$;
+END;
+$$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE PROCEDURE finish_discussion(cur_case_id integer, new_result case_log_result) language plpgsql    
+CREATE OR REPLACE FUNCTION start_torture(cur_case_id integer, discription text)  RETURNS integer   
 as $$
     DECLARE
+		principal					 integer;
 		locality_id					 integer;
-		old_case_log_id				 integer;
+		new_case_log_id				 integer;
     BEGIN
 		locality_id = ( select church.locality_id from church 
 							join inquisition_process on church_id = church.id
@@ -224,12 +250,63 @@ as $$
 							join accusation_record on id_accusation = accusation.id 
 							where accusation_record.id in (
 								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
-		
-		old_case_log_id = (select id from case_log where case_id = cur_case_id and case_status = 'Исправительная беседа' limit 1);
-		IF old_case_log_id IS NULL THEN
-			RAISE EXCEPTION 'беседа не была начата';
+		IF locality_id IS NULL THEN
+			RAISE EXCEPTION 'введенное дело не найдено';
+			RETURN NULL;
 		ELSE
-			UPDATE case_log SET result = new_result, finish_time = CURRENT_TIMESTAMP where id = old_case_log_id;
+			principal = get_best_principal(locality_id, 'Инквизитор'); 
+		
+			INSERT INTO case_log (case_id, case_status, principal, start_time, result, prison_id, finish_time, 
+			punishment_id, description) VALUES (cur_case_id, 'Пыточный процесс', principal, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, description)
+			RETURNING id INTO new_case_log_id;
+			RETURN new_case_log_id;
 		END IF;
-	commit;
-    END;$$;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION finish_case_log_process(cur_case_log_id integer, cur_case_status case_log_status, new_result case_log_result)  RETURNS integer     
+as $$
+DECLARE
+	cur_finish_time					timestamp;
+BEGIN
+	IF cur_case_status = "Наказание" THEN
+		RAISE EXCEPTION 'Нельзя завершить наказание';
+		RETURN NULL;
+	END IF;
+	cur_finish_time = (select finish_time from case_log where case_log.id = cur_case_log_id and case_log_status = cur_case_status; limit 1);
+	IF cur_finish_time IS NULL THEN
+		UPDATE case_log SET result = new_result, finish_time = CURRENT_TIMESTAMP where id = cur_case_log_id;
+		RETURN cur_case_log_id;
+	ELSE
+		RAISE EXCEPTION 'Процесс уже окончен';
+		RETURN NULL;
+	END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION assign_punishment(cur_case_id integer, punishment_id integer, discription text)  RETURNS integer   
+as $$
+    DECLARE
+		prison						 integer;
+		locality_id					 integer;
+		new_case_log_id				 integer;
+    BEGIN
+		locality_id = ( select church.locality_id from church 
+							join inquisition_process on church_id = church.id
+							join accusation on accusation.inquisition_process_id = inquisition_process.id
+							join accusation_record on id_accusation = accusation.id 
+							where accusation_record.id in (
+								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
+		IF locality_id IS NULL THEN
+			RAISE EXCEPTION 'Введенное дело не найдено';
+			RETURN NULL;
+		ELSE
+			prison = get_best_prison(locality_id); 
+		
+			INSERT INTO case_log (case_id, case_status, principal, start_time, result, prison_id, finish_time, 
+			punishment_id, description) VALUES (cur_case_id, 'Наказание', principal, CURRENT_TIMESTAMP, NULL, prison, NULL, punishment_id, description)
+			RETURNING id INTO new_case_log_id;
+			RETURN new_case_log_id;
+		END IF;
+END;
+$$ LANGUAGE plpgsql;
