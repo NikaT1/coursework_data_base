@@ -135,7 +135,7 @@ CREATE OR REPLACE FUNCTION get_best_principal(cur_locality_id integer, cur_offic
 	DECLARE
 		principal					 integer;
 	BEGIN
-		 SELECT id INTO principal FROM official
+		 SELECT official.id INTO principal FROM official
 			JOIN person on person_id = person.id
 			WHERE official_name = cur_official_name and locality_id = cur_locality_id and NOT EXISTS (
 				SELECT 1 FROM case_log WHERE official.id = principal)
@@ -172,23 +172,24 @@ END;
 $$ LANGUAGE plpgsql;
 		
 
-CREATE OR REPLACE PROCEDURE start_discution(cur_case_id integer, discription text) RETURNS integer AS $$
-	IS
+CREATE OR REPLACE PROCEDURE start_discussion(cur_case_id integer, discription text) language plpgsql    
+as $$
+    DECLARE
 		principal					 integer;
 		locality_id					 integer;
 		new_case_log_id				 integer;
     BEGIN
-		locality_id = ( select locality_id from church 
+		locality_id = ( select church.locality_id from church 
 							join inquisition_process on church_id = church.id
-							join accusation inquisition_process_id = inquisition_process.id
-							join accusation_record id_accusation = accusation.id 
-							where accusation_record_id in (
+							join accusation on accusation.inquisition_process_id = inquisition_process.id
+							join accusation_record on id_accusation = accusation.id 
+							where accusation_record.id in (
 								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
 		principal = get_best_principal(locality_id, 'Епископ'); 
 		
 		INSERT INTO case_log (case_id, case_status, principal, start_time, result, prison_id, finish_time, 
 		punishment_id, description) VALUES (cur_case_id, 'Исправительная беседа', principal, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, description)
 		RETURNING id INTO new_case_log_id;
-        DBMS_OUTPUT.PUT_LINE(new_case_log_id);
-    END;
-$$ LANGUAGE plpgsql;
+        RAISE NOTICE 'Case_log id: %', new_case_log_id;
+	commit;
+    END;$$;
