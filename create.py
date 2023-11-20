@@ -24,7 +24,7 @@ CREATE TABLE church (
     id serial PRIMARY KEY,
     name varchar(255) NOT NULL,
     foundation_date date,
-    locality_id integer REFERENCES locality(id) ON DELETE CASCADE
+    locality_id integer NOT NULL REFERENCES locality(id) ON DELETE CASCADE
 );
 """
 
@@ -32,7 +32,7 @@ create_prison_table = """
 CREATE TABLE prison (
     id serial PRIMARY KEY,
     name varchar(255) NOT NULL,
-    locality_id integer REFERENCES locality(id) ON DELETE CASCADE
+    locality_id integer NOT NULL REFERENCES locality(id) ON DELETE CASCADE
 );
 """
 
@@ -80,7 +80,7 @@ CREATE TYPE official_name as enum ('Епископ', 'Светсткая вла�
 create_official_table_query = """
 CREATE TABLE official (
  id serial PRIMARY KEY,
- person_id integer REFERENCES person(id) ON DELETE CASCADE,
+ person_id integer NOT NULL REFERENCES person(id) ON DELETE CASCADE,
  official_name official_name NOT NULL,
  employment_date date NOT NULL,
  fired_date date
@@ -93,9 +93,9 @@ CREATE TABLE inquisition_process (
  id serial PRIMARY KEY,
  start_data date NOT NULL,
  finish_data date,
- official_id integer REFERENCES official(id) ON DELETE RESTRICT,
- church_id integer REFERENCES church(id) ON DELETE RESTRICT,
- bible_id integer REFERENCES bible(version) ON DELETE RESTRICT,
+ official_id integer NOT NULL REFERENCES official(id) ON DELETE RESTRICT,
+ church_id integer NOT NULL REFERENCES church(id) ON DELETE RESTRICT,
+ bible_id integer NOT NULL REFERENCES bible(version) ON DELETE RESTRICT,
  CHECK (finish_data IS NULL OR start_data < finish_data)
 );
 """
@@ -104,8 +104,8 @@ create_accusation_table_query = """
 CREATE TABLE accusation (
  id serial PRIMARY KEY,
  informer integer REFERENCES person(id) ON DELETE RESTRICT,
- bishop integer REFERENCES official(id) ON DELETE RESTRICT,
- inquisition_process_id integer REFERENCES inquisition_process(id) ON DELETE CASCADE
+ bishop integer NOT NULL REFERENCES official(id) ON DELETE RESTRICT,
+ inquisition_process_id integer NOT NULL REFERENCES inquisition_process(id) ON DELETE CASCADE
 );
 """
 
@@ -113,10 +113,10 @@ create_accusation_record_table_query = """
 CREATE TABLE accusation_record (
  id serial PRIMARY KEY,
  violation_place varchar(255),
- accused integer REFERENCES person(id) ON DELETE RESTRICT,
+ accused integer NOT NULL REFERENCES person(id) ON DELETE RESTRICT,
  date_time timestamp NOT NULL,
  description text,
- id_accusation integer REFERENCES accusation(id) ON DELETE CASCADE
+ id_accusation integer NOT NULL REFERENCES accusation(id) ON DELETE CASCADE
 );
 """
 
@@ -156,9 +156,9 @@ CREATE TYPE case_log_status as enum ('Пыточный процесс', 'Исп�
 create_case_log_table_query = """
 CREATE TABLE case_log (
  id serial PRIMARY KEY,
- case_id integer REFERENCES investigative_case(id) ON DELETE RESTRICT,
+ case_id integer NOT NULL REFERENCES investigative_case(id) ON DELETE RESTRICT,
  case_status case_log_status NOT NULL,
- principal integer REFERENCES official(id) ON DELETE RESTRICT,
+ principal integer NOT NULL REFERENCES official(id) ON DELETE RESTRICT,
  start_time timestamp NOT NULL,
  result case_log_result,
  prison_id integer REFERENCES prison(id) ON DELETE RESTRICT,
@@ -188,10 +188,10 @@ CREATE TABLE torture_type (
 
 create_torture_log_table_query = """
 CREATE TABLE torture_log (
- case_log_id integer REFERENCES case_log(id) ON DELETE CASCADE,
- type_id integer REFERENCES torture_type(id) ON DELETE RESTRICT,
- executor integer REFERENCES official(id) ON DELETE RESTRICT,
- victim integer REFERENCES person(id) ON DELETE RESTRICT,
+ case_log_id integer NOT NULL REFERENCES case_log(id) ON DELETE CASCADE,
+ type_id integer NOT NULL REFERENCES torture_type(id) ON DELETE RESTRICT,
+ executor integer NOT NULL REFERENCES official(id) ON DELETE RESTRICT,
+ victim integer NOT NULL REFERENCES person(id) ON DELETE RESTRICT,
  PRIMARY KEY(case_log_id, type_id)
 );
 """
