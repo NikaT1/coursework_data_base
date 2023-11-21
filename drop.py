@@ -34,6 +34,7 @@ drop_queries = [
     "DROP TYPE case_log_result;",
     "DROP TYPE case_log_status;",
     "DROP TYPE official_name;",
+    "DROP TYPE accusation_status",
 ]
 
 for query in drop_queries:
