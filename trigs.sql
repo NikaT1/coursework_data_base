@@ -143,7 +143,7 @@ CREATE OR REPLACE FUNCTION check_data_for_accusation() RETURNS trigger AS $$
 $$ LANGUAGE plpgsql;
 
 	
-CREATE TRIGGER check_data_for_accusation BEFORE INSERT OR UPDATE ON accusation
+CREATE TRIGGER check_data_for_accusation BEFORE INSERT OR UPDATE ON accusation_process
     FOR EACH ROW EXECUTE FUNCTION check_data_for_accusation();
 
 CREATE OR REPLACE FUNCTION check_data_for_inquisition_process() RETURNS trigger AS $$
@@ -240,8 +240,8 @@ as $$
     BEGIN
 		locality_id = ( select church.locality_id from church 
 							join inquisition_process on church_id = church.id
-							join accusation on accusation.inquisition_process_id = inquisition_process.id
-							join accusation_record on id_accusation = accusation.id 
+							join accusation_process on accusation_process.inquisition_process_id = inquisition_process.id
+							join accusation_record on id_accusation = accusation_process.id 
 							where accusation_record.id in (
 								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
 		IF locality_id IS NULL THEN
@@ -267,8 +267,8 @@ as $$
     BEGIN
 		locality_id = ( select church.locality_id from church 
 							join inquisition_process on church_id = church.id
-							join accusation on accusation.inquisition_process_id = inquisition_process.id
-							join accusation_record on id_accusation = accusation.id 
+							join accusation_process on accusation_process.inquisition_process_id = inquisition_process.id
+							join accusation_record on id_accusation = accusation_process.id 
 							where accusation_record.id in (
 								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
 		IF locality_id IS NULL THEN
@@ -314,8 +314,8 @@ as $$
     BEGIN
 		locality_id = ( select church.locality_id from church 
 							join inquisition_process on church_id = church.id
-							join accusation on accusation.inquisition_process_id = inquisition_process.id
-							join accusation_record on id_accusation = accusation.id 
+							join accusation_process on accusation_process.inquisition_process_id = inquisition_process.id
+							join accusation_record on id_accusation = accusation_process.id 
 							where accusation_record.id in (
 								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
 		IF locality_id IS NULL THEN
@@ -367,7 +367,7 @@ as $$
 DECLARE
 	new_accusation_id				integer;
 BEGIN
-			INSERT INTO accusation (start_time, finish_time, inquisition_process_id) VALUES (CURRENT_TIMESTAMP, NULL, cur_inquisition_process_id)
+			INSERT INTO accusation_process (start_time, finish_time, inquisition_process_id) VALUES (CURRENT_TIMESTAMP, NULL, cur_inquisition_process_id)
 			RETURNING id INTO new_accusation_id;
 			RETURN new_accusation_id;
 END;
@@ -378,9 +378,9 @@ as $$
 DECLARE
 	cur_finish_time					timestamp;
 BEGIN
-	cur_finish_time = (select finish_time from accusation where accusation.id = cur_accusation_id limit 1);
+	cur_finish_time = (select finish_time from accusation_process where accusation_process.id = cur_accusation_id limit 1);
 	IF cur_finish_time IS NULL THEN
-		UPDATE accusation SET finish_time = CURRENT_TIMESTAMP where id = cur_accusation_id;
+		UPDATE accusation_process SET finish_time = CURRENT_TIMESTAMP where id = cur_accusation_id;
 		RETURN cur_accusation_id;
 	ELSE
 		RAISE EXCEPTION 'Процесс уже окончен';
@@ -395,9 +395,9 @@ DECLARE
 	new_accusation_record_id				integer;
 	cur_finish_time							timestamp;
 BEGIN
-		cur_finish_time = (select finish_time from accusation where accusation.id = cur_accusation_id limit 1);
+		cur_finish_time = (select finish_time from accusation_process where accusation_process.id = cur_accusation_id limit 1);
 		IF cur_finish_time IS NULL THEN	
-			INSERT INTO accusation (informer, bishop, accused, violation_place, date_time, description, id_accusation, status) 
+			INSERT INTO accusation_process (informer, bishop, accused, violation_place, date_time, description, id_accusation, status) 
 				VALUES (cur_informer, cur_bishop, cur_accused, cur_violation_place, cur_date_time, cur_description, cur_accusation_id, NULL)
 			RETURNING id INTO new_accusation_record_id;
 			RETURN new_accusation_record_id;
@@ -413,7 +413,7 @@ as $$
 DECLARE
 	cur_finish_time							timestamp;
 BEGIN
-		cur_finish_time = (select finish_time from accusation where accusation.id = cur_accusation_id limit 1);
+		cur_finish_time = (select finish_time from accusation_process where accusation_process.id = cur_accusation_id limit 1);
 		IF cur_finish_time IS NULL THEN	
 			RAISE EXCEPTION 'Процесс сбора доносов еще не окончен';
 		ELSE
@@ -431,4 +431,55 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE PROCEDURE connect_commandment_with_record(cur_commandment_id integer, cur_record_id integer)  
+as $$
+DECLARE
+	cur_finish_time							timestamp;
+BEGIN
+	UPDATE accusation_record SET status = "Правдивый" where id = cur_commandment_id;
+	INSERT INTO violation (record_id, commandment_id) 
+				VALUES (cur_record_id, cur_commandment_id)
+END;
+$$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE PROCEDURE add_record_to_case(cur_record_id integer, cur_accused integer)  
+as $$
+DECLARE
+	cur_case							integer;
+BEGIN
+	cur_case = (select investigative_case.id from investigative_case where 
+					EXISTS(select 1 from accusation-investigative_case
+								join accusation_record on accusation_record.id = record_id
+								where case_id = investigative_case.id and accusation_record.accused = cur_accused) limit 1);
+	IF cur_case IS NULL THEN
+		INSERT INTO investigative_case (creation_date, closed_date) 
+					VALUES (GETDATE(), NULL)
+					RETURNING id INTO cur_case;
+	END IF;
+    INSERT INTO accusation-investigative_case (case_id, record_id) 
+				VALUES (cur_case, cur_record_id); 
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE generate_cases(accusation_process integer)
+as $$
+DECLARE
+	accusation_record_id							RECORD;
+	new_case_id								integer;
+BEGIN
+	FOR accusation_record_id IN
+       SELECT id
+         FROM accusation_record
+        WHERE status is null and id_accusation = accusation_process
+    LOOP
+		UPDATE accusation_record SET status = "Ложный" where id = accusation_record_id.id;
+    END LOOP;
+	FOR accusation_record_id IN
+       SELECT id, accused
+         FROM accusation_record
+        WHERE status = 'Правдивый' and id_accusation = accusation_process
+    LOOP
+		CALL add_record_to_case(accusation_record_id.id, accusation_record_id.accused);
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
