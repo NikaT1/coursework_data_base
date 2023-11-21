@@ -66,7 +66,7 @@ CREATE TABLE inquisition_process(
 	CHECK (finish_data IS NULL OR start_data < finish_data)
 );
 
-CREATE TABLE accusation(
+CREATE TABLE accusation_process(
 	id serial PRIMARY KEY,
 	start_time timestamp NOT NULL,
 	finish_time timestamp,
@@ -124,10 +124,10 @@ CREATE TABLE case_log(
 	CHECK (finish_time IS NULL OR start_time < finish_time)
 );
 
-CREATE TABLE violation(
-	commandment_id integer REFERENCES commandment(id) ON DELETE RESTRICT,
-	case_id integer REFERENCES investigative_case(id) ON DELETE CASCADE,
-	PRIMARY KEY(commandment_id, case_id)
+CREATE TABLE violation (
+	 commandment_id integer REFERENCES commandment(id) ON DELETE RESTRICT,
+	 record_id integer REFERENCES accusation_record(id) ON DELETE CASCADE,
+	 PRIMARY KEY(commandment_id, record_id)
 );
 
 CREATE TABLE torture_type(

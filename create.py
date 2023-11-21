@@ -101,7 +101,7 @@ CREATE TABLE inquisition_process (
 """
 
 create_accusation_table_query = """
-CREATE TABLE accusation(
+CREATE TABLE accusation_process(
 	id serial PRIMARY KEY,
 	start_time timestamp NOT NULL,
 	finish_time timestamp,
@@ -180,8 +180,8 @@ CREATE TABLE case_log (
 create_violation_table_query = """
 CREATE TABLE violation (
  commandment_id integer REFERENCES commandment(id) ON DELETE RESTRICT,
- case_id integer REFERENCES investigative_case(id) ON DELETE CASCADE,
- PRIMARY KEY(commandment_id, case_id)
+ record_id integer REFERENCES accusation_record(id) ON DELETE CASCADE,
+ PRIMARY KEY(commandment_id, record_id)
 );
 """
 
