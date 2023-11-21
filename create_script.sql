@@ -26,7 +26,8 @@ CREATE TABLE bible(
 
 CREATE TABLE commandment(
 	id serial PRIMARY KEY,
-	description text NOT NULL UNIQUE
+	description text NOT NULL UNIQUE,
+	rank integer NOT NULL CHECK (rank > 0 and rank < 6)
 );
 
 CREATE TABLE bible_commandment(

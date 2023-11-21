@@ -48,7 +48,8 @@ CREATE TABLE bible (
 create_commandment_table = """
 CREATE TABLE commandment (
     id serial PRIMARY KEY,
-    description text NOT NULL UNIQUE
+    description text NOT NULL UNIQUE,
+    rank integer NOT NULL CHECK (rank > 0 and rank < 6)
 );
 """
 
