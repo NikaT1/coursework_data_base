@@ -332,12 +332,15 @@ as $$
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION start_inquisition_process(church integer, bible integer)  RETURNS integer   
+CREATE OR REPLACE FUNCTION start_inquisition_process(cur_official integer, cur_church integer, cur_bible integer)  RETURNS integer   
 as $$
     DECLARE
+		cur_locality_id							 integer;
 		new_inquisition_process_id				 integer;
     BEGIN
-			INSERT INTO inquisition_process (start_data, finish_data, church_id, bible_id) VALUES (GETDATE(), NULL, church, bible)
+			cur_locality_id = ( select church.locality_id from church where church.id = cur_church limit 1);
+			UPDATE person SET locality_id = cur_locality_id where id = cur_official_name.person_id;
+			INSERT INTO inquisition_process (start_data, finish_data, official_id, church_id, bible_id) VALUES (GETDATE(), NULL, cur_official, cur_church, cur_bible)
 			RETURNING id INTO new_inquisition_process_id;
 			RETURN new_inquisition_process_id;
 END;
@@ -358,5 +361,6 @@ BEGIN
 	END IF;
 END;
 $$ LANGUAGE plpgsql;
+
 
 
