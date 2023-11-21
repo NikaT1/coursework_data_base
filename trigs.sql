@@ -389,3 +389,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION add_accusation_record(cur_informer integer, cur_bishop integer, cur_accused integer, cur_violation_place varchar(255), cur_date_time timestamp, cur_description text, cur_accusation_id integer)  RETURNS integer   
+as $$
+DECLARE
+	new_accusation_record_id				integer;
+	cur_finish_time							timestamp;
+BEGIN
+		cur_finish_time = (select finish_time from accusation where accusation.id = cur_accusation_id limit 1);
+		IF cur_finish_time IS NULL THEN	
+			INSERT INTO accusation (informer, bishop, accused, violation_place, date_time, description, id_accusation, status) 
+				VALUES (cur_informer, cur_bishop, cur_accused, cur_violation_place, cur_date_time, cur_description, cur_accusation_id, NULL)
+			RETURNING id INTO new_accusation_record_id;
+			RETURN new_accusation_record_id;
+		ELSE
+			RAISE EXCEPTION 'Процесс сбора доносов уже окончен';
+			RETURN NULL;
+		END IF;
+END;
+$$ LANGUAGE plpgsql;
