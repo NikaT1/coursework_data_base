@@ -362,5 +362,30 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION start_accusation(cur_inquisition_process_id integer)  RETURNS integer   
+as $$
+DECLARE
+	new_accusation_id				integer;
+BEGIN
+			INSERT INTO accusation (start_time, finish_time, inquisition_process_id) VALUES (CURRENT_TIMESTAMP, NULL, cur_inquisition_process_id)
+			RETURNING id INTO new_accusation_id;
+			RETURN new_accusation_id;
+END;
+$$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION finish_accusation(cur_accusation_id integer)  RETURNS integer   
+as $$
+DECLARE
+	cur_finish_time					timestamp;
+BEGIN
+	cur_finish_time = (select finish_time from accusation where accusation.id = cur_accusation_id limit 1);
+	IF cur_finish_time IS NULL THEN
+		UPDATE accusation SET finish_time = CURRENT_TIMESTAMP where id = cur_accusation_id;
+		RETURN cur_accusation_id;
+	ELSE
+		RAISE EXCEPTION 'Процесс уже окончен';
+		RETURN NULL;
+	END IF;
+END;
+$$ LANGUAGE plpgsql;
 
