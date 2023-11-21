@@ -101,23 +101,25 @@ CREATE TABLE inquisition_process (
 """
 
 create_accusation_table_query = """
-CREATE TABLE accusation (
- id serial PRIMARY KEY,
- informer integer REFERENCES person(id) ON DELETE RESTRICT,
- bishop integer NOT NULL REFERENCES official(id) ON DELETE RESTRICT,
- inquisition_process_id integer NOT NULL REFERENCES inquisition_process(id) ON DELETE CASCADE
+CREATE TABLE accusation(
+	id serial PRIMARY KEY,
+	start_time timestamp NOT NULL,
+	finish_time timestamp,
+	inquisition_process_id integer NOT NULL REFERENCES inquisition_process(id) ON DELETE CASCADE
 );
 """
 
 create_accusation_record_table_query = """
-CREATE TABLE accusation_record (
- id serial PRIMARY KEY,
- violation_place varchar(255),
- accused integer NOT NULL REFERENCES person(id) ON DELETE RESTRICT,
- date_time timestamp NOT NULL,
- description text,
- id_accusation integer NOT NULL REFERENCES accusation(id) ON DELETE CASCADE, 
- status accusation_status
+CREATE TABLE accusation_record(
+	id serial PRIMARY KEY,
+	informer integer REFERENCES person(id) ON DELETE RESTRICT,
+	bishop integer NOT NULL REFERENCES official(id) ON DELETE RESTRICT,
+	accused integer NOT NULL REFERENCES person(id) ON DELETE RESTRICT,
+	violation_place varchar(255),
+	date_time timestamp NOT NULL,
+	description text,
+	id_accusation integer NOT NULL REFERENCES accusation(id) ON DELETE CASCADE,
+	status accusation_status
 );
 """
 

@@ -68,8 +68,8 @@ CREATE TABLE inquisition_process(
 
 CREATE TABLE accusation(
 	id serial PRIMARY KEY,
-	informer integer REFERENCES person(id) ON DELETE RESTRICT,
-	bishop integer NOT NULL REFERENCES official(id) ON DELETE RESTRICT,
+	start_time timestamp NOT NULL,
+	finish_time timestamp,
 	inquisition_process_id integer NOT NULL REFERENCES inquisition_process(id) ON DELETE CASCADE
 );
 
@@ -77,8 +77,10 @@ CREATE TYPE accusation_status as enum ('Ложный', 'Легкий', 'Тяжк
 
 CREATE TABLE accusation_record(
 	id serial PRIMARY KEY,
-	violation_place varchar(255),
+	informer integer REFERENCES person(id) ON DELETE RESTRICT,
+	bishop integer NOT NULL REFERENCES official(id) ON DELETE RESTRICT,
 	accused integer NOT NULL REFERENCES person(id) ON DELETE RESTRICT,
+	violation_place varchar(255),
 	date_time timestamp NOT NULL,
 	description text,
 	id_accusation integer NOT NULL REFERENCES accusation(id) ON DELETE CASCADE,
