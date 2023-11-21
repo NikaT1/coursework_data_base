@@ -407,3 +407,28 @@ BEGIN
 		END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE get_not_resolved_accusation_record(cur_accusation_id integer)  
+as $$
+DECLARE
+	cur_finish_time							timestamp;
+BEGIN
+		cur_finish_time = (select finish_time from accusation where accusation.id = cur_accusation_id limit 1);
+		IF cur_finish_time IS NULL THEN	
+			RAISE EXCEPTION 'Процесс сбора доносов еще не окончен';
+		ELSE
+			SELECT * FROM accusation_record where id_accusation = cur_accusation_id and status is null;
+		END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE find_in_bible(phrase varchar(250), cur_bible integer)  
+as $$
+DECLARE
+	cur_finish_time							timestamp;
+BEGIN
+		SELECT * FROM commandment where description like "%phrase%" and id in (select commandment_id from bible_commandment where bible_id = cur_bible);
+END;
+$$ LANGUAGE plpgsql;
+
+
