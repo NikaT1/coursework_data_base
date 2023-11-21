@@ -464,15 +464,16 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE PROCEDURE generate_cases(accusation_process integer)
 as $$
 DECLARE
-	accusation_record_id							RECORD;
+	record_id								RECORD;
+	accusation_record_id					RECORD;
 	new_case_id								integer;
 BEGIN
-	FOR accusation_record_id IN
+	FOR record_id IN
        SELECT id
          FROM accusation_record
         WHERE status is null and id_accusation = accusation_process
     LOOP
-		UPDATE accusation_record SET status = "Ложный" where id = accusation_record_id.id;
+		UPDATE accusation_record SET status = "Ложный" where id = record_id.id;
     END LOOP;
 	FOR accusation_record_id IN
        SELECT id, accused
