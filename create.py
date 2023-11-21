@@ -158,7 +158,7 @@ CREATE TYPE case_log_status as enum ('Пыточный процесс', 'Исп�
 """
 
 create_accusation_status_type_query = """
-CREATE TYPE accusation_status as enum ('Ложный', 'Легкий', 'Тяжкий');
+CREATE TYPE accusation_status as enum ('Ложный', 'Правдивый');
 """
 
 create_case_log_table_query = """

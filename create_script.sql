@@ -74,7 +74,7 @@ CREATE TABLE accusation_process(
 	inquisition_process_id integer NOT NULL REFERENCES inquisition_process(id) ON DELETE CASCADE
 );
 
-CREATE TYPE accusation_status as enum ('Ложный', 'Легкий', 'Тяжкий');
+CREATE TYPE accusation_status as enum ('Ложный', 'Правдивый');
 
 CREATE TABLE accusation_record(
 	id serial PRIMARY KEY,
