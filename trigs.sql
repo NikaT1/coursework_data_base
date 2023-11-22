@@ -531,7 +531,28 @@ BEGIN
 	   GROUP BY id, accused
     LOOP
 		assign_punishment(cur_cases.id, 1, "Отправлен на наказание в связи с тяжким грехом") ###### 1 - id для казни???????? сделать глобальные переменные?
+		UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
 	END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE PROCEDURE get_not_resolved_cases(cur_inquisition_process integer)  
+as $$
+DECLARE
+	cur_finish_time							timestamp;
+	cur_accusation_id						integer;
+BEGIN
+		cur_accusation_id = (select id from accusation_process where inquisition_process_id = cur_inquisition_process limit 1);
+		cur_finish_time = (select finish_time from accusation_process where accusation_process.id = cur_accusation_id limit 1);
+		IF cur_finish_time IS NULL THEN	
+			RAISE EXCEPTION 'Процесс сбора доносов еще не окончен';
+		ELSE
+			SELECT *
+			FROM investigative_case
+		    WHERE investigative_case.id not in (select DISTINCT case_id from case_log)
+		    
+		END IF;
 END;
 $$ LANGUAGE plpgsql;
 
