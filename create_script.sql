@@ -42,7 +42,8 @@ CREATE TABLE person(
 	id serial PRIMARY KEY,
 	name varchar(255) NOT NULL,
 	birth_date date NOT NULL,
-	person_gender gender NOT NULL
+	person_gender gender NOT NULL,
+	localiry_id integer NOT NULL
 );
 
 
@@ -84,7 +85,7 @@ CREATE TABLE accusation_record(
 	violation_place varchar(255),
 	date_time timestamp NOT NULL,
 	description text,
-	id_accusation integer NOT NULL REFERENCES accusation(id) ON DELETE CASCADE,
+	id_accusation integer NOT NULL REFERENCES accusation_process(id) ON DELETE CASCADE,
 	status accusation_status
 );
 
