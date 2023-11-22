@@ -285,18 +285,30 @@ as $$
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION finish_case_log_process(cur_case_log_id integer, cur_case_status case_log_status, new_result case_log_result)  RETURNS integer     
+CREATE OR REPLACE FUNCTION finish_case_log_process(cur_case_log_id integer, new_result case_log_result)  RETURNS integer     
 as $$
 DECLARE
 	cur_finish_time					timestamp;
+	cur_case_status					case_log_status;
 BEGIN
+	cur_case_status = (select case_status from case_log where case_log.id = cur_case_log_id; limit 1);
 	IF cur_case_status = "Наказание" THEN
 		RAISE EXCEPTION 'Нельзя завершить наказание';
 		RETURN NULL;
 	END IF;
-	cur_finish_time = (select finish_time from case_log where case_log.id = cur_case_log_id and case_log_status = cur_case_status; limit 1);
+	cur_finish_time = (select finish_time from case_log where case_log.id = cur_case_log_id; limit 1);
 	IF cur_finish_time IS NULL THEN
 		UPDATE case_log SET result = new_result, finish_time = CURRENT_TIMESTAMP where id = cur_case_log_id;
+		IF cur_case_status = "Исправительная беседа" and new_result = 'Признание вины' THEN
+			assign_punishment(cur_cases.id, 2, "Назначена епетимья в связи с раскаянием") ###### 2 - id для епетимьи???????? сделать глобальные переменные?
+			UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
+		ELIF cur_case_status = "Пыточный процесс" and new_result = 'Признание вины' THEN
+			assign_punishment(cur_cases.id, 3, "Назначено аутодафе в связи с раскаянием") ###### 3 - id для аутодафе???????? сделать глобальные переменные?
+			UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
+		ELIF cur_case_status = "Пыточный процесс" and new_result = 'Отрицание вины' THEN
+			assign_punishment(cur_cases.id, 1, "Назначена казнь в связи с непризнаванием вины") ###### 1 - id для казни???????? сделать глобальные переменные?
+			UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
+		END IF;
 		RETURN cur_case_log_id;
 	ELSE
 		RAISE EXCEPTION 'Процесс уже окончен';
@@ -550,7 +562,7 @@ BEGIN
 		ELSE
 			SELECT *
 			FROM investigative_case
-		    WHERE investigative_case.id not in (select DISTINCT case_id from case_log)
+		    WHERE investigative_case.id where investigative_case.closed_date is NULL;
 		    
 		END IF;
 END;
