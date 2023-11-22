@@ -95,7 +95,7 @@ CREATE OR REPLACE FUNCTION check_data_for_case_log() RETURNS trigger AS $$
 			END IF;
 			RETURN NEW;
         END IF;
-		IF NEW.case_status = 'Наказание' and step = 2 THEN
+		IF NEW.case_status = 'Наказание' and (step = 2 or step = 0) THEN
 			IF  principal != 'Светсткая власть' THEN
             	RAISE EXCEPTION 'для наказания principal должен быть светской властью';
 				RETURN NULL;
@@ -498,15 +498,40 @@ BEGIN
          FROM investigative_case
 		 JOIN accusation_investigative_case on accusation_investigative_case.case_id = investigative_case.id
 		 JOIN accusation_record on accusation_investigative_case.record_id = accusation_record.id
-       WHERE id_accusation = cur_accusation_id and accusation_record.accused = accusation_record.informer;
+       WHERE id_accusation = cur_accusation_id and accusation_record.accused = accusation_record.informer
+	   GROUP BY id, accused
     LOOP
 		cur_case_count = (select count(*) from FROM investigative_case
 							 JOIN accusation_investigative_case on accusation_investigative_case.case_id = investigative_case.id
 							 JOIN accusation_record on accusation_investigative_case.record_id = accusation_record.id
 							 WHERE accusation_record.accused = cur_cases.accused);
-		IF cur_case_count > 1 THEN
+		IF cur_case_count < 2 THEN
 			UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
 		END IF;
+	END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE handle_cases_with_grave_sin (cur_inquisition_process integer)
+as $$
+DECLARE
+	cur_cases								RECORD;
+	cur_accusation_id						integer;
+	cur_case_count							integer;
+BEGIN
+	cur_accusation_id = (select id from accusation_process where inquisition_process_id = cur_inquisition_process limit 1);
+	FOR cur_cases IN
+       SELECT investigative_case.id as id, accusation_record.accused as accused
+         FROM investigative_case
+		 JOIN accusation_investigative_case on accusation_investigative_case.case_id = investigative_case.id
+		 JOIN accusation_record on accusation_investigative_case.record_id = accusation_record.id
+		 JOIN violation on violation.record_id=accusation_record.id
+		 JOIN commandment on commandment.id = violation.commandment_id
+       WHERE id_accusation = cur_accusation_id and commandment.rank > 3
+	   GROUP BY id, accused
+    LOOP
+		assign_punishment(cur_cases.id, 1, "Отправлен на наказание в связи с тяжким грехом") ###### 1 - id для казни???????? сделать глобальные переменные?
+	END LOOP;
 END;
 $$ LANGUAGE plpgsql;
 
