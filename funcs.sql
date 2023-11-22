@@ -42,7 +42,8 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION start_accusation(cur_inquisition_process_id integer)  RETURNS integer   
+
+CREATE OR REPLACE FUNCTION start_accusation_process(cur_inquisition_process_id integer)  RETURNS integer   
 as $$
 DECLARE
 	new_accusation_id				integer;
@@ -53,7 +54,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION finish_accusation(cur_accusation_id integer)  RETURNS integer   
+CREATE OR REPLACE FUNCTION finish_accusation_process(cur_accusation_id integer)  RETURNS integer   
 as $$
 DECLARE
 	cur_finish_time					timestamp;
@@ -68,6 +69,10 @@ BEGIN
 	END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+
+
+
 
 CREATE OR REPLACE FUNCTION add_accusation_record(cur_informer integer, cur_bishop integer, cur_accused integer, cur_violation_place varchar(255), cur_date_time timestamp, cur_description text, cur_accusation_id integer)  RETURNS integer   
 as $$
@@ -87,6 +92,10 @@ BEGIN
 		END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+
+
+
 
 CREATE OR REPLACE PROCEDURE get_not_resolved_accusation_record(cur_accusation_id integer)  
 as $$
@@ -121,6 +130,10 @@ BEGIN
 				VALUES (cur_record_id, cur_commandment_id)
 END;
 $$ LANGUAGE plpgsql;
+
+
+
+
 
 CREATE OR REPLACE PROCEDURE add_record_to_case(cur_record_id integer, cur_accused integer)  
 as $$
@@ -165,6 +178,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+
+
+
+
 CREATE OR REPLACE PROCEDURE handle_simple_cases(cur_inquisition_process integer)
 as $$
 DECLARE
@@ -178,7 +196,7 @@ BEGIN
          FROM investigative_case
 		 JOIN accusation_investigative_case on accusation_investigative_case.case_id = investigative_case.id
 		 JOIN accusation_record on accusation_investigative_case.record_id = accusation_record.id
-       WHERE id_accusation = cur_accusation_id and accusation_record.accused = accusation_record.informer
+       WHERE id_accusation = cur_accusation_id and accusation_record.accused = accusation_record.informer  ### может грех еще должен быть легким?
 	   GROUP BY id, accused
     LOOP
 		cur_case_count = (select count(*) from FROM investigative_case
@@ -217,6 +235,10 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+
+
+
+
 CREATE OR REPLACE PROCEDURE get_not_resolved_cases(cur_inquisition_process integer)  
 as $$
 DECLARE
@@ -237,6 +259,7 @@ BEGIN
 		END IF;
 END;
 $$ LANGUAGE plpgsql;
+
 
 
 
@@ -278,7 +301,6 @@ CREATE OR REPLACE FUNCTION get_best_principal(cur_locality_id integer, cur_offic
 		RETURN principal;
 END;
 $$ LANGUAGE plpgsql;
-		
 
 CREATE OR REPLACE FUNCTION get_best_prison(cur_locality_id integer) RETURNS integer AS $$
 	DECLARE
@@ -303,6 +325,10 @@ CREATE OR REPLACE FUNCTION get_best_prison(cur_locality_id integer) RETURNS inte
 		RETURN cur_prison_id;
 END;
 $$ LANGUAGE plpgsql;
+
+
+
+
 
 CREATE OR REPLACE FUNCTION start_discussion(cur_case_id integer, discription text)  RETURNS integer   
 as $$
@@ -358,6 +384,45 @@ as $$
 END;
 $$ LANGUAGE plpgsql;
 
+
+
+
+CREATE OR REPLACE FUNCTION make_torture_step(cur_case_id integer, step integer)  RETURNS integer   
+as $$
+    DECLARE
+		principal					 integer;
+		locality_id					 integer;
+		cur_case_log_id				 integer;
+		cur_victim					 integer;
+    BEGIN
+		locality_id = ( select church.locality_id from church 
+							join inquisition_process on church_id = church.id
+							join accusation_process on accusation_process.inquisition_process_id = inquisition_process.id
+							join accusation_record on id_accusation = accusation_process.id 
+							where accusation_record.id in (
+								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
+		IF locality_id IS NULL THEN
+			RAISE EXCEPTION '¬веденное дело не найдено';
+			RETURN NULL;
+		ELSE
+			principal = get_best_principal(locality_id, "‘искал"); 
+			cur_victim = ( select accused from accusation_process
+							join accusation_record on id_accusation = accusation_process.id 
+							where accusation_record.id in (
+								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
+			cur_case_log_id = ( select case_log.id from case_log where case_id = cur_case_id and case_status = "ѕыточный процесс" );
+
+			INSERT INTO torture_log (case_log_id, type_id, executor, victim) 
+				VALUES (cur_case_log_id, step, principal, cur_victim)
+			RETURNING id INTO new_torture_log_id;
+			RETURN new_torture_log_id;
+		END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+
 CREATE OR REPLACE FUNCTION finish_case_log_process(cur_case_log_id integer, new_result case_log_result)  RETURNS integer     
 as $$
 DECLARE
@@ -389,6 +454,11 @@ BEGIN
 	END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+
+
+
+
 
 CREATE OR REPLACE FUNCTION assign_punishment(cur_case_id integer, punishment_id integer, discription text)  RETURNS integer   
 as $$
