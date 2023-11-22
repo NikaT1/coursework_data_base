@@ -69,8 +69,10 @@ create_person_table = """
 CREATE TABLE person (
     id serial PRIMARY KEY,
     name varchar(255) NOT NULL,
+    surname varchar(255) NOT NULL,
     birth_date date NOT NULL,
-    person_gender gender NOT NULL
+    person_gender gender NOT NULL,
+    locality_id integer REFERENCES locality(id) ON DELETE RESTRICT
 );
 """
 

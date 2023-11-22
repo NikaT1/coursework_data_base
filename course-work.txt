@@ -1,0 +1,173 @@
+Table "person" {
+  "id" serial [pk]
+  "name" varchar(255) [not null]
+  "age" integer [not null]
+  "gender" char(1) [not null]
+}
+
+Table "official" {
+  "id" serial [pk]
+  "person_id" integer [not null]
+  "name" varchar(255) [not null]
+  "employment date" date [not null]
+  "fired date" date
+}
+
+Ref:"person"."id" < "official"."person_id"
+
+Table "locality" {
+  "id" serial [pk]
+  "name" varchar(255) [not null]
+  "foundation date" date
+}
+
+Table "church" {
+  "id" serial [pk]
+  "name" varchar(255) [not null]
+  "foundation_date" date
+  "locality_id" integer [not null]
+}
+
+Ref:"church"."locality_id" > "locality"."id"
+
+Table "prison" {
+  "id" serial [pk]
+  "name" varchar(255) [not null]
+  "church_id" integer [not null]
+}
+
+Ref:"prison"."church_id" - "church"."id"
+
+Table "bible" {
+  "id" serial [pk]
+  "publication_date" date [not null]
+  "version" integer [not null]
+}
+
+Table "commandment" {
+  "id" serial [pk]
+  "bible_id" integer [not null]
+  "description" text
+}
+
+Ref:"bible"."id" < "commandment"."bible_id"
+
+Table "inquisition_process" {
+  "id" serial [pk]
+  "start" date [not null]
+  "finish" date
+  "bible_id" integer
+  "church_id" integer [not null]
+  "official_id" integer [not null]
+}
+
+Ref:"inquisition_process"."official_id" - "official"."id"
+Ref:"inquisition_process"."church_id" - "church"."id"
+Ref:"inquisition_process"."bible_id" - "bible"."id"
+
+Table "accusation" {
+  "id" serial [pk]
+  "informer" integer [not null]
+  "bishop" integer [not null]
+  "inquisition_process_id" integer [not null]
+  "place" varchar(255)
+  "accused" varchar(255)
+  "date_time" timestamp
+  "description" text
+}
+
+Ref:"accusation"."bishop" > "official"."id"
+Ref:"accusation"."accused" > "person"."id"
+Ref:"accusation"."informer" > "person"."id"
+Ref:"accusation"."inquisition_process_id" > "inquisition_process"."id"
+
+Table "witness" {
+  "person_id" integer [not null]
+  "accusation_id" integer [not null]
+}
+
+Ref:"witness"."person_id" > "person"."id"
+Ref:"witness"."accusation_id" > "accusation"."id"
+
+Table "investigative_case" {
+  "id" serial [pk]
+  "accusation_id" integer [not null]
+  "creation_date" date [not null]
+  "closed_date" date
+}
+
+Ref:"investigative_case"."accusation_id" - "accusation"."id"
+
+Table "case_log" {
+  "id" serial [pk]
+  "case_id" integer [not null]
+  "accused_status" enum [not null]
+  "case_status" enum [not null]
+  "principal" integer [not null]
+  "time" timestamp [not null]
+}
+
+Ref:"case_log"."case_id" > "investigative_case"."id"
+
+Table "violation" {
+  "commandment_id" integer [not null]
+  "case_id" integer [not null]
+}
+
+Ref:"violation"."commandment_id" > "commandment"."id"
+Ref:"investigative_case"."id" < "violation"."case_id"
+
+Table "discussion" {
+  "id" serial [pk]
+  "case_log_id" integer [not null]
+  "official_id" integer [not null]
+  "description" text
+  "result" enum
+  "date" date [not null]
+}
+
+Ref:"discussion"."case_log_id" > "case_log"."id"
+Ref:"discussion"."official_id" > "official"."id"
+
+Table "punishment" {
+  "id" serial [pk]
+  "category" enum [not null]
+  "status" enum [not null]
+  "execution_date" date [not null]
+  "responsible" integer [not null]
+  "case_log_id" integer [not null]
+  "prison_id" integer [not null]
+}
+
+Ref:"punishment"."responsible" > "official"."id"
+Ref:"punishment"."case_log_id" > "case_log"."id"
+Ref:"punishment"."prison_id" > "prison"."id"
+
+Table "torture" {
+  "id" serial [pk]
+  "responsible" integer [not null]
+  "case_log_id" integer [not null]
+  "execution_date" date [not null]
+  "result" enum
+}
+
+Ref:"torture"."responsible" > "official"."id"
+Ref:"torture"."case_log_id" > "case_log"."id"
+
+Table "torture_type" {
+  "id" serial [pk]
+  "name" integer [not null]
+  "description" text
+}
+
+Table "torture_log" {
+  "type_id" integer [pk]
+  "torture_id" integer [pk]
+  "executor" integer [not null]
+  "victim" integer [not null]
+}
+
+Ref:"torture_log"."type_id" > "torture_type"."id"
+Ref:"torture_log"."torture_id" > "torture"."id"
+Ref:"torture_log"."executor" > "official"."id"
+Ref:"torture_log"."victim" > "person"."id"
