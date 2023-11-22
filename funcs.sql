@@ -4,9 +4,11 @@ as $$
     DECLARE
 		cur_locality_id							 integer;
 		new_inquisition_process_id				 integer;
+		cur_person_id							 integer;
     BEGIN
 			cur_locality_id = ( select church.locality_id from church where church.id = cur_church limit 1);
-			UPDATE person SET locality_id = cur_locality_id where id = cur_official_name.person_id;
+			cur_person_id = (select person_id from official where id = cur_official);
+			UPDATE person SET locality_id = cur_locality_id where id = cur_person_id;
 			INSERT INTO inquisition_process (start_data, finish_data, official_id, church_id, bible_id) VALUES (GETDATE(), NULL, cur_official, cur_church, cur_bible)
 			RETURNING id INTO new_inquisition_process_id;
 			RETURN new_inquisition_process_id;
@@ -30,11 +32,11 @@ BEGIN
 	IF cur_finish_date IS NULL and case_count = 0 THEN
 		UPDATE inquisition_process SET finish_data = GETDATE() where id = inquisition_process_id;
 		RETURN cur_case_log_id;
-	ELIF case_count = 0 THEN
-		RAISE EXCEPTION 'Не все дела закрыты';
+	ELSIF case_count = 0 THEN
+		RAISE EXCEPTION 'РќРµ РІСЃРµ РґРµР»Р° Р·Р°РєСЂС‹С‚С‹';
 		RETURN NULL;
 	ELSE
-		RAISE EXCEPTION 'Процесс уже окончен';
+		RAISE EXCEPTION 'РџСЂРѕС†РµСЃСЃ СѓР¶Рµ РѕРєРѕРЅС‡РµРЅ';
 		RETURN NULL;
 	END IF;
 END;
@@ -64,7 +66,7 @@ BEGIN
 		UPDATE accusation_process SET finish_time = CURRENT_TIMESTAMP where id = cur_accusation_id;
 		RETURN cur_accusation_id;
 	ELSE
-		RAISE EXCEPTION 'Процесс уже окончен';
+		RAISE EXCEPTION 'РџСЂРѕС†РµСЃСЃ СѓР¶Рµ РѕРєРѕРЅС‡РµРЅ';
 		RETURN NULL;
 	END IF;
 END;
@@ -87,7 +89,7 @@ BEGIN
 			RETURNING id INTO new_accusation_record_id;
 			RETURN new_accusation_record_id;
 		ELSE
-			RAISE EXCEPTION 'Процесс сбора доносов уже окончен';
+			RAISE EXCEPTION 'РџСЂРѕС†РµСЃСЃ СЃР±РѕСЂР° РґРѕРЅРѕСЃРѕРІ СѓР¶Рµ РѕРєРѕРЅС‡РµРЅ';
 			RETURN NULL;
 		END IF;
 END;
@@ -104,7 +106,7 @@ DECLARE
 BEGIN
 		cur_finish_time = (select finish_time from accusation_process where accusation_process.id = cur_accusation_id limit 1);
 		IF cur_finish_time IS NULL THEN	
-			RAISE EXCEPTION 'Процесс сбора доносов еще не окончен';
+			RAISE EXCEPTION 'РџСЂРѕС†РµСЃСЃ СЃР±РѕСЂР° РґРѕРЅРѕСЃРѕРІ РµС‰Рµ РЅРµ РѕРєРѕРЅС‡РµРЅ';
 		ELSE
 			SELECT * FROM accusation_record where id_accusation = cur_accusation_id and status is null;
 		END IF;
@@ -125,9 +127,9 @@ as $$
 DECLARE
 	cur_finish_time							timestamp;
 BEGIN
-	UPDATE accusation_record SET status = "Правдивый" where id = cur_commandment_id;
+	UPDATE accusation_record SET status = "РџСЂР°РІРґРёРІС‹Р№" where id = cur_commandment_id;
 	INSERT INTO violation (record_id, commandment_id) 
-				VALUES (cur_record_id, cur_commandment_id)
+				VALUES (cur_record_id, cur_commandment_id);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -141,7 +143,7 @@ DECLARE
 	cur_case							integer;
 BEGIN
 	cur_case = (select investigative_case.id from investigative_case where 
-					EXISTS(select 1 from accusation-investigative_case
+					EXISTS(select 1 from accusation_investigative_case
 								join accusation_record on accusation_record.id = record_id
 								where case_id = investigative_case.id and accusation_record.accused = cur_accused) limit 1);
 	IF cur_case IS NULL THEN
@@ -149,7 +151,7 @@ BEGIN
 					VALUES (GETDATE(), NULL)
 					RETURNING id INTO cur_case;
 	END IF;
-    INSERT INTO accusation-investigative_case (case_id, record_id) 
+    INSERT INTO accusation_investigative_case (case_id, record_id) 
 				VALUES (cur_case, cur_record_id); 
 END;
 $$ LANGUAGE plpgsql;
@@ -166,12 +168,12 @@ BEGIN
          FROM accusation_record
         WHERE status is null and id_accusation = accusation_process
     LOOP
-		UPDATE accusation_record SET status = "Ложный" where id = record_id.id;
+		UPDATE accusation_record SET status = "Р›РѕР¶РЅС‹Р№" where id = record_id.id;
     END LOOP;
 	FOR accusation_record_id IN
        SELECT id, accused
          FROM accusation_record
-        WHERE status = 'Правдивый' and id_accusation = accusation_process
+        WHERE status = 'РџСЂР°РІРґРёРІС‹Р№' and id_accusation = accusation_process
     LOOP
 		CALL add_record_to_case(accusation_record_id.id, accusation_record_id.accused);
     END LOOP;
@@ -196,10 +198,10 @@ BEGIN
          FROM investigative_case
 		 JOIN accusation_investigative_case on accusation_investigative_case.case_id = investigative_case.id
 		 JOIN accusation_record on accusation_investigative_case.record_id = accusation_record.id
-       WHERE id_accusation = cur_accusation_id and accusation_record.accused = accusation_record.informer  ### может грех еще должен быть легким?
+       WHERE id_accusation = cur_accusation_id and accusation_record.accused = accusation_record.informer  
 	   GROUP BY id, accused
     LOOP
-		cur_case_count = (select count(*) from FROM investigative_case
+		cur_case_count = (select count(*) from investigative_case
 							 JOIN accusation_investigative_case on accusation_investigative_case.case_id = investigative_case.id
 							 JOIN accusation_record on accusation_investigative_case.record_id = accusation_record.id
 							 WHERE accusation_record.accused = cur_cases.accused);
@@ -228,7 +230,7 @@ BEGIN
        WHERE id_accusation = cur_accusation_id and commandment.rank > 3
 	   GROUP BY id, accused
     LOOP
-		assign_punishment(cur_cases.id, 1, "Отправлен на наказание в связи с тяжким грехом") ###### 1 - id для казни???????? сделать глобальные переменные?
+		SELECT assign_punishment(cur_cases.id, 1, 'РћС‚РїСЂР°РІР»РµРЅ РЅР° РЅР°РєР°Р·Р°РЅРёРµ РІ СЃРІСЏР·Рё СЃ С‚СЏР¶РєРёРј РіСЂРµС…РѕРј');
 		UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
 	END LOOP;
 END;
@@ -248,7 +250,7 @@ BEGIN
 		cur_accusation_id = (select id from accusation_process where inquisition_process_id = cur_inquisition_process limit 1);
 		cur_finish_time = (select finish_time from accusation_process where accusation_process.id = cur_accusation_id limit 1);
 		IF cur_finish_time IS NULL THEN	
-			RAISE EXCEPTION 'Процесс сбора доносов еще не окончен';
+			RAISE EXCEPTION 'РџСЂРѕС†РµСЃСЃ СЃР±РѕСЂР° РґРѕРЅРѕСЃРѕРІ РµС‰Рµ РЅРµ РѕРєРѕРЅС‡РµРЅ';
 		ELSE
 			SELECT *
 			FROM investigative_case
@@ -344,13 +346,13 @@ as $$
 							where accusation_record.id in (
 								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
 		IF locality_id IS NULL THEN
-			RAISE EXCEPTION 'введенное дело не найдено';
+			RAISE EXCEPTION 'РІРІРµРґРµРЅРЅРѕРµ РґРµР»Рѕ РЅРµ РЅР°Р№РґРµРЅРѕ';
 			RETURN NULL;
 		ELSE
-			principal = get_best_principal(locality_id, 'Епископ'); 
+			principal = get_best_principal(locality_id, 'Р•РїРёСЃРєРѕРї'); 
 		
 			INSERT INTO case_log (case_id, case_status, principal, start_time, result, prison_id, finish_time, 
-			punishment_id, description) VALUES (cur_case_id, 'Исправительная беседа', principal, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, description)
+			punishment_id, description) VALUES (cur_case_id, 'РСЃРїСЂР°РІРёС‚РµР»СЊРЅР°СЏ Р±РµСЃРµРґР°', principal, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, description)
 			RETURNING id INTO new_case_log_id;
 			RETURN new_case_log_id;
 		END IF;
@@ -371,13 +373,13 @@ as $$
 							where accusation_record.id in (
 								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
 		IF locality_id IS NULL THEN
-			RAISE EXCEPTION 'введенное дело не найдено';
+			RAISE EXCEPTION 'РІРІРµРґРµРЅРЅРѕРµ РґРµР»Рѕ РЅРµ РЅР°Р№РґРµРЅРѕ';
 			RETURN NULL;
 		ELSE
-			principal = get_best_principal(locality_id, 'Инквизитор'); 
+			principal = get_best_principal(locality_id, 'РРЅРєРІРёР·РёС‚РѕСЂ'); 
 		
 			INSERT INTO case_log (case_id, case_status, principal, start_time, result, prison_id, finish_time, 
-			punishment_id, description) VALUES (cur_case_id, 'Пыточный процесс', principal, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, description)
+			punishment_id, description) VALUES (cur_case_id, 'РџС‹С‚РѕС‡РЅС‹Р№ РїСЂРѕС†РµСЃСЃ', principal, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, description)
 			RETURNING id INTO new_case_log_id;
 			RETURN new_case_log_id;
 		END IF;
@@ -394,6 +396,8 @@ as $$
 		locality_id					 integer;
 		cur_case_log_id				 integer;
 		cur_victim					 integer;
+		new_torture_log_id				 integer;
+
     BEGIN
 		locality_id = ( select church.locality_id from church 
 							join inquisition_process on church_id = church.id
@@ -402,19 +406,20 @@ as $$
 							where accusation_record.id in (
 								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
 		IF locality_id IS NULL THEN
-			RAISE EXCEPTION 'Введенное дело не найдено';
+			RAISE EXCEPTION 'Р’РІРµРґРµРЅРЅРѕРµ РґРµР»Рѕ РЅРµ РЅР°Р№РґРµРЅРѕ';
 			RETURN NULL;
 		ELSE
-			principal = get_best_principal(locality_id, "Фискал"); 
+			principal = get_best_principal(locality_id, "Р¤РёСЃРєР°Р»"); 
 			cur_victim = ( select accused from accusation_process
 							join accusation_record on id_accusation = accusation_process.id 
 							where accusation_record.id in (
 								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
-			cur_case_log_id = ( select case_log.id from case_log where case_id = cur_case_id and case_status = "Пыточный процесс" );
+			cur_case_log_id = ( select case_log.id from case_log where case_id = cur_case_id and case_status = "РџС‹С‚РѕС‡РЅС‹Р№ РїСЂРѕС†РµСЃСЃ" );
 
 			INSERT INTO torture_log (case_log_id, type_id, executor, victim) 
 				VALUES (cur_case_log_id, step, principal, cur_victim)
 			RETURNING id INTO new_torture_log_id;
+
 			RETURN new_torture_log_id;
 		END IF;
 END;
@@ -429,27 +434,27 @@ DECLARE
 	cur_finish_time					timestamp;
 	cur_case_status					case_log_status;
 BEGIN
-	cur_case_status = (select case_status from case_log where case_log.id = cur_case_log_id; limit 1);
-	IF cur_case_status = "Наказание" THEN
-		RAISE EXCEPTION 'Нельзя завершить наказание';
+	cur_case_status = (select case_status from case_log where case_log.id = cur_case_log_id limit 1);
+	IF cur_case_status = "РќР°РєР°Р·Р°РЅРёРµ" THEN
+		RAISE EXCEPTION 'РќРµР»СЊР·СЏ Р·Р°РІРµСЂС€РёС‚СЊ РЅР°РєР°Р·Р°РЅРёРµ';
 		RETURN NULL;
 	END IF;
-	cur_finish_time = (select finish_time from case_log where case_log.id = cur_case_log_id; limit 1);
+	cur_finish_time = (select finish_time from case_log where case_log.id = cur_case_log_id limit 1);
 	IF cur_finish_time IS NULL THEN
 		UPDATE case_log SET result = new_result, finish_time = CURRENT_TIMESTAMP where id = cur_case_log_id;
-		IF cur_case_status = "Исправительная беседа" and new_result = 'Признание вины' THEN
-			assign_punishment(cur_cases.id, 2, "Назначена епетимья в связи с раскаянием") ###### 2 - id для епетимьи???????? сделать глобальные переменные?
+		IF cur_case_status = "РСЃРїСЂР°РІРёС‚РµР»СЊРЅР°СЏ Р±РµСЃРµРґР°" and new_result = 'РџСЂРёР·РЅР°РЅРёРµ РІРёРЅС‹' THEN
+			SELECT assign_punishment(cur_cases.id, 2, 'РќР°Р·РЅР°С‡РµРЅР° РµРїРµС‚РёРјСЊСЏ РІ СЃРІСЏР·Рё СЃ СЂР°СЃРєР°СЏРЅРёРµРј');
 			UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
-		ELIF cur_case_status = "Пыточный процесс" and new_result = 'Признание вины' THEN
-			assign_punishment(cur_cases.id, 3, "Назначено аутодафе в связи с раскаянием") ###### 3 - id для аутодафе???????? сделать глобальные переменные?
+		ELSIF cur_case_status = "РџС‹С‚РѕС‡РЅС‹Р№ РїСЂРѕС†РµСЃСЃ" and new_result = 'РџСЂРёР·РЅР°РЅРёРµ РІРёРЅС‹' THEN
+			SELECT assign_punishment(cur_cases.id, 3, 'РќР°Р·РЅР°С‡РµРЅРѕ Р°СѓС‚РѕРґР°С„Рµ РІ СЃРІСЏР·Рё СЃ СЂР°СЃРєР°СЏРЅРёРµРј'); 
 			UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
-		ELIF cur_case_status = "Пыточный процесс" and new_result = 'Отрицание вины' THEN
-			assign_punishment(cur_cases.id, 1, "Назначена казнь в связи с непризнаванием вины") ###### 1 - id для казни???????? сделать глобальные переменные?
+		ELSIF cur_case_status = "РџС‹С‚РѕС‡РЅС‹Р№ РїСЂРѕС†РµСЃСЃ" and new_result = 'РћС‚СЂРёС†Р°РЅРёРµ РІРёРЅС‹' THEN
+			SELECT assign_punishment(cur_cases.id, 1, 'РќР°Р·РЅР°С‡РµРЅР° РєР°Р·РЅСЊ РІ СЃРІСЏР·Рё СЃ РЅРµРїСЂРёР·РЅР°РІР°РЅРёРµРј РІРёРЅС‹');
 			UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
 		END IF;
 		RETURN cur_case_log_id;
 	ELSE
-		RAISE EXCEPTION 'Процесс уже окончен';
+		RAISE EXCEPTION 'РџСЂРѕС†РµСЃСЃ СѓР¶Рµ РѕРєРѕРЅС‡РµРЅ';
 		RETURN NULL;
 	END IF;
 END;
@@ -474,18 +479,16 @@ as $$
 							where accusation_record.id in (
 								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
 		IF locality_id IS NULL THEN
-			RAISE EXCEPTION 'Введенное дело не найдено';
+			RAISE EXCEPTION 'Р’РІРµРґРµРЅРЅРѕРµ РґРµР»Рѕ РЅРµ РЅР°Р№РґРµРЅРѕ';
 			RETURN NULL;
 		ELSE
 			prison = get_best_prison(locality_id); 
 		
 			INSERT INTO case_log (case_id, case_status, principal, start_time, result, prison_id, finish_time, 
-			punishment_id, description) VALUES (cur_case_id, 'Наказание', principal, CURRENT_TIMESTAMP, NULL, prison, NULL, punishment_id, description)
+			punishment_id, description) VALUES (cur_case_id, 'РќР°РєР°Р·Р°РЅРёРµ', principal, CURRENT_TIMESTAMP, NULL, prison, NULL, punishment_id, description)
 			RETURNING id INTO new_case_log_id;
 			RETURN new_case_log_id;
 		END IF;
 END;
 $$ LANGUAGE plpgsql;
-
-
 
