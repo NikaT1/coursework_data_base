@@ -484,3 +484,32 @@ BEGIN
     END LOOP;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE handle_simple_cases(cur_inquisition_process integer)
+as $$
+DECLARE
+	cur_cases								RECORD;
+	cur_accusation_id						integer;
+	cur_case_count							integer;
+BEGIN
+	cur_accusation_id = (select id from accusation_process where inquisition_process_id = cur_inquisition_process limit 1);
+	FOR cur_cases IN
+       SELECT investigative_case.id as id, accusation_record.accused as accused
+         FROM investigative_case
+		 JOIN accusation_investigative_case on accusation_investigative_case.case_id = investigative_case.id
+		 JOIN accusation_record on accusation_investigative_case.record_id = accusation_record.id
+       WHERE id_accusation = cur_accusation_id and accusation_record.accused = accusation_record.informer;
+    LOOP
+		cur_case_count = (select count(*) from FROM investigative_case
+							 JOIN accusation_investigative_case on accusation_investigative_case.case_id = investigative_case.id
+							 JOIN accusation_record on accusation_investigative_case.record_id = accusation_record.id
+							 WHERE accusation_record.accused = cur_cases.accused);
+		IF cur_case_count > 1 THEN
+			UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
+		END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+
