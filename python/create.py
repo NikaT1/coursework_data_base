@@ -1,4 +1,5 @@
 import psycopg2
+
 DATABASE = "studs"
 HOST = "pg"
 PORT = "5432"
@@ -112,6 +113,10 @@ CREATE TABLE accusation_process(
 );
 """
 
+create_accusation_status_type_query = """
+CREATE TYPE accusation_status as enum ('Ложный', 'Правдивый');
+"""
+
 create_accusation_record_table_query = """
 CREATE TABLE accusation_record(
 	id serial PRIMARY KEY,
@@ -122,7 +127,7 @@ CREATE TABLE accusation_record(
 	date_time timestamp NOT NULL,
 	description text,
 	id_accusation integer NOT NULL REFERENCES accusation_process(id) ON DELETE CASCADE,
-	status accusation_status
+	status accusation_status DEFAULT NULL
 );
 """
 
@@ -157,10 +162,6 @@ CREATE TYPE case_log_result as enum ('Признание вины', 'Отриц�
 
 create_case_log_status_type_query = """
 CREATE TYPE case_log_status as enum ('Пыточный процесс', 'Исправительная беседа', 'Наказание');
-"""
-
-create_accusation_status_type_query = """
-CREATE TYPE accusation_status as enum ('Ложный', 'Правдивый');
 """
 
 create_case_log_table_query = """

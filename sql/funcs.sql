@@ -74,7 +74,7 @@ $$ LANGUAGE plpgsql;
 
 
 
--- fixme заменить insert на эту функцию
+-- FIXME fixme заменить insert на эту функцию
 
 CREATE OR REPLACE FUNCTION add_accusation_record(cur_informer integer, cur_bishop integer, cur_accused integer, cur_violation_place varchar(255), cur_date_time timestamp, cur_description text, cur_accusation_id integer)  RETURNS integer   
 as $$

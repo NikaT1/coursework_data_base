@@ -1,8 +1,8 @@
 # import psycopg2
 import random
 from datetime import timedelta, datetime, date
-from python.person_data import russian_male_names, russian_female_names, russian_male_surnames, russian_female_surnames
-from python.commandment_data import commandments
+from person_data import russian_male_names, russian_female_names, russian_male_surnames, russian_female_surnames
+from commandment_data import commandments
 import csv
 
 from datetime import datetime, timedelta
@@ -77,9 +77,9 @@ def insert_bible(version, publication_date, name):
     cursor.execute(query, data)
     connection.commit()
 
-def insert_commandment(description):
-    query = "INSERT INTO commandment (description) VALUES (%s);"
-    data = (description,)
+def insert_commandment(description, rank):
+    query = "INSERT INTO commandment (description, rank) VALUES (%s, %s);"
+    data = (description, rank)
     cursor.execute(query, data)
     connection.commit()
 
@@ -385,18 +385,19 @@ save_to_file('backup/bibles.csv', ['version', 'publication_date', 'name'], bible
 #FIXME: add rank
 # for commandment in commandments:
 #     insert_commandment(commandment)
-save_to_file('backup/commandments.csv', ['description'], commandments)
+commandments_to_save = [(commandments[i], i // 125 + 1) for i in range(len(commandments))]
+save_to_file('backup/commandments.csv', ['description', 'rank'], commandments_to_save)
 
 #TODO
-first_bible_commandments = [(1, comm) for comm in commandments[::5]]
+first_bible_commandments = [(1, comm_id) for comm_id in range(1, len(commandments) + 1, 5)]
 # for bible_commandment in first_bible_commandments:
 #     insert_bible_commandment(*bible_commandment)
 
-second_bible_commandments = [(2, comm) for comm in commandments[::3]]
+second_bible_commandments = [(2, comm_id) for comm_id in range(1, len(commandments) + 1, 3)]
 # for bible_commandment in second_bible_commandments:
 #     insert_bible_commandment(*bible_commandment)
     
-third_bible_commandments = [(3, comm) for comm in commandments]
+third_bible_commandments = [(3, comm_id) for comm_id in range(1, len(commandments) + 1)]
 # for bible_commandment in third_bible_commandments:
 #     insert_bible_commandment(*bible_commandment)
 bible_commandments = first_bible_commandments + second_bible_commandments + third_bible_commandments
@@ -423,9 +424,6 @@ for i in range(1, 25151):
     else:
         m_locality_id = random.randrange(1, 31)
 
-    if i % 30 == 0:
-        curr_locality_id += 1
-
     persons.append([2 * i - 1, m_name, m_surname, m_birth_date, 'M', m_locality_id])
     persons_to_save.append([m_name, m_surname, m_birth_date, 'M', m_locality_id])
     locality_by_person_id[2 * i - 1] = m_locality_id
@@ -439,8 +437,9 @@ for i in range(1, 25151):
     f_name = random.choice(russian_female_names)[0]
     f_surname = random.choice(russian_female_surnames)[0]
     f_birth_date = random_date(birth_start, birth_end)
+    
     if i < 151:
-        f_locality_id = i % 30
+        f_locality_id = curr_locality_id
     else:
         f_locality_id = random.randrange(1, 31)
 
@@ -453,6 +452,9 @@ for i in range(1, 25151):
         persons_by_locality[f_locality_id] = [i]
     else:
         persons_by_locality[f_locality_id].append(i)
+
+    if i % 30 == 0:
+        curr_locality_id += 1
  
 save_to_file('backup/persons.csv', ['name', 'surname', 'birth_date', 'gender', 'locality_id'], persons_to_save)
 
@@ -590,8 +592,8 @@ accusations_to_save = []
 for proc in processes:
     start_date_proc = datetime.strptime(proc[1], "%Y-%m-%d")
     finish_date_proc = add_date_without_formating(start_date_proc, random.randint(4, 9))
-    start_date_acc = random_date_without_formating(start_date_proc, finish_date_proc)
-    finish_date_acc = add_days(start_date_acc, random.randrange(1, 90))
+    start_date_acc = start_date_proc
+    finish_date_acc = add_days(start_date_acc, random.randrange(1, 120))
     start_date_acc = start_date_acc.strftime('%Y-%m-%d')
 
     accusation_by_process[proc[0]] = [len(accusation_process)+1, start_date_acc, finish_date_acc, proc[0]]
@@ -806,7 +808,7 @@ for key, value in accusation_by_process.items():
         counter += 1
         # insert_accusation_record(informer, bishop, accused, violation_place, violation_time, description, id_accusation, record_time)
 
-save_to_file('accusation_record.csv', ['informer', 'bishop', 'accused', 'violation_place', 'violation_time', 'description', 'id_accusation', 'record_time'], accusation_record_to_save)
+save_to_file('backup/accusation_record.csv', ['informer', 'bishop', 'accused', 'violation_place', 'violation_time', 'description', 'id_accusation', 'record_time'], accusation_record_to_save)
 
 
 # investigative_cases = [
@@ -862,17 +864,16 @@ punishments = [
 # for case_log in case_logs:
 #     insert_case_log(*case_log)
 
-counter = 0
-violation = []
-
+violations_to_save = []
 #TODO
 for record_id in range(1, len(accusation_record)):
-    if counter % 100 == 0:
+    if record_id % 100 == 0:
         continue
     commandment_id = random.randint(1, len(commandments) + 1)
-    violation.append([commandment_id, record_id])
+    violations_to_save.append([commandment_id, record_id])
     # insert_violation(commandment_id, record_id)
-save_to_file('backup/violation.csv', ['commandment_id', 'record_id'], violation)
+
+save_to_file('backup/violation.csv', ['commandment_id', 'record_id'], violations_to_save)
 
 torture_types = [
     ('Падение связанного узника с высоты', 'Классные ощущения полета, только падать большо'),

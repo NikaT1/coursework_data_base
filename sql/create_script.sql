@@ -87,7 +87,7 @@ CREATE TABLE accusation_record(
 	date_time timestamp NOT NULL,
 	description text,
 	id_accusation integer NOT NULL REFERENCES accusation_process(id) ON DELETE CASCADE,
-	status accusation_status
+	status accusation_status DEFAULT NULL
 );
 
 CREATE TABLE investigative_case(

@@ -5,3 +5,4 @@
 .vs/
 *.csv
 __pycache__/
+backup/
