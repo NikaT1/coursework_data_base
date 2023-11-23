@@ -74,7 +74,7 @@ $$ LANGUAGE plpgsql;
 
 
 
-# fixme заменить insert на эту функцию
+-- fixme заменить insert на эту функцию
 
 CREATE OR REPLACE FUNCTION add_accusation_record(cur_informer integer, cur_bishop integer, cur_accused integer, cur_violation_place varchar(255), cur_date_time timestamp, cur_description text, cur_accusation_id integer)  RETURNS integer   
 as $$
@@ -218,7 +218,7 @@ BEGIN
 		 JOIN accusation_investigative_case on accusation_investigative_case.case_id = investigative_case.id
 		 JOIN accusation_record on accusation_investigative_case.record_id = accusation_record.id
        WHERE id_accusation = cur_accusation_id and accusation_record.accused = accusation_record.informer  
-	   GROUP BY id, accused
+	   GROUP BY investigative_case.id, accusation_record.accused
     LOOP
 		cur_case_count = (select count(*) from investigative_case
 							 JOIN accusation_investigative_case on accusation_investigative_case.case_id = investigative_case.id
@@ -231,7 +231,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-#FIXME прописать rank для сводов
+-- FIXME прописать rank для сводов
 CREATE OR REPLACE PROCEDURE handle_cases_with_grave_sin (cur_inquisition_process integer)
 as $$
 DECLARE
@@ -248,9 +248,9 @@ BEGIN
 		 JOIN violation on violation.record_id=accusation_record.id
 		 JOIN commandment on commandment.id = violation.commandment_id
        WHERE id_accusation = cur_accusation_id and commandment.rank > 3
-	   GROUP BY id, accused
+	   GROUP BY investigative_case.id, accusation_record.accused
     LOOP
-		SELECT assign_punishment(cur_cases.id, 1, 'Отправлен на наказание в связи с тяжким грехом');
+		PERFORM assign_punishment(cur_cases.id, 1, 'Отправлен на наказание в связи с тяжким грехом');
 		UPDATE investigative_case SET closed_date = CAST (NOW() AS date) WHERE investigative_case.id = cur_cases.id;
 	END LOOP;
 END;
@@ -261,7 +261,7 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE PROCEDURE get_not_resolved_cases(cur_inquisition_process integer)  
+CREATE OR REPLACE FUNCTION get_not_resolved_cases(cur_inquisition_process integer)  RETURNS SETOF investigative_case
 as $$
 DECLARE
 	cur_finish_time							timestamp;
@@ -272,12 +272,12 @@ BEGIN
 		IF cur_finish_time IS NULL THEN	
 			RAISE EXCEPTION 'Процесс сбора доносов еще не окончен';
 		ELSE
-			SELECT *
+			RETURN QUERY EXECUTE format('SELECT *
 			FROM investigative_case
 		    WHERE investigative_case.id in (select case_id from accusation_investigative_case 
-						join accusation_record on accusation_record.id = record.id 
-						where id_accusation = cur_accusation_id)
-					and investigative_case.closed_date is NULL;
+						join accusation_record on accusation_record.id = record_id 
+						where id_accusation = %s)
+					and investigative_case.closed_date is NULL', cur_accusation_id);
 		END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -288,31 +288,31 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION get_best_principal(cur_locality_id integer, cur_official_name official_name) RETURNS integer AS $$
 	DECLARE
-		principal					 integer;
+		cur_principal					 integer;
 	BEGIN
-		 SELECT official.id INTO principal FROM official
+		 SELECT official.id INTO cur_principal FROM official
 			JOIN person on person_id = person.id
 			WHERE official_name = cur_official_name and locality_id = cur_locality_id and NOT EXISTS (
-				SELECT 1 FROM case_log WHERE official.id = principal)
+				SELECT 1 FROM case_log WHERE case_log.principal = official.id)
 			LIMIT 1;
 
-		IF principal IS NOT NULL THEN
-			RETURN principal;
+		IF cur_principal IS NOT NULL THEN
+			RETURN cur_principal;
 		END IF;
 
-		SELECT official.id INTO principal FROM official
+		SELECT official.id INTO cur_principal FROM official
 			JOIN case_log ON official.id = case_log.principal
 			JOIN person on person_id = person.id
 			WHERE finish_time IS NOT NULL and official_name = cur_official_name and locality_id = cur_locality_id
 			GROUP BY official.id
-			HAVING COUNT(*) = (SELECT COUNT(*) FROM case_log WHERE principal = official.id)
+			HAVING COUNT(*) = (SELECT COUNT(*) FROM case_log WHERE case_log.principal = official.id)
 			LIMIT 1;
 
-		IF principal IS NOT NULL THEN
-			RETURN principal;
+		IF cur_principal IS NOT NULL THEN
+			RETURN cur_principal;
 		END IF;
 
-		SELECT case_log.principal INTO principal FROM case_log
+		SELECT case_log.principal INTO cur_principal FROM case_log
 			JOIN official on official.id = case_log.principal
 			JOIN person on person_id = person.id
 			WHERE official_name = cur_official_name and locality_id = cur_locality_id
@@ -320,7 +320,7 @@ CREATE OR REPLACE FUNCTION get_best_principal(cur_locality_id integer, cur_offic
 			ORDER BY COUNT(*) ASC
 			LIMIT 1;
 
-		RETURN principal;
+		RETURN cur_principal;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -485,10 +485,11 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION assign_punishment(cur_case_id integer, punishment_id integer, discription text)  RETURNS integer   
+CREATE OR REPLACE FUNCTION assign_punishment(cur_case_id integer, cur_punishment_id integer, cur_discription text)  RETURNS integer   
 as $$
     DECLARE
 		prison						 integer;
+		principal_id				 integer;
 		locality_id					 integer;
 		new_case_log_id				 integer;
     BEGIN
@@ -503,9 +504,9 @@ as $$
 			RETURN NULL;
 		ELSE
 			prison = get_best_prison(locality_id); 
-		
+			principal_id = get_best_principal(locality_id, 'Светсткая власть');
 			INSERT INTO case_log (case_id, case_status, principal, start_time, result, prison_id, finish_time, 
-			punishment_id, description) VALUES (cur_case_id, 'Наказание', principal, CURRENT_TIMESTAMP, NULL, prison, NULL, punishment_id, description)
+			punishment_id, description) VALUES (cur_case_id, 'Наказание', principal_id, CURRENT_TIMESTAMP, NULL, prison, NULL, cur_punishment_id, cur_discription)
 			RETURNING id INTO new_case_log_id;
 			RETURN new_case_log_id;
 		END IF;

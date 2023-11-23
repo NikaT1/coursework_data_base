@@ -131,7 +131,7 @@ CREATE TABLE investigative_case (
  id serial PRIMARY KEY,
  creation_date date NOT NULL,
  closed_date date,
- CHECK (closed_date IS NULL OR creation_date < closed_date)
+ CHECK (closed_date IS NULL OR creation_date <= closed_date)
 );
 """
 

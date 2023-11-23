@@ -58,7 +58,7 @@ CREATE TABLE official(
 	fired_date date
 	CHECK (fired_date IS NULL OR employment_date < fired_date)
 );
-; FIXME: определиться с тем, церковь у нас или локация. И как мы определяем.
+
 CREATE TABLE inquisition_process(
 	id serial PRIMARY KEY,
 	start_data date NOT NULL,
@@ -94,7 +94,7 @@ CREATE TABLE investigative_case(
 	id serial PRIMARY KEY,
 	creation_date date NOT NULL,
 	closed_date date,
-	CHECK (closed_date IS NULL OR creation_date < closed_date)
+	CHECK (closed_date IS NULL OR creation_date <= closed_date)
 );
 
 CREATE TABLE accusation_investigative_case(

@@ -22,7 +22,7 @@ echo -e "${RED} Фиксируем доносы${NC}"
 
 psql -e -h pg -d studs -c "SELECT add_accusation_record(1, 1, 2, 'Дома на столе', '1488-8-12', 'Найдена книга с запрещенными текстами', 1);"
 psql -e -h pg -d studs -c "SELECT add_accusation_record(1, 2, 1, 'Около церкви', '1479-10-2', 'Выругался на прохожего', 1);"
-psql -e -h pg -d studs -c "SELECT add_accusation_record(3, 2, 3, 'На сенокосе', '1480-6-22', 'Ради мести сломал орудие труда и подставил другого', 1);"
+psql -e -h pg -d studs -c "SELECT add_accusation_record(4, 2, 3, 'На сенокосе', '1480-6-22', 'Ради мести сломал орудие труда и подставил другого', 1);"
 psql -e -h pg -d studs -c "SELECT add_accusation_record(1, 2, 4, 'Ночью в комнате', '1483-4-18', 'Просил Бога наказать знакомого, потому что тому повезло', 1);"
 psql -e -h pg -d studs -c "SELECT add_accusation_record(3, 1, 4, 'В церковь', '1481-3-8', 'Появился в церкви в нетрезвом виде', 1);"
 
@@ -60,6 +60,15 @@ psql -e -h pg -d studs -c "SELECT connect_commandment_with_record(11, 4)"
 echo -e "${RED}Генерируем дела${NC}"
 
 psql -e -h pg -d studs -c "SELECT generate_cases(1)"
+
+echo -e "${RED}Обработаем простые дела${NC}"
+
+psql -e -h pg -d studs -c "CALL handle_simple_cases(1)"
+
+psql -e -h pg -d studs -c "CALL handle_cases_with_grave_sin(1)"
+
+echo -e "${RED}Посмотрим на оставшиеся дела${NC}"
+psql -e -h pg -d studs -c "SELECT get_not_resolved_cases(1)"
 
 
 #SELECT finish_inquisition_process(inquisition_process_id integer) 

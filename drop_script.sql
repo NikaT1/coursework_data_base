@@ -11,7 +11,7 @@ DROP PROCEDURE add_record_to_case;
 DROP FUNCTION generate_cases;
 DROP PROCEDURE handle_simple_cases;
 DROP PROCEDURE handle_cases_with_grave_sin;
-DROP PROCEDURE get_not_resolved_cases;
+DROP FUNCTION get_not_resolved_cases;
 DROP FUNCTION get_best_principal;
 DROP FUNCTION get_best_prison;
 DROP FUNCTION start_discussion;
