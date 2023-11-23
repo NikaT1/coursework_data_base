@@ -125,7 +125,7 @@ CREATE TRIGGER check_data_for_case_log BEFORE INSERT OR UPDATE ON case_log
     FOR EACH ROW EXECUTE FUNCTION check_data_for_case_log();
 
 
-CREATE OR REPLACE FUNCTION check_data_for_accusation() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION check_data_for_accusation_record() RETURNS trigger AS $$
 	DECLARE
 		official					 official_name;
     BEGIN
@@ -143,15 +143,15 @@ CREATE OR REPLACE FUNCTION check_data_for_accusation() RETURNS trigger AS $$
 $$ LANGUAGE plpgsql;
 
 	
-CREATE TRIGGER check_data_for_accusation BEFORE INSERT OR UPDATE ON accusation_process
-    FOR EACH ROW EXECUTE FUNCTION check_data_for_accusation();
+CREATE TRIGGER check_data_for_accusation_record BEFORE INSERT OR UPDATE ON accusation_record
+    FOR EACH ROW EXECUTE FUNCTION check_data_for_accusation_record();
 
 CREATE OR REPLACE FUNCTION check_data_for_inquisition_process() RETURNS trigger AS $$
 	DECLARE
 		old_inquisition_process_id					 integer;
     BEGIN
 		old_inquisition_process_id = (
-				select id from inquisition_process where church_id = NEW.church_id and finish_time IS NULL
+				select id from inquisition_process where church_id = NEW.church_id and finish_data IS NULL
 			);
 		
 		IF old_inquisition_process_id IS NOT NULL  THEN

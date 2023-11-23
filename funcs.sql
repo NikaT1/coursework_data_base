@@ -9,7 +9,7 @@ as $$
 			cur_locality_id = ( select church.locality_id from church where church.id = cur_church limit 1);
 			cur_person_id = (select person_id from official where id = cur_official);
 			UPDATE person SET locality_id = cur_locality_id where id = cur_person_id;
-			INSERT INTO inquisition_process (start_data, finish_data, official_id, church_id, bible_id) VALUES (GETDATE(), NULL, cur_official, cur_church, cur_bible)
+			INSERT INTO inquisition_process (start_data, finish_data, official_id, church_id, bible_id) VALUES (CAST (NOW() AS date), NULL, cur_official, cur_church, cur_bible)
 			RETURNING id INTO new_inquisition_process_id;
 			RETURN new_inquisition_process_id;
 END;
@@ -30,7 +30,7 @@ BEGIN
 						where id_accusation = cur_accusation_id)
 					and investigative_case.closed_date is NULL);
 	IF cur_finish_date IS NULL and case_count = 0 THEN
-		UPDATE inquisition_process SET finish_data = GETDATE() where id = inquisition_process_id;
+		UPDATE inquisition_process SET finish_data = CAST (NOW() AS date) where id = inquisition_process_id;
 		RETURN cur_case_log_id;
 	ELSIF case_count = 0 THEN
 		RAISE EXCEPTION 'Не все дела закрыты';
@@ -74,7 +74,7 @@ $$ LANGUAGE plpgsql;
 
 
 
-
+# fixme заменить insert на эту функцию
 
 CREATE OR REPLACE FUNCTION add_accusation_record(cur_informer integer, cur_bishop integer, cur_accused integer, cur_violation_place varchar(255), cur_date_time timestamp, cur_description text, cur_accusation_id integer)  RETURNS integer   
 as $$
@@ -84,7 +84,7 @@ DECLARE
 BEGIN
 		cur_finish_time = (select finish_time from accusation_process where accusation_process.id = cur_accusation_id limit 1);
 		IF cur_finish_time IS NULL THEN	
-			INSERT INTO accusation_process (informer, bishop, accused, violation_place, date_time, description, id_accusation, status) 
+			INSERT INTO accusation_record (informer, bishop, accused, violation_place, date_time, description, id_accusation, status) 
 				VALUES (cur_informer, cur_bishop, cur_accused, cur_violation_place, cur_date_time, cur_description, cur_accusation_id, NULL)
 			RETURNING id INTO new_accusation_record_id;
 			RETURN new_accusation_record_id;
@@ -99,7 +99,7 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE PROCEDURE get_not_resolved_accusation_record(cur_accusation_id integer)  
+CREATE OR REPLACE FUNCTION get_not_resolved_accusation_record(cur_accusation_id integer) RETURNS SETOF accusation_record
 as $$
 DECLARE
 	cur_finish_time							timestamp;
@@ -108,28 +108,43 @@ BEGIN
 		IF cur_finish_time IS NULL THEN	
 			RAISE EXCEPTION 'Процесс сбора доносов еще не окончен';
 		ELSE
-			SELECT * FROM accusation_record where id_accusation = cur_accusation_id and status is null;
+			 RETURN QUERY EXECUTE format('SELECT * FROM accusation_record where id_accusation = %s and status is null', cur_accusation_id);	
 		END IF;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE PROCEDURE find_in_bible(phrase varchar(250), cur_bible integer)  
+CREATE OR REPLACE FUNCTION find_in_bible(phrase text, cur_bible integer) RETURNS table(cur_phrase text, cur_id integer, cur_description text) 
 as $$
 DECLARE
-	cur_finish_time							timestamp;
+	result_row							commandment;
 BEGIN
-		SELECT * FROM commandment where description like "%phrase%" and id in (select commandment_id from bible_commandment where bible_id = cur_bible);
+		FOR result_row IN SELECT * FROM  commandment where description ILIKE '%' || phrase || '%' and id in (select commandment_id from bible_commandment where bible_id = cur_bible) LOOP
+			cur_phrase := phrase;
+			cur_id := result_row.id;
+			cur_description := result_row.description;
+			RETURN NEXT;
+		END LOOP;
+		RETURN;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE PROCEDURE connect_commandment_with_record(cur_commandment_id integer, cur_record_id integer)  
+CREATE OR REPLACE FUNCTION read_bible(cur_bible integer) RETURNS SETOF commandment 
 as $$
-DECLARE
-	cur_finish_time							timestamp;
 BEGIN
-	UPDATE accusation_record SET status = "Правдивый" where id = cur_commandment_id;
+		RETURN QUERY EXECUTE format('SELECT * FROM commandment where id in (select commandment_id from bible_commandment where bible_id = %s)', cur_bible);	
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+CREATE OR REPLACE FUNCTION connect_commandment_with_record(cur_commandment_id integer, cur_record_id integer) RETURNS SETOF integer 
+as $$
+BEGIN
+	UPDATE accusation_record SET status = 'Правдивый' where id = cur_record_id;
 	INSERT INTO violation (record_id, commandment_id) 
 				VALUES (cur_record_id, cur_commandment_id);
+	RETURN NEXT cur_commandment_id;
+	RETURN NEXT cur_record_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -148,7 +163,7 @@ BEGIN
 								where case_id = investigative_case.id and accusation_record.accused = cur_accused) limit 1);
 	IF cur_case IS NULL THEN
 		INSERT INTO investigative_case (creation_date, closed_date) 
-					VALUES (GETDATE(), NULL)
+					VALUES (CAST (NOW() AS date), NULL)
 					RETURNING id INTO cur_case;
 	END IF;
     INSERT INTO accusation_investigative_case (case_id, record_id) 
@@ -156,7 +171,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE PROCEDURE generate_cases(accusation_process integer)
+CREATE OR REPLACE FUNCTION generate_cases(accusation_process integer) RETURNS SETOF investigative_case 
 as $$
 DECLARE
 	record_id								RECORD;
@@ -168,7 +183,7 @@ BEGIN
          FROM accusation_record
         WHERE status is null and id_accusation = accusation_process
     LOOP
-		UPDATE accusation_record SET status = "Ложный" where id = record_id.id;
+		UPDATE accusation_record SET status = 'Ложный' where id = record_id.id;
     END LOOP;
 	FOR accusation_record_id IN
        SELECT id, accused
@@ -177,6 +192,10 @@ BEGIN
     LOOP
 		CALL add_record_to_case(accusation_record_id.id, accusation_record_id.accused);
     END LOOP;
+	RETURN QUERY EXECUTE format('select * from investigative_case where 
+								EXISTS(select 1 from accusation_investigative_case
+									join accusation_record on accusation_record.id = record_id
+									where case_id = investigative_case.id and id_accusation = %s)', accusation_process);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -206,12 +225,13 @@ BEGIN
 							 JOIN accusation_record on accusation_investigative_case.record_id = accusation_record.id
 							 WHERE accusation_record.accused = cur_cases.accused);
 		IF cur_case_count < 2 THEN
-			UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
+			UPDATE investigative_case SET closed_date = CAST (NOW() AS date) WHERE investigative_case.id = cur_cases.id;
 		END IF;
 	END LOOP;
 END;
 $$ LANGUAGE plpgsql;
 
+#FIXME прописать rank для сводов
 CREATE OR REPLACE PROCEDURE handle_cases_with_grave_sin (cur_inquisition_process integer)
 as $$
 DECLARE
@@ -231,7 +251,7 @@ BEGIN
 	   GROUP BY id, accused
     LOOP
 		SELECT assign_punishment(cur_cases.id, 1, 'Отправлен на наказание в связи с тяжким грехом');
-		UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
+		UPDATE investigative_case SET closed_date = CAST (NOW() AS date) WHERE investigative_case.id = cur_cases.id;
 	END LOOP;
 END;
 $$ LANGUAGE plpgsql;
@@ -444,13 +464,13 @@ BEGIN
 		UPDATE case_log SET result = new_result, finish_time = CURRENT_TIMESTAMP where id = cur_case_log_id;
 		IF cur_case_status = "Исправительная беседа" and new_result = 'Признание вины' THEN
 			SELECT assign_punishment(cur_cases.id, 2, 'Назначена епетимья в связи с раскаянием');
-			UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
+			UPDATE investigative_case SET closed_date = CAST (NOW() AS date) WHERE investigative_case.id = cur_cases.id;
 		ELSIF cur_case_status = "Пыточный процесс" and new_result = 'Признание вины' THEN
 			SELECT assign_punishment(cur_cases.id, 3, 'Назначено аутодафе в связи с раскаянием'); 
-			UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
+			UPDATE investigative_case SET closed_date = CAST (NOW() AS date) WHERE investigative_case.id = cur_cases.id;
 		ELSIF cur_case_status = "Пыточный процесс" and new_result = 'Отрицание вины' THEN
 			SELECT assign_punishment(cur_cases.id, 1, 'Назначена казнь в связи с непризнаванием вины');
-			UPDATE investigative_case SET closed_date = GETDATE() WHERE investigative_case.id = cur_cases.id;
+			UPDATE investigative_case SET closed_date = CAST (NOW() AS date) WHERE investigative_case.id = cur_cases.id;
 		END IF;
 		RETURN cur_case_log_id;
 	ELSE
