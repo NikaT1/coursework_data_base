@@ -41,6 +41,7 @@ CREATE TYPE gender as enum ('М', 'Ж');
 CREATE TABLE person(
 	id serial PRIMARY KEY,
 	name varchar(255) NOT NULL,
+	surname varchar(255) NOT NULL,
 	birth_date date NOT NULL,
 	person_gender gender NOT NULL,
 	localiry_id integer NOT NULL
@@ -57,7 +58,7 @@ CREATE TABLE official(
 	fired_date date
 	CHECK (fired_date IS NULL OR employment_date < fired_date)
 );
-
+; FIXME: определиться с тем, церковь у нас или локация. И как мы определяем.
 CREATE TABLE inquisition_process(
 	id serial PRIMARY KEY,
 	start_data date NOT NULL,
