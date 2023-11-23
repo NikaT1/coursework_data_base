@@ -2,6 +2,6 @@
 # Данный GITIGNORE-файл был автоматически создан Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs/slnx.sqlite
 /.gitignore
 /.vs/coursework_data_base/v17/.wsuo
+/.vs/slnx.sqlite
