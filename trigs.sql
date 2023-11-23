@@ -155,7 +155,7 @@ CREATE OR REPLACE FUNCTION check_data_for_inquisition_process() RETURNS trigger 
 			);
 		
 		IF old_inquisition_process_id IS NOT NULL  THEN
-           	RAISE EXCEPTION "В этой церкви в данный момент уже проводится инквизиционный процесс с id %", old_inquisition_process_id ;
+           	RAISE EXCEPTION 'В этой церкви в данный момент уже проводится инквизиционный процесс с id %', old_inquisition_process_id ;
 			RETURN NULL;
 		END IF;
 		
