@@ -26,7 +26,8 @@ CREATE TABLE bible(
 
 CREATE TABLE commandment(
 	id serial PRIMARY KEY,
-	description text NOT NULL UNIQUE
+	description text NOT NULL UNIQUE,
+	rank integer NOT NULL CHECK (rank > 0 and rank < 6)
 );
 
 CREATE TABLE bible_commandment(
@@ -67,19 +68,21 @@ CREATE TABLE inquisition_process(
 	CHECK (finish_data IS NULL OR start_data < finish_data)
 );
 
-CREATE TABLE accusation(
+CREATE TABLE accusation_process(
 	id serial PRIMARY KEY,
-	informer integer REFERENCES person(id) ON DELETE RESTRICT,
-	bishop integer NOT NULL REFERENCES official(id) ON DELETE RESTRICT,
+	start_time timestamp NOT NULL,
+	finish_time timestamp,
 	inquisition_process_id integer NOT NULL REFERENCES inquisition_process(id) ON DELETE CASCADE
 );
 
-CREATE TYPE accusation_status as enum ('Ложный', 'Легкий', 'Тяжкий');
+CREATE TYPE accusation_status as enum ('Ложный', 'Правдивый');
 
 CREATE TABLE accusation_record(
 	id serial PRIMARY KEY,
-	violation_place varchar(255),
+	informer integer REFERENCES person(id) ON DELETE RESTRICT,
+	bishop integer NOT NULL REFERENCES official(id) ON DELETE RESTRICT,
 	accused integer NOT NULL REFERENCES person(id) ON DELETE RESTRICT,
+	violation_place varchar(255),
 	date_time timestamp NOT NULL,
 	description text,
 	id_accusation integer NOT NULL REFERENCES accusation(id) ON DELETE CASCADE,
@@ -123,10 +126,10 @@ CREATE TABLE case_log(
 	CHECK (finish_time IS NULL OR start_time < finish_time)
 );
 
-CREATE TABLE violation(
-	commandment_id integer REFERENCES commandment(id) ON DELETE RESTRICT,
-	case_id integer REFERENCES investigative_case(id) ON DELETE CASCADE,
-	PRIMARY KEY(commandment_id, case_id)
+CREATE TABLE violation (
+	 commandment_id integer REFERENCES commandment(id) ON DELETE RESTRICT,
+	 record_id integer REFERENCES accusation_record(id) ON DELETE CASCADE,
+	 PRIMARY KEY(commandment_id, record_id)
 );
 
 CREATE TABLE torture_type(

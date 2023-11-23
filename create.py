@@ -48,7 +48,8 @@ CREATE TABLE bible (
 create_commandment_table = """
 CREATE TABLE commandment (
     id serial PRIMARY KEY,
-    description text NOT NULL UNIQUE
+    description text NOT NULL UNIQUE,
+    rank integer NOT NULL CHECK (rank > 0 and rank < 6)
 );
 """
 
@@ -103,23 +104,25 @@ CREATE TABLE inquisition_process (
 """
 
 create_accusation_table_query = """
-CREATE TABLE accusation (
- id serial PRIMARY KEY,
- informer integer REFERENCES person(id) ON DELETE RESTRICT,
- bishop integer NOT NULL REFERENCES official(id) ON DELETE RESTRICT,
- inquisition_process_id integer NOT NULL REFERENCES inquisition_process(id) ON DELETE CASCADE
+CREATE TABLE accusation_process(
+	id serial PRIMARY KEY,
+	start_time timestamp NOT NULL,
+	finish_time timestamp,
+	inquisition_process_id integer NOT NULL REFERENCES inquisition_process(id) ON DELETE CASCADE
 );
 """
 
 create_accusation_record_table_query = """
-CREATE TABLE accusation_record (
- id serial PRIMARY KEY,
- violation_place varchar(255),
- accused integer NOT NULL REFERENCES person(id) ON DELETE RESTRICT,
- date_time timestamp NOT NULL,
- description text,
- id_accusation integer NOT NULL REFERENCES accusation(id) ON DELETE CASCADE, 
- status accusation_status
+CREATE TABLE accusation_record(
+	id serial PRIMARY KEY,
+	informer integer REFERENCES person(id) ON DELETE RESTRICT,
+	bishop integer NOT NULL REFERENCES official(id) ON DELETE RESTRICT,
+	accused integer NOT NULL REFERENCES person(id) ON DELETE RESTRICT,
+	violation_place varchar(255),
+	date_time timestamp NOT NULL,
+	description text,
+	id_accusation integer NOT NULL REFERENCES accusation(id) ON DELETE CASCADE,
+	status accusation_status
 );
 """
 
@@ -157,7 +160,7 @@ CREATE TYPE case_log_status as enum ('Пыточный процесс', 'Исп�
 """
 
 create_accusation_status_type_query = """
-CREATE TYPE accusation_status as enum ('Ложный', 'Легкий', 'Тяжкий');
+CREATE TYPE accusation_status as enum ('Ложный', 'Правдивый');
 """
 
 create_case_log_table_query = """
@@ -180,8 +183,8 @@ CREATE TABLE case_log (
 create_violation_table_query = """
 CREATE TABLE violation (
  commandment_id integer REFERENCES commandment(id) ON DELETE RESTRICT,
- case_id integer REFERENCES investigative_case(id) ON DELETE CASCADE,
- PRIMARY KEY(commandment_id, case_id)
+ record_id integer REFERENCES accusation_record(id) ON DELETE CASCADE,
+ PRIMARY KEY(commandment_id, record_id)
 );
 """
 
