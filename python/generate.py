@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 import random
 from dateutil.relativedelta import relativedelta
 
+random.seed(10)
+
 def random_date_without_formating(start, end):
     return start + timedelta(seconds=random.randint(0, int((end - start).total_seconds())))
 
@@ -231,8 +233,9 @@ localities = [
 #TODO
 # for locality in localities:
     # insert_locality(*locality)
+localities_to_save = [(id, *(localities[id-1])) for id in range(1, len(localities) + 1)]
 
-save_to_file('backup/localities.csv', ['name', 'foundation_date'], localities)
+save_to_file('backup/locality.csv', ['id', 'name', 'foundation_date'], localities_to_save)
 
 churches = [
     ('Iglesia de Santa María', date(912, 8, 14), 1),
@@ -300,7 +303,8 @@ churches = [
 #TODO
 # for church in churches:
     # insert_church(*church)
-save_to_file('backup/churches.csv', ['name', 'foundation_date', 'locality_id'], churches)
+churches_to_save = [(id, *(churches[id - 1])) for id in range(1, len(churches) + 1)]
+save_to_file('backup/church.csv', ['id', 'name', 'foundation_date', 'locality_id'], churches_to_save)
 
 prisons = [
     ('Centro Penitenciario Albolote', 1),
@@ -368,7 +372,8 @@ prisons = [
 #TODO
 # for prison in prisons:
 #     insert_prison(*prison)
-save_to_file('backup/prisons.csv', ['name', 'locality_id'], prisons)
+prisons_to_save = [(id, *(prisons[id - 1])) for id in range(1, len(prisons) + 1)]
+save_to_file('backup/prison.csv', ['id', 'name', 'locality_id'], prisons_to_save)
 
 bibles = [
     (1, date(89, 1, 1), 'Bible 1'),
@@ -379,16 +384,16 @@ bibles = [
 #TODO
 # for bible in bibles:
 #     insert_bible(*bible)
-save_to_file('backup/bibles.csv', ['version', 'publication_date', 'name'], bibles)
+save_to_file('backup/bible.csv', ['version', 'publication_date', 'name'], bibles)
 
 #TODO
 #FIXME: add rank
 # for commandment in commandments:
 #     insert_commandment(commandment)
-commandments_to_save = [(commandments[i], i // 125 + 1) for i in range(len(commandments))]
-save_to_file('backup/commandments.csv', ['description', 'rank'], commandments_to_save)
+commandments_to_save = [(i, commandments[i - 1], 5 - (i // 150)) for i in range(1, len(commandments) + 1)]
+save_to_file('backup/commandment.csv', ['id', 'description', 'rank'], commandments_to_save)
 
-#TODO
+# #TODO
 first_bible_commandments = [(1, comm_id) for comm_id in range(1, len(commandments) + 1, 5)]
 # for bible_commandment in first_bible_commandments:
 #     insert_bible_commandment(*bible_commandment)
@@ -401,7 +406,7 @@ third_bible_commandments = [(3, comm_id) for comm_id in range(1, len(commandment
 # for bible_commandment in third_bible_commandments:
 #     insert_bible_commandment(*bible_commandment)
 bible_commandments = first_bible_commandments + second_bible_commandments + third_bible_commandments
-save_to_file('backup/bible_commandments.csv', ['bible_id, commandment_id'], bible_commandments)
+save_to_file('backup/bible_commandment.csv', ['bible_id, commandment_id'], bible_commandments)
 
 birth_start = datetime(1400, 1, 1)
 birth_end = datetime(1420, 12, 31)
@@ -424,8 +429,8 @@ for i in range(1, 25151):
     else:
         m_locality_id = random.randrange(1, 31)
 
-    persons.append([2 * i - 1, m_name, m_surname, m_birth_date, 'M', m_locality_id])
-    persons_to_save.append([m_name, m_surname, m_birth_date, 'M', m_locality_id])
+    persons.append([2 * i - 1, m_name, m_surname, m_birth_date, 'М', m_locality_id])
+    persons_to_save.append([m_name, m_surname, m_birth_date, 'М', m_locality_id])
     locality_by_person_id[2 * i - 1] = m_locality_id
     # insert_person(m_name, m_surname, m_birth_date, 'M', m_locality_id)
 
@@ -443,8 +448,8 @@ for i in range(1, 25151):
     else:
         f_locality_id = random.randrange(1, 31)
 
-    persons.append([2 * i, f_name, f_surname, f_birth_date, 'F', f_locality_id])
-    persons_to_save.append([f_name, f_surname, f_birth_date, 'F', f_locality_id])
+    persons.append([2 * i, f_name, f_surname, f_birth_date, 'Ж', f_locality_id])
+    persons_to_save.append([f_name, f_surname, f_birth_date, 'Ж', f_locality_id])
     locality_by_person_id[2 * i] = f_locality_id
     # insert_person(f_name, f_surname, f_birth_date, 'F', f_locality_id)
     
@@ -456,7 +461,7 @@ for i in range(1, 25151):
     if i % 30 == 0:
         curr_locality_id += 1
  
-save_to_file('backup/persons.csv', ['name', 'surname', 'birth_date', 'gender', 'locality_id'], persons_to_save)
+save_to_file('backup/person.csv', ['id', 'name', 'surname', 'birth_date', 'gender', 'locality_id'], persons)
 
 official_types = [
     'Инквизитор',
@@ -477,10 +482,10 @@ officials = []
 officials_to_save = []
 official_ids = set()
 
-bishop = {}
+# bishop = {}
 inqusitors = []
-fiskal = {}
-sovety = {}
+# fiskal = {}
+# sovety = {}
 
 bishops_by_locality = {}
 
@@ -500,20 +505,22 @@ for i in range(1, 5):
             official_ids.add(person_id)
             
             if type_officials == 'Епископ':
-                bishop[person_id] = [person_id, type_officials, hired_date, fired_date]
+                # bishop[person_id] = [person_id, type_officials, hired_date, fired_date]
                 locality = locality_by_person_id[person_id]
                 
                 if locality not in bishops_by_locality:
-                    bishops_by_locality[locality] = [person_id]
+                    bishops_by_locality[locality] = [counter]
                 else:
-                    bishops_by_locality[locality].append(person_id)
+                    bishops_by_locality[locality].append(counter)
 
             elif type_officials == 'Инквизитор':
                 inqusitors.append([counter, person_id, type_officials, hired_date, fired_date])
-            elif type_officials == 'Фискал':
-                fiskal[person_id] = [person_id, type_officials, hired_date, fired_date]
-            else:
-                sovety[person_id] = [person_id, type_officials, hired_date, fired_date]
+            # elif type_officials == 'Фискал':
+                # pass
+                # fiskal[person_id] = [person_id, type_officials, hired_date, fired_date]
+            # else:
+                # pass
+                # sovety[person_id] = [person_id, type_officials, hired_date, fired_date]
 
             # insert_official(person_id, type_officials, hired_date, fired_date)
             counter += 1
@@ -534,24 +541,26 @@ for i in range(64, 20065):
     official_ids.add(person_id)
     
     if type_officials == 'Епископ':
-        bishop[person_id] = [person_id, type_officials, hired_date, fired_date]
+        # bishop[person_id] = [person_id, type_officials, hired_date, fired_date]
         locality = locality_by_person_id[person_id]
         
         if locality not in bishops_by_locality:
-            bishops_by_locality[locality] = [person_id]
+            bishops_by_locality[locality] = [counter]
         else:
-            bishops_by_locality[locality].append(person_id)
+            bishops_by_locality[locality].append(counter)
 
     elif type_officials == 'Инквизитор':
         inqusitors.append([counter, person_id, type_officials, hired_date, fired_date])
-    elif type_officials == 'Фискал':
-        fiskal[person_id] = [person_id, type_officials, hired_date, fired_date]
-    else:
-        sovety[person_id] = [person_id, type_officials, hired_date, fired_date]
+    # elif type_officials == 'Фискал':
+        # pass
+        # fiskal[person_id] = [person_id, type_officials, hired_date, fired_date]
+    # else:
+        # pass
+        # sovety[person_id] = [person_id, type_officials, hired_date, fired_date]
 
     # insert_official(person_id, type_officials, hired_date, fired_date)
     counter += 1
-save_to_file('backup/officials.csv', ['person_id', 'official_name', 'employment_date', 'fired_date'], officials_to_save)
+save_to_file('backup/official.csv', ['id', 'person_id', 'official_name', 'employment_date', 'fired_date'], officials)
 
 inquis_start = datetime(1480, 1, 1)
 inquis_end = datetime(1490, 12, 31)
@@ -581,7 +590,7 @@ for i in range(1, 5):
     locality_by_process[i] = locality_for_process
     # insert_inquisition_process(start_date, finish_date, inquis, church_id, bible)
 
-save_to_file('backup/inquisition_process.csv', ['start_date', 'finish_date', 'official_id', 'church_id', 'bible_id'], processes_to_save)
+save_to_file('backup/inquisition_process.csv', ['id', 'start_date', 'finish_date', 'official_id', 'church_id', 'bible_id'], processes)
 
 date_by_accusation = {}
 accusation_process = []
@@ -600,7 +609,7 @@ for proc in processes:
     accusation_process.append([len(accusation_process)+1, start_date_acc, finish_date_acc, proc[0]])
     accusations_to_save.append([start_date_acc, finish_date_acc, proc[0]])
     # insert_accusation_process(start_date_acc, finish_date_acc, proc[0])
-save_to_file('backup/accusation_process.csv', ['start_time', 'finish_time', 'inquisition_process_id'], accusations_to_save)
+save_to_file('backup/accusation_process.csv', ['id', 'start_time', 'finish_time', 'inquisition_process_id'], accusation_process)
 
     # start_date_acc = 
 #FIXME: тут нужно создать доносы
@@ -803,12 +812,12 @@ for key, value in accusation_by_process.items():
         violation_time = random_date(minus_date_without_formating(st_date, 12), st_date)
         record_time = random_date(st_date, fn_date)
 
-        accusation_record.append([counter, informer_id, bishop, accuset_id, violation_place, violation_time, description, acc_pr_id, record_time])
-        accusation_record_to_save.append([informer_id, bishop, accuset_id, violation_place, violation_time, description, acc_pr_id, record_time])
+        accusation_record.append([counter, informer_id, bishop, accuset_id, violation_place, violation_time, description, acc_pr_id, record_time, None])
+        accusation_record_to_save.append([informer_id, bishop, accuset_id, violation_place, violation_time, description, acc_pr_id, record_time, None])
         counter += 1
         # insert_accusation_record(informer, bishop, accused, violation_place, violation_time, description, id_accusation, record_time)
 
-save_to_file('backup/accusation_record.csv', ['informer', 'bishop', 'accused', 'violation_place', 'violation_time', 'description', 'id_accusation', 'record_time'], accusation_record_to_save)
+save_to_file('backup/accusation_record.csv', ['id', 'informer', 'bishop', 'accused', 'violation_place', 'violation_time', 'description', 'id_accusation', 'record_time', 'status'], accusation_record)
 
 
 # investigative_cases = [
@@ -846,6 +855,8 @@ punishments = [
     ('Епетимья', 'На поболтать'),
     ('Аутодафе', 'Командный синк'),
 ]
+punishments_to_save = [(id, *(punishments[id - 1])) for id in range(1, len(punishments) + 1)]
+save_to_file('backup/punishment.csv', ['id', 'name', 'description'], punishments_to_save)
 #TODO
 # for punishment in punishments:
 #     insert_punishment(*punishment)
@@ -869,7 +880,7 @@ violations_to_save = []
 for record_id in range(1, len(accusation_record)):
     if record_id % 100 == 0:
         continue
-    commandment_id = random.randint(1, len(commandments) + 1)
+    commandment_id = random.randint(1, len(commandments))
     violations_to_save.append([commandment_id, record_id])
     # insert_violation(commandment_id, record_id)
 
@@ -880,6 +891,8 @@ torture_types = [
     ('Пытка водой', 'Самое то в жаркий день и в засуху'),
     ('Пытка огнем', 'Лучше держать 40 минут на среднем огне. Так мясо прожариться, но при это сохранит весь сок. Получить очень нежным и сочным'),
 ]
+torture_types_to_save = [(id, *(torture_types[id - 1])) for id in range(1, len(torture_types) + 1)]
+save_to_file('backup/torture_type.csv', ['id', 'name', 'description'], torture_types_to_save)
 #TODO
 # for torture_type in torture_types:
     # insert_torture_type(*torture_type)
