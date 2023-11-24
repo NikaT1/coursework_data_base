@@ -4,3 +4,4 @@ CREATE INDEX ON person USING btree(locality_id);
 CREATE INDEX ON church USING btree(locality_id);
 CREATE INDEX ON prison USING btree(locality_id);
 CREATE INDEX ON locality USING btree(name);
+CREATE INDEX ON person USING btree(name);
