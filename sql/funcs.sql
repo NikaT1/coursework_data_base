@@ -15,14 +15,15 @@ as $$
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION finish_inquisition_process(inquisition_process_id integer)  RETURNS integer   
+CREATE OR REPLACE FUNCTION finish_inquisition_process(cur_inquisition_process_id integer)  RETURNS integer   
 as $$
 DECLARE
 	cur_finish_date					timestamp;
 	case_count						integer;
 	cur_accusation_id				integer;
 BEGIN
-	cur_finish_date = (select finish_data from inquisition_process where inquisition_process.id = inquisition_process_id limit 1);
+	cur_finish_date = (select finish_data from inquisition_process where inquisition_process.id = cur_inquisition_process_id limit 1);
+	cur_accusation_id = (select id from accusation_process where cur_inquisition_process_id = accusation_process.inquisition_process_id limit 1);
 	case_count = (SELECT count(*)
 			FROM investigative_case
 		    WHERE investigative_case.id in (select case_id from accusation_investigative_case 
@@ -30,9 +31,9 @@ BEGIN
 						where id_accusation = cur_accusation_id)
 					and investigative_case.closed_date is NULL);
 	IF cur_finish_date IS NULL and case_count = 0 THEN
-		UPDATE inquisition_process SET finish_data = CAST (NOW() AS date) where id = inquisition_process_id;
-		RETURN inquisition_process_id;
-	ELSIF case_count = 0 THEN
+		UPDATE inquisition_process SET finish_data = CAST (NOW() AS date) where id = cur_inquisition_process_id;
+		RETURN cur_inquisition_process_id;
+	ELSIF case_count != 0 THEN
 		RAISE EXCEPTION 'Не все дела закрыты';
 		RETURN NULL;
 	ELSE
