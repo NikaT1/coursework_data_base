@@ -45,7 +45,7 @@ PASSWORD = "YourPassword"
 HOST = "pg"
 PORT = "5432"
 
-#FIXME: uncomment
+# uncomment
 # connection = psycopg2.connect(
     # dbname=DATABASE,
     # host=HOST,
@@ -121,9 +121,6 @@ def insert_accusation_process(start_time, finish_time, inquisition_process_id):
     cursor.execute(query, data)
     connection.commit()
 
-#FIXME: есть проблема, не понятно, что показывает date_time - время преступления или время доноса. 
-# было бы круто добавить еще одно временное поле с временем доноса, а то оставить как  время преступления
-#FIXME: проверить изменения столбцов
 def insert_accusation_record(informer, bishop, accused, violation_place, violation_time, description, id_accusation, record_time):
     query = """
     INSERT INTO accusation_record (informer, bishop, accused, violation_place, violation_time, description, id_accusation, record_time)
@@ -387,11 +384,10 @@ bibles = [
 save_to_file('backup/bible.csv', ['version', 'publication_date', 'name'], bibles)
 
 #TODO
-#FIXME: add rank
 # for commandment in commandments:
 #     insert_commandment(commandment)
-commandments_to_save = [(i, commandments[i - 1], 5 - (i // 150)) for i in range(1, len(commandments) + 1)]
-save_to_file('backup/commandment.csv', ['id', 'description', 'rank'], commandments_to_save)
+commandments_to_save = [(i, commandments[i - 1], 5 - (i // 150), None) for i in range(1, len(commandments) + 1)]
+save_to_file('backup/commandment.csv', ['id', 'description', 'rank', 'description_vector'], commandments_to_save)
 
 # #TODO
 first_bible_commandments = [(1, comm_id) for comm_id in range(1, len(commandments) + 1, 5)]
@@ -611,52 +607,6 @@ for proc in processes:
     # insert_accusation_process(start_date_acc, finish_date_acc, proc[0])
 save_to_file('backup/accusation_process.csv', ['id', 'start_time', 'finish_time', 'inquisition_process_id'], accusation_process)
 
-    # start_date_acc = 
-#FIXME: тут нужно создать доносы
-# for i in range(1, 50151):
-#     if i in official_ids:
-#         continue
-#     informer = i
-#     person_locality = locality_by_person_id[i]
-#     if person_locality not in bishops_by_locality:
-#         continue
-#     bishopds_for_locality = bishops_by_locality[person_locality]
-#     bishop = random.choice(bishopds_for_locality)
-#     if person_locality not in process_by_locality:
-#         continue
-#     process_for_lotality = process_by_locality[person_locality]
-#     process = random.choice(process_for_lotality)
-#     process_id = process[0]
-
-#     accusations.append([informer, bishop, process])
-#     insert_accusation(informer, bishop, process)
-
-# with open('accusations.csv', mode='w') as file:
-#     writer = csv.writer(file)
-
-#     # Write a header row, if needed
-#     header = ['Informer', 'Bishop', 'Process']
-#     writer.writerow(header)
-
-#     # Write each row of data to the file
-#     for row in accusations:
-#         writer.writerow(row)
-
-
-# for accusation in accusations:
-#     insert_accusation(*accusation)
-
-# accusation_records = [
-#     ('Дома на столе', 22, date(1488, 8, 12), 'Найдена книга с запрещенными текстами', 1),
-#     ('Около церкви', 23, date(1479, 10, 2), 'Выругался на прохожего', 2),
-#     ('На сенокосе', 24, date(1480, 6, 22), 'Ради мести сломал орудие труда и подставил другого', 3),
-#     ('Ночью в комнате', 25, date(1483, 4, 18), 'Просил Бога наказать знакомого, потому что тому повезло', 4),
-#     ('У меня дома', 27, date(1488, 10, 18), 'Съел всю еду', 5),
-#     ('Слева от главной площади, есть дом с коричневой крышей', 13, date(1479, 12, 26), 'Украл из дома драгоценности', 6),
-#     ('В церковь', 11, date(1481, 3, 8), 'Появился в церкви в нетрезвом виде', 7),
-#     ('С утра на дороге в город', 14, date(1483, 3, 4), 'Подкупил местного офицера', 8),
-# ]
-
 violations = [
     ('Дом художника в Саламанке', 'Совершение колдовских обрядов и заклинаний, противоречащих Библии.'),
     ('Церковь Санта-Мария в Севилье', 'Ересь и распространение ложных учений о Святой Троице.'),
@@ -819,37 +769,6 @@ for key, value in accusation_by_process.items():
 
 save_to_file('backup/accusation_record.csv', ['id', 'informer', 'bishop', 'accused', 'violation_place', 'violation_time', 'description', 'id_accusation', 'record_time', 'status'], accusation_record)
 
-
-# investigative_cases = [
-#     (date(1489, 2, 12), date(1490, 3, 12)),
-#     (date(1480, 3, 2), date(1480, 3, 22)),
-#     (date(1481, 5, 22), date(1481, 8, 22)),
-#     (date(1483, 4, 25), date(1483, 5, 18)),
-#     (date(1489, 1, 28), date(1489, 2, 22)),
-#     (date(1481, 5, 27), date(1481, 7, 2)),
-#     (date(1483, 4, 22), date(1483, 5, 22)),
-#     (date(1480, 4, 22), date(1480, 5, 22)),
-# ]
-
-# for investigative_case in investigative_cases:
-    # insert_investigative_case(*investigative_case)
-
-# accusation_investigative_cases = [
-#     (1, 1),
-#     (2, 2),
-#     (3, 3),
-#     (4, 4),
-#     (5, 5),
-#     (6, 6),
-#     (7, 7),
-#     (8, 8),
-# ]
-
-# for accusation_investigative_case in accusation_investigative_cases:
-#     insert_accusation_investigative_case(*accusation_investigative_case)
-
-
-# Example data for punishments
 punishments = [
     ('Казнь', 'Ну убили и все'),
     ('Епетимья', 'На поболтать'),
@@ -860,20 +779,6 @@ save_to_file('backup/punishment.csv', ['id', 'name', 'description'], punishments
 #TODO
 # for punishment in punishments:
 #     insert_punishment(*punishment)
-
-# case_logs = [
-#     (1, 'Пыточный процесс', 3, date(1489, 2, 22), 'Признание вины', 2, date(1489, 2, 23), 1, 'Признал вину после первой пытки, лох какой-то'),
-#     (2, 'Исправительная беседа', 2, date(1479, 10, 12), 'Отрицание вины', 2,  date(1479, 10, 13), 2, 'Сказал бы да, пошел бы домой, а так на висилицу ушел'),
-#     (3, 'Наказание', 3, date(1480, 7, 14), 'Отрицание вины', 3, None, 3, 'Наказание: сделать 5 лаб по ЛЛП за месяц'),
-#     (4, 'Пыточный процесс', 4, date(1483, 5, 15), 'Признание вины', 2, date(1483, 5, 17), 3, 'Жалко пацана'),
-#     (5, 'Исправительная беседа', 1, date(1488, 10, 28), 'Признание вины', 1, date(1488, 11, 8), 1, 'Ну съел всю еду, ну был голодный. С кем не случается'),
-#     (6, 'Наказание', 2, date(1480, 1, 26), 'Отрицание вины', 2, None, 2, 'Палач устал, все домой'),
-#     (7, 'Пыточный процесс', 5, date(1481, 6, 1), 'Отрицание вины', 1, date(1481, 6, 4), 3, 'Крепкий орешек, не раскололся'),
-#     (1, 'Исправительная беседа', 3, date(1483, 3, 24), 'Отрицание вины', 3, date(1483, 3, 26), 3, 'Как же хочется спать'),
-# ]
-
-# for case_log in case_logs:
-#     insert_case_log(*case_log)
 
 violations_to_save = []
 #TODO
@@ -896,17 +801,6 @@ save_to_file('backup/torture_type.csv', ['id', 'name', 'description'], torture_t
 #TODO
 # for torture_type in torture_types:
     # insert_torture_type(*torture_type)
-
-# Example data for torture_logs (assuming some case_log IDs, torture_type IDs, official IDs, and person IDs from previous insertions)
-# torture_logs = [
-#     (1, 1, 7, 22),
-#     (4, 2, 7, 25),
-#     (7, 3, 7, 11),
-# ]
-
-# for torture_log in torture_logs:
-#     insert_torture_log(*torture_log)
-
 
 
 # Close the connection after completion
