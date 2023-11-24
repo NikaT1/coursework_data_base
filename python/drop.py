@@ -49,10 +49,10 @@ drop_queries = [
     "DROP TABLE IF EXISTS commandment;",
     "DROP TABLE IF EXISTS official;",
     "DROP TABLE IF EXISTS punishment;",
+    "DROP TYPE IF EXISTS case_log_result;",
     "DROP TABLE IF EXISTS person;",
     "DROP TABLE IF EXISTS locality;",
     "DROP TYPE IF EXISTS gender;",
-    "DROP TYPE IF EXISTS case_log_result;",
     "DROP TYPE IF EXISTS case_log_status;",
     "DROP TYPE IF EXISTS official_name;",
     "DROP TYPE IF EXISTS accusation_status",
@@ -60,6 +60,7 @@ drop_queries = [
 
 for query in drop_queries:
     cursor.execute(query)
+    print(query)
 
 # Commit the changes to the database.
 connection.commit()

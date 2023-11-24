@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 import random
 from dateutil.relativedelta import relativedelta
 
+random.seed(10)
+
 def random_date_without_formating(start, end):
     return start + timedelta(seconds=random.randint(0, int((end - start).total_seconds())))
 
@@ -480,10 +482,10 @@ officials = []
 officials_to_save = []
 official_ids = set()
 
-bishop = {}
+# bishop = {}
 inqusitors = []
-fiskal = {}
-sovety = {}
+# fiskal = {}
+# sovety = {}
 
 bishops_by_locality = {}
 
@@ -503,20 +505,22 @@ for i in range(1, 5):
             official_ids.add(person_id)
             
             if type_officials == 'Епископ':
-                bishop[person_id] = [person_id, type_officials, hired_date, fired_date]
+                # bishop[person_id] = [person_id, type_officials, hired_date, fired_date]
                 locality = locality_by_person_id[person_id]
                 
                 if locality not in bishops_by_locality:
-                    bishops_by_locality[locality] = [person_id]
+                    bishops_by_locality[locality] = [counter]
                 else:
-                    bishops_by_locality[locality].append(person_id)
+                    bishops_by_locality[locality].append(counter)
 
             elif type_officials == 'Инквизитор':
                 inqusitors.append([counter, person_id, type_officials, hired_date, fired_date])
-            elif type_officials == 'Фискал':
-                fiskal[person_id] = [person_id, type_officials, hired_date, fired_date]
-            else:
-                sovety[person_id] = [person_id, type_officials, hired_date, fired_date]
+            # elif type_officials == 'Фискал':
+                # pass
+                # fiskal[person_id] = [person_id, type_officials, hired_date, fired_date]
+            # else:
+                # pass
+                # sovety[person_id] = [person_id, type_officials, hired_date, fired_date]
 
             # insert_official(person_id, type_officials, hired_date, fired_date)
             counter += 1
@@ -537,20 +541,22 @@ for i in range(64, 20065):
     official_ids.add(person_id)
     
     if type_officials == 'Епископ':
-        bishop[person_id] = [person_id, type_officials, hired_date, fired_date]
+        # bishop[person_id] = [person_id, type_officials, hired_date, fired_date]
         locality = locality_by_person_id[person_id]
         
         if locality not in bishops_by_locality:
-            bishops_by_locality[locality] = [person_id]
+            bishops_by_locality[locality] = [counter]
         else:
-            bishops_by_locality[locality].append(person_id)
+            bishops_by_locality[locality].append(counter)
 
     elif type_officials == 'Инквизитор':
         inqusitors.append([counter, person_id, type_officials, hired_date, fired_date])
-    elif type_officials == 'Фискал':
-        fiskal[person_id] = [person_id, type_officials, hired_date, fired_date]
-    else:
-        sovety[person_id] = [person_id, type_officials, hired_date, fired_date]
+    # elif type_officials == 'Фискал':
+        # pass
+        # fiskal[person_id] = [person_id, type_officials, hired_date, fired_date]
+    # else:
+        # pass
+        # sovety[person_id] = [person_id, type_officials, hired_date, fired_date]
 
     # insert_official(person_id, type_officials, hired_date, fired_date)
     counter += 1
@@ -806,12 +812,12 @@ for key, value in accusation_by_process.items():
         violation_time = random_date(minus_date_without_formating(st_date, 12), st_date)
         record_time = random_date(st_date, fn_date)
 
-        accusation_record.append([counter, informer_id, bishop, accuset_id, violation_place, violation_time, description, acc_pr_id, record_time])
-        accusation_record_to_save.append([informer_id, bishop, accuset_id, violation_place, violation_time, description, acc_pr_id, record_time])
+        accusation_record.append([counter, informer_id, bishop, accuset_id, violation_place, violation_time, description, acc_pr_id, record_time, None])
+        accusation_record_to_save.append([informer_id, bishop, accuset_id, violation_place, violation_time, description, acc_pr_id, record_time, None])
         counter += 1
         # insert_accusation_record(informer, bishop, accused, violation_place, violation_time, description, id_accusation, record_time)
 
-save_to_file('backup/accusation_record.csv', ['id', 'informer', 'bishop', 'accused', 'violation_place', 'violation_time', 'description', 'id_accusation', 'record_time'], accusation_record)
+save_to_file('backup/accusation_record.csv', ['id', 'informer', 'bishop', 'accused', 'violation_place', 'violation_time', 'description', 'id_accusation', 'record_time', 'status'], accusation_record)
 
 
 # investigative_cases = [
@@ -874,7 +880,7 @@ violations_to_save = []
 for record_id in range(1, len(accusation_record)):
     if record_id % 100 == 0:
         continue
-    commandment_id = random.randint(1, len(commandments) + 1)
+    commandment_id = random.randint(1, len(commandments))
     violations_to_save.append([commandment_id, record_id])
     # insert_violation(commandment_id, record_id)
 

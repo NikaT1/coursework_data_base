@@ -124,9 +124,10 @@ CREATE TABLE IF NOT EXISTS accusation_record(
 	bishop integer NOT NULL REFERENCES official(id) ON DELETE RESTRICT,
 	accused integer NOT NULL REFERENCES person(id) ON DELETE RESTRICT,
 	violation_place varchar(255),
-	date_time timestamp NOT NULL,
+	violation_time timestamp NOT NULL,
 	description text,
 	id_accusation integer NOT NULL REFERENCES accusation_process(id) ON DELETE CASCADE,
+    record_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	status accusation_status DEFAULT NULL
 );
 """
