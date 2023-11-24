@@ -75,7 +75,6 @@ $$ LANGUAGE plpgsql;
 
 
 
--- fixme заменить insert на эту функцию
 
 CREATE OR REPLACE FUNCTION add_accusation_record(cur_informer integer, cur_bishop integer, cur_accused integer, cur_violation_place varchar(255), cur_date_time timestamp, cur_description text, cur_accusation_id integer)  RETURNS integer   
 as $$
@@ -232,7 +231,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- FIXME прописать rank для сводов
+
 CREATE OR REPLACE PROCEDURE handle_cases_with_grave_sin (cur_inquisition_process integer)
 as $$
 DECLARE
