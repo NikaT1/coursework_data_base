@@ -50,7 +50,8 @@ create_commandment_table = """
 CREATE TABLE IF NOT EXISTS commandment (
     id serial PRIMARY KEY,
     description text NOT NULL UNIQUE,
-    rank integer NOT NULL CHECK (rank > 0 and rank < 6)
+    rank integer NOT NULL CHECK (rank > 0 and rank < 6),
+    description_vector tsvector
 );
 """
 

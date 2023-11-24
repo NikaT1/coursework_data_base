@@ -162,7 +162,6 @@ for commandment in commandments:
     insert_commandment(*commandment)
 
 # Example data for bible_commandments
-# FIXME: кажется есть проблемка с тем, что мы не проверям есть ли такой свод в Бибилии, по которой проходит процесс
 bible_commandments = [
     (1, 1),
     (1, 2),
