@@ -167,3 +167,13 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER check_data_for_inquisition_process BEFORE INSERT ON inquisition_process
     FOR EACH ROW EXECUTE FUNCTION check_data_for_inquisition_process();
 
+CREATE OR REPLACE FUNCTION update_content_vector() RETURNS trigger AS $$
+BEGIN
+  NEW.description_vector := to_tsvector('russian', NEW.description);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER update_content_vector_trigger BEFORE INSERT OR UPDATE ON commandment
+FOR EACH ROW EXECUTE FUNCTION update_content_vector();
