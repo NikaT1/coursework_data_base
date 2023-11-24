@@ -1,0 +1,80 @@
+RED='\033[0;31m'
+NC='\033[0m'
+echo -e "${RED} Создание и заполнение тестовыми данными${NC}"
+python ../python/drop.py
+python ../python/create.py
+psql -h pg -d studs -f ../sql/trigs.sql
+psql -h pg -d studs -f ../sql/funcs.sql
+python ../python/insert_test.py
+
+echo -e "${RED} ------- Тест 6- обработка дела в неправильном порядке ---------${NC}"
+
+
+echo -e "${RED} Начинаем инквизиционный процесс${NC}"
+
+psql -e -h pg -d studs -c 'SELECT start_inquisition_process(3, 1, 1);'  
+
+echo -e "${RED} Начинаем процесс приема доносов${NC}"
+
+psql -e -h pg -d studs -c 'SELECT start_accusation_process(1);'  
+
+echo -e "${RED} Фиксируем доносы${NC}"
+
+psql -e -h pg -d studs -c "SELECT add_accusation_record(1, 1, 2, 'Дома на столе', '1488-8-12', 'Найдена книга с запрещенными текстами', 1);"
+psql -e -h pg -d studs -c "SELECT add_accusation_record(1, 2, 1, 'Около церкви', '1479-10-2', 'Выругался на прохожего', 1);"
+psql -e -h pg -d studs -c "SELECT add_accusation_record(4, 2, 3, 'На сенокосе', '1480-6-22', 'Ради мести сломал орудие труда и подставил другого', 1);"
+psql -e -h pg -d studs -c "SELECT add_accusation_record(1, 2, 4, 'Ночью в комнате', '1483-4-18', 'Просил Бога наказать знакомого, потому что тому повезло', 1);"
+psql -e -h pg -d studs -c "SELECT add_accusation_record(3, 1, 4, 'В церковь', '1481-3-8', 'Появился в церкви в нетрезвом виде', 1);"
+
+echo -e "${RED} Заканчиваем процесс приема доносов${NC}"
+
+psql -e -h pg -d studs -c "SELECT finish_accusation_process(1);"
+
+echo -e "${RED} Смотрим на доносы, которые нужно распределить${NC}"
+
+psql -e -h pg -d studs -c "SELECT get_not_resolved_accusation_record(1)"  
+
+echo -e "${RED} Ищем по ключевым словам своды${NC}"
+
+echo 'книг'
+psql -e -h pg -d studs -c "SELECT find_in_bible('книг', 1)"  
+echo 'руг'
+psql -e -h pg -d studs -c "SELECT find_in_bible('руг', 1)"  
+echo 'мест'
+psql -e -h pg -d studs -c "SELECT find_in_bible('мест', 1)"  
+echo 'зави'
+psql -e -h pg -d studs -c "SELECT find_in_bible('зави', 1)"  
+echo 'свят'
+psql -e -h pg -d studs -c "SELECT find_in_bible('свят', 1)"  
+
+echo -e "${RED} Читаем библию${NC}"
+
+psql -e -h pg -d studs -c "SELECT read_bible(1)"  
+
+echo -e "${RED} Соединяем своды библии с доносами${NC}"
+
+psql -e -h pg -d studs -c "SELECT connect_commandment_with_record(2, 1)"  
+psql -e -h pg -d studs -c "SELECT connect_commandment_with_record(13, 3)"  
+psql -e -h pg -d studs -c "SELECT connect_commandment_with_record(11, 4)" 
+
+echo -e "${RED}Генерируем дела${NC}"
+
+psql -e -h pg -d studs -c "SELECT generate_cases(1)"
+
+echo -e "${RED}Обработаем простые дела${NC}"
+
+psql -e -h pg -d studs -c "CALL handle_simple_cases(1)"
+
+psql -e -h pg -d studs -c "CALL handle_cases_with_grave_sin(1)"
+
+echo -e "${RED}Посмотрим на оставшиеся дела${NC}"
+psql -e -h pg -d studs -c "SELECT get_not_resolved_cases(1)"
+
+echo -e "${RED}Отправим на беседу в церковь${NC}"
+
+psql -e -h pg -d studs -c "SELECT start_discussion(2)"
+
+echo -e "${RED}Пытаемся начать пытки до окончания беседы${NC}"
+
+psql -e -h pg -d studs -c "SELECT start_torture(2)"
+

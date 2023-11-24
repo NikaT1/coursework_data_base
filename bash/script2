@@ -1,0 +1,19 @@
+RED='\033[0;31m'
+NC='\033[0m'
+echo -e "${RED} Создание и заполнение тестовыми данными${NC}"
+python ../python/drop.py
+python ../python/create.py
+psql -h pg -d studs -f ../sql/trigs.sql
+psql -h pg -d studs -f ../sql/funcs.sql
+python ../python/insert_test.py
+
+echo -e "${RED} ------- Тест 2 - попытка начать два инквизиционных процесса в одной местности ---------${NC}"
+
+
+echo -e "${RED} Начинаем инквизиционный процесс 1 ${NC}"
+
+psql -e -h pg -d studs -c 'SELECT start_inquisition_process(3, 1, 1);'  
+
+echo -e "${RED} Начинаем инквизиционный процесс 2 ${NC}"
+
+psql -e -h pg -d studs -c 'SELECT start_inquisition_process(3, 1, 1);'  
