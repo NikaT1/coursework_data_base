@@ -26,12 +26,12 @@ BEGIN
 	case_count = (SELECT count(*)
 			FROM investigative_case
 		    WHERE investigative_case.id in (select case_id from accusation_investigative_case 
-						join accusation_record on accusation_record.id = record.id 
+						join accusation_record on accusation_record.id = record_id 
 						where id_accusation = cur_accusation_id)
 					and investigative_case.closed_date is NULL);
 	IF cur_finish_date IS NULL and case_count = 0 THEN
 		UPDATE inquisition_process SET finish_data = CAST (NOW() AS date) where id = inquisition_process_id;
-		RETURN cur_case_log_id;
+		RETURN inquisition_process_id;
 	ELSIF case_count = 0 THEN
 		RAISE EXCEPTION 'Не все дела закрыты';
 		RETURN NULL;
@@ -74,7 +74,7 @@ $$ LANGUAGE plpgsql;
 
 
 
--- FIXME fixme заменить insert на эту функцию
+-- fixme заменить insert на эту функцию
 
 CREATE OR REPLACE FUNCTION add_accusation_record(cur_informer integer, cur_bishop integer, cur_accused integer, cur_violation_place varchar(255), cur_date_time timestamp, cur_description text, cur_accusation_id integer)  RETURNS integer   
 as $$
@@ -352,7 +352,7 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION start_discussion(cur_case_id integer, discription text)  RETURNS integer   
+CREATE OR REPLACE FUNCTION start_discussion(cur_case_id integer)  RETURNS integer   
 as $$
     DECLARE
 		principal					 integer;
@@ -372,14 +372,14 @@ as $$
 			principal = get_best_principal(locality_id, 'Епископ'); 
 		
 			INSERT INTO case_log (case_id, case_status, principal, start_time, result, prison_id, finish_time, 
-			punishment_id, description) VALUES (cur_case_id, 'Исправительная беседа', principal, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, description)
+			punishment_id, description) VALUES (cur_case_id, 'Исправительная беседа', principal, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL)
 			RETURNING id INTO new_case_log_id;
 			RETURN new_case_log_id;
 		END IF;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION start_torture(cur_case_id integer, discription text)  RETURNS integer   
+CREATE OR REPLACE FUNCTION start_torture(cur_case_id integer)  RETURNS integer   
 as $$
     DECLARE
 		principal					 integer;
@@ -399,7 +399,7 @@ as $$
 			principal = get_best_principal(locality_id, 'Инквизитор'); 
 		
 			INSERT INTO case_log (case_id, case_status, principal, start_time, result, prison_id, finish_time, 
-			punishment_id, description) VALUES (cur_case_id, 'Пыточный процесс', principal, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, description)
+			punishment_id, description) VALUES (cur_case_id, 'Пыточный процесс', principal, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL)
 			RETURNING id INTO new_case_log_id;
 			RETURN new_case_log_id;
 		END IF;
@@ -409,14 +409,13 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION make_torture_step(cur_case_id integer, step integer)  RETURNS integer   
+CREATE OR REPLACE FUNCTION make_torture_step(cur_case_id integer, step integer)  RETURNS SETOF integer   
 as $$
     DECLARE
 		principal					 integer;
 		locality_id					 integer;
 		cur_case_log_id				 integer;
 		cur_victim					 integer;
-		new_torture_log_id				 integer;
 
     BEGIN
 		locality_id = ( select church.locality_id from church 
@@ -427,20 +426,19 @@ as $$
 								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
 		IF locality_id IS NULL THEN
 			RAISE EXCEPTION 'Введенное дело не найдено';
-			RETURN NULL;
 		ELSE
-			principal = get_best_principal(locality_id, "Фискал"); 
+			principal = get_best_principal(locality_id, 'Фискал'); 
 			cur_victim = ( select accused from accusation_process
 							join accusation_record on id_accusation = accusation_process.id 
 							where accusation_record.id in (
 								select record_id from accusation_investigative_case where case_id = cur_case_id) limit 1);
-			cur_case_log_id = ( select case_log.id from case_log where case_id = cur_case_id and case_status = "Пыточный процесс" );
+			cur_case_log_id = ( select case_log.id from case_log where case_id = cur_case_id and case_status = 'Пыточный процесс' );
 
 			INSERT INTO torture_log (case_log_id, type_id, executor, victim) 
-				VALUES (cur_case_log_id, step, principal, cur_victim)
-			RETURNING id INTO new_torture_log_id;
-
-			RETURN new_torture_log_id;
+				VALUES (cur_case_log_id, step, principal, cur_victim);
+			
+			RETURN NEXT cur_case_id;
+			RETURN NEXT step;
 		END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -448,29 +446,31 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION finish_case_log_process(cur_case_log_id integer, new_result case_log_result)  RETURNS integer     
+CREATE OR REPLACE FUNCTION finish_case_log_process(cur_case_log_id integer, new_result case_log_result,  cur_description text)  RETURNS integer     
 as $$
 DECLARE
 	cur_finish_time					timestamp;
 	cur_case_status					case_log_status;
+	cur_case_id						integer;
 BEGIN
 	cur_case_status = (select case_status from case_log where case_log.id = cur_case_log_id limit 1);
-	IF cur_case_status = "Наказание" THEN
+	IF cur_case_status = 'Наказание' THEN
 		RAISE EXCEPTION 'Нельзя завершить наказание';
 		RETURN NULL;
 	END IF;
 	cur_finish_time = (select finish_time from case_log where case_log.id = cur_case_log_id limit 1);
+	cur_case_id = (select case_id from  case_log where case_log.id = cur_case_log_id limit 1);
 	IF cur_finish_time IS NULL THEN
-		UPDATE case_log SET result = new_result, finish_time = CURRENT_TIMESTAMP where id = cur_case_log_id;
-		IF cur_case_status = "Исправительная беседа" and new_result = 'Признание вины' THEN
-			SELECT assign_punishment(cur_cases.id, 2, 'Назначена епетимья в связи с раскаянием');
-			UPDATE investigative_case SET closed_date = CAST (NOW() AS date) WHERE investigative_case.id = cur_cases.id;
-		ELSIF cur_case_status = "Пыточный процесс" and new_result = 'Признание вины' THEN
-			SELECT assign_punishment(cur_cases.id, 3, 'Назначено аутодафе в связи с раскаянием'); 
-			UPDATE investigative_case SET closed_date = CAST (NOW() AS date) WHERE investigative_case.id = cur_cases.id;
-		ELSIF cur_case_status = "Пыточный процесс" and new_result = 'Отрицание вины' THEN
-			SELECT assign_punishment(cur_cases.id, 1, 'Назначена казнь в связи с непризнаванием вины');
-			UPDATE investigative_case SET closed_date = CAST (NOW() AS date) WHERE investigative_case.id = cur_cases.id;
+		UPDATE case_log SET result = new_result, finish_time = CURRENT_TIMESTAMP, description = cur_description where id = cur_case_log_id;
+		IF cur_case_status = 'Исправительная беседа' and new_result = 'Признание вины' THEN
+			PERFORM assign_punishment(cur_case_id, 2, 'Назначена епетимья в связи с раскаянием');
+			UPDATE investigative_case SET closed_date = CAST (NOW() AS date) WHERE investigative_case.id = cur_case_id;
+		ELSIF cur_case_status = 'Пыточный процесс' and new_result = 'Признание вины' THEN
+			PERFORM assign_punishment(cur_case_id, 3, 'Назначено аутодафе в связи с раскаянием'); 
+			UPDATE investigative_case SET closed_date = CAST (NOW() AS date) WHERE investigative_case.id = cur_case_id;
+		ELSIF cur_case_status = 'Пыточный процесс' and new_result = 'Отрицание вины' THEN
+			PERFORM assign_punishment(cur_case_id, 1, 'Назначена казнь в связи с непризнаванием вины');
+			UPDATE investigative_case SET closed_date = CAST (NOW() AS date) WHERE investigative_case.id = cur_case_id;
 		END IF;
 		RETURN cur_case_log_id;
 	ELSE

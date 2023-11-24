@@ -70,6 +70,24 @@ psql -e -h pg -d studs -c "CALL handle_cases_with_grave_sin(1)"
 echo -e "${RED}Посмотрим на оставшиеся дела${NC}"
 psql -e -h pg -d studs -c "SELECT get_not_resolved_cases(1)"
 
+echo -e "${RED}Отправим на беседу в церковь${NC}"
 
-#SELECT finish_inquisition_process(inquisition_process_id integer) 
+psql -e -h pg -d studs -c "SELECT start_discussion(2)"
+
+echo -e "${RED}Заканчиваем беседу, фиксируем результат${NC}"
+psql -e -h pg -d studs -c "SELECT  finish_case_log_process(3, 'Отрицание вины',  'Беседовали долго, но безрезультатно')"
+
+echo -e "${RED}Отправим на пытки${NC}"
+
+psql -e -h pg -d studs -c "SELECT start_torture(2)"
+
+psql -e -h pg -d studs -c "SELECT make_torture_step(2, 1)"
+psql -e -h pg -d studs -c "SELECT make_torture_step(2, 2)"
+psql -e -h pg -d studs -c "SELECT make_torture_step(2, 3)"
+
+echo -e "${RED}Заканчиваем пытки, фиксируем результат${NC}"
+psql -e -h pg -d studs -c "SELECT  finish_case_log_process(4,'Отрицание вины',  'Пытали долго, но безрезультатно')"
+
+echo -e "${RED}Закрываем инквизиционный процесс${NC}"
+psql -e -h pg -d studs -c "SELECT finish_inquisition_process(1)" 
 

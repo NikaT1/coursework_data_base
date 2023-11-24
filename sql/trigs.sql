@@ -31,7 +31,7 @@ CREATE OR REPLACE FUNCTION check_data_for_torture() RETURNS trigger AS $$
 			prev_type = (
 				select type_id from torture_log where case_log_id = NEW.case_log_id order by type_id DESC limit 1
 			);
-			IF NEW.type_id - 1 = prev_type THEN
+			IF NEW.type_id - 1 != prev_type THEN
 				RAISE EXCEPTION 'значение type_id указано неверно';
 				RETURN NULL;
 			END IF;
@@ -53,15 +53,15 @@ CREATE OR REPLACE FUNCTION check_data_for_case_log() RETURNS trigger AS $$
 				select official_name from official where id = new.principal limit 1
 			);
 		step = 0;
-		IF (select 1 from case_log where case_log.case_id = NEW.case_id and case_log.case_status = 'Исправительная беседа') = 1 THEN
+		IF (select 1 from case_log where case_log.case_id = NEW.case_id and case_log.case_status = 'Исправительная беседа' and case_log.finish_time IS NOT NULL) = 1 THEN
 			step = 1;
 		END IF;
 
-		IF step = 1 and (select 1 from case_log where case_log.case_id = NEW.case_id and case_log.case_status = 'Пыточный процесс') = 1 THEN
+		IF step = 1 and (select 1 from case_log where case_log.case_id = NEW.case_id and case_log.case_status = 'Пыточный процесс' and case_log.finish_time IS NOT NULL) = 1 THEN
 			step = 2;
 		END IF;
 
-		IF step = 2 and (select 1 from case_log where case_log.case_id = NEW.case_id and case_log.case_status = 'Наказание') = 1 THEN
+		IF step = 2 and (select 1 from case_log where case_log.case_id = NEW.case_id and case_log.case_status = 'Наказание' and case_log.finish_time IS NOT NULL) = 1 THEN
 			step = 3;
 		END IF;
 			
@@ -164,6 +164,6 @@ CREATE OR REPLACE FUNCTION check_data_for_inquisition_process() RETURNS trigger 
 $$ LANGUAGE plpgsql;
 
 
-CREATE TRIGGER check_data_for_inquisition_process BEFORE INSERT OR UPDATE ON inquisition_process
+CREATE TRIGGER check_data_for_inquisition_process BEFORE INSERT ON inquisition_process
     FOR EACH ROW EXECUTE FUNCTION check_data_for_inquisition_process();
 

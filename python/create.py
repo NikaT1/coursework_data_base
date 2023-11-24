@@ -100,7 +100,7 @@ CREATE TABLE inquisition_process (
  official_id integer NOT NULL REFERENCES official(id) ON DELETE RESTRICT,
  church_id integer NOT NULL REFERENCES church(id) ON DELETE RESTRICT,
  bible_id integer NOT NULL REFERENCES bible(version) ON DELETE RESTRICT,
- CHECK (finish_data IS NULL OR start_data < finish_data)
+ CHECK (finish_data IS NULL OR start_data <= finish_data)
 );
 """
 
