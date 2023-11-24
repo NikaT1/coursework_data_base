@@ -513,3 +513,24 @@ as $$
 END;
 $$ LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE FUNCTION get_cases_by_name(cur_surname text)  RETURNS SETOF investigative_case
+as $$
+DECLARE
+	cur_persons								RECORD;
+BEGIN
+	FOR cur_persons IN
+       SELECT person.id
+         FROM person
+       WHERE person.surname = cur_surname
+    LOOP
+		RETURN QUERY EXECUTE format('SELECT *
+			FROM investigative_case
+		    WHERE investigative_case.id in (select case_id from accusation_investigative_case 
+						join accusation_record on accusation_record.id = record_id 
+						where accused = %s)', cur_persons.id);
+	END LOOP;
+		
+END;
+$$ LANGUAGE plpgsql;
+
