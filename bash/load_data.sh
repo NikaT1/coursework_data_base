@@ -1,0 +1,14 @@
+\copy locality from '/home/studs/s336768/backup/locality.csv' delimiter ',' csv header
+\copy church from '/home/studs/s336768/backup/church.csv' delimiter ',' csv header
+\copy prison from '/home/studs/s336768/backup/prison.csv' delimiter ',' csv header
+\copy bible from '/home/studs/s336768/backup/bible.csv' delimiter ',' csv header
+\copy commandment from '/home/studs/s336768/backup/commandment.csv' delimiter ',' csv header
+\copy bible_commandment from '/home/studs/s336768/backup/bible_commandment.csv' delimiter ',' csv header
+\copy person from '/home/studs/s336768/backup/person.csv' delimiter ',' csv header
+\copy official from '/home/studs/s336768/backup/official.csv' delimiter ',' csv header
+\copy inquisition_process from '/home/studs/s336768/backup/inquisition_process.csv' delimiter ',' csv header
+\copy accusation_process from '/home/studs/s336768/backup/accusation_process.csv' delimiter ',' csv header
+\copy accusation_record from '/home/studs/s336768/backup/accusation_record.csv' delimiter ',' csv header
+\copy punishment from '/home/studs/s336768/backup/punishment.csv' delimiter ',' csv header
+\copy violation from '/home/studs/s336768/backup/violation.csv' delimiter ',' csv header
+\copy torture_type from '/home/studs/s336768/backup/torture_type.csv' delimiter ',' csv header
