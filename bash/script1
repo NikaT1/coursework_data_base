@@ -1,11 +1,11 @@
 RED='\033[0;31m'
 NC='\033[0m'
 echo -e "${RED} Создание и заполнение тестовыми данными${NC}"
-python drop.py
-python create.py
-psql -h pg -d studs -f trigs.sql
-psql -h pg -d studs -f funcs.sql
-python insert_test.py
+python ../python/drop.py
+python ../python/create.py
+psql -h pg -d studs -f ../sql/trigs.sql
+psql -h pg -d studs -f ../sql/funcs.sql
+python ../python/insert_test.py
 
 echo -e "${RED} ------- Тест 1 - успешное выполнение всех функций ---------${NC}"
 
