@@ -1,5 +1,6 @@
 import Index from "@/components/Index";
 import Main from "@/components/Main";
+import Proccessing from "@/components/Proccessing";
 import NotFoundError from "@/components/Error";
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -16,7 +17,7 @@ const routes = [
     },
     {
         path: '/main-inquisitor',
-        name: 'main-page',
+        name: 'main-inquisitor-page',
         component: Main,
         beforeEnter: (to, from, next) =>
         {
@@ -27,11 +28,21 @@ const routes = [
         }
     },
     {
+        path: '/proccessing-inq',
+        name: 'proccessing-inq-page',
+        component: Proccessing,
+        beforeEnter: (to, from, next) => {
+            //            if (localStorage.getItem("par") !== null) {
+            //                next()
+            //            } else next({name: 'auth-page'}); ------ чтобы тестировать без авторизации
+            next()
+        }
+    },
+    {
         path: '/:pathMatch(.*)*',
         name: 'error-page',
         component: NotFoundError,
         props: {
-            //default: true,
             errorCode: "404",
             errorMessage: "Данной страницы не существует"
         }

@@ -49,7 +49,7 @@ export default {
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({username: this.login, password: this.password})
       };
-      this.sendRequest(requestOptions, "/api/user/new-user");
+      this.sendRequest(requestOptions, "***************");
 
     },
     logIn() {
@@ -58,7 +58,7 @@ export default {
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({username: this.login, password: this.password})
       };
-      this.sendRequest(requestOptions, "/api/user/check-user");
+      this.sendRequest(requestOptions, "****************");
     },
     start() {
       this.account = true
@@ -74,8 +74,17 @@ export default {
               });
             }
           }).then(data => {
-        localStorage.setItem("par", data);
-        this.$router.push({name: 'main-page'});
+              localStorage.setItem("par", data.user);
+              localStorage.setItem("role", data.role);
+              if (localStorage.getItem("role") == 0) {
+                  this.$router.push({ name: 'main-inquisitor-page' });
+              }
+              if (localStorage.getItem("role") == 1) {
+                  this.$router.push({ name: 'proccessing-inq-page' });
+              }
+              if (localStorage.getItem("role") == 2) {
+                  this.$router.push({ name: '------' }); //not created yet
+              }
       }).catch((e) => {
         localStorage.removeItem("par");
         this.$notify({

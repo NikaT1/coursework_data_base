@@ -31,7 +31,7 @@ export default {
     ButtonsBlock,
     ResultTable,
   },
-  name: 'Main',
+  name: 'Proccessing',
   data() {
     return {
       param_x: -5,
