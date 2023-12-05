@@ -15,7 +15,6 @@
 
 <script>
     import RadioBoxChain from "@/components/pcomponents/interactiveElements/RadioBoxChain";
-
     export default {
         name: "ArgsBlockInq",
         components: {

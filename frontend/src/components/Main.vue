@@ -28,7 +28,7 @@
     import ResultTable from "@/components/pcomponents/table/InquisitionResultTable";
     import Footer from "@/components/pcomponents/blocks/Footer";
     import ArgsBlockInq from "@/components/pcomponents/blocks/ArgsBlockInq";
-
+    import { useStore } from 'vuex';
     export default {
         components: {
             Footer,
@@ -78,8 +78,9 @@
             createNew() {
                 let locality = this.p_locality;
                 let bible = this.p_bible;
-                alert(this.store);
-                this.store().dispatch('CREATE_NEW_INQ', { locality, bible })
+                const store = useStore().state.inquisition;
+                alert(store);
+                store.dispatch('CREATE_NEW_INQ', { locality, bible })
                     .then(() => this.$router.push({ name: 'proccessing-page' }))
                     .catch(err => this.showError(err));
             },

@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from "@/App.vue";
 import Notifications from '@kyvg/vue3-notification';
 import router from "./Router.js";
-import { store } from './store';
+import store from './store/index';
 
 const app = createApp(App).use(router).use(Notifications);
 app.use(store);
