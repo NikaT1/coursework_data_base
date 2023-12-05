@@ -1,11 +1,9 @@
 <template>
-  <div v-for="x in radio_data" :key="x" class="labels">
+  <div v-for="bible in bible_data" :key="bible" class="labels">
     <label>
-      <input v-if="x===param_x" :name="radio_name" type="radio" :value="x" checked
-             @input="$emit('update:param_x', $event.target.value)">
-      <input v-else :name="radio_name" type="radio" :value="x"
-             @input="$emit('update:param_x', $event.target.value)">
-      <p>{{ x }}</p>
+      <input :name="radio_name" type="radio" :value="bible" checked
+             @input="$emit('update:param_bible', $event.target.value)">
+      <p>{{ bible.name }}</p>
     </label>
   </div>
 </template>
@@ -13,8 +11,8 @@
 <script>
 export default {
   name: "RadioBoxChain",
-  props: ['radio_data', 'param_x', 'radio_name'],
-  emits: ['update:param_x'],
+  props: ['bible_data', 'param_bible', 'radio_name'],
+  emits: ['update:param_bible'],
 }
 </script>
 
@@ -26,7 +24,7 @@ export default {
 .labels label {
   display: block;
   vertical-align: middle;
-  margin: 10% 10% 10%;
+  margin: 20% 20% 20%;
   text-align: center;
 }
 
