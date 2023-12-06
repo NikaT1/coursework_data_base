@@ -3,6 +3,12 @@
         <Header />
         <div class="main-background div-block">
             <div class="div-block" id="div-inline">
+                <div v-if="new_inq" class="div-block table-name">
+                    Создание нового инквизиционного процесса
+                </div>
+                <div v-if="main_info" class="div-block table-name">
+                    Возможные действия для Инквизитора
+                </div>
                 <ArgsBlockInq v-if="new_inq" class="div-block" v-model:p_locality="p_locality" v-model:p_bible="p_bible" />
                 <div v-if="new_inq" class="div-inline" id="div-buttons">
                     <ButtonsBlock v-bind:buttons="new_inq_buttons" v-on:goBackToMain="goBackToMain" v-on:createNew="createNew" />
@@ -11,7 +17,7 @@
                     <ButtonsBlock v-bind:buttons="start_buttons" v-on:goBack="goBack" v-on:startNew="startNew" v-on:openCurrent="openCurrent" />
                 </div>
             </div>
-            <div v-if="main_info" class="div-block table-name">
+            <div class="div-block table-name">
                 Список прошлых инквизиционных процессов:
             </div>
         </div>
@@ -28,7 +34,7 @@
     import ResultTable from "@/components/pcomponents/table/InquisitionResultTable";
     import Footer from "@/components/pcomponents/blocks/Footer";
     import ArgsBlockInq from "@/components/pcomponents/blocks/ArgsBlockInq";
-    import { useStore } from 'vuex';
+    import { mapState } from 'vuex';
     export default {
         components: {
             Footer,
@@ -40,7 +46,6 @@
         name: 'Main',
         data() {
             return {
-                data: new Array(0),
                 start_buttons: [
                     { msg: 'выйти', command: 'goBack' },
                     { msg: 'новый инквизиционный процесс', command: 'startNew' },
@@ -56,9 +61,12 @@
                 p_locality: null,
             }
         },
-        created: function () {
-            document.addEventListener('beforeunload', this.handlerClose);
+        created() {
+            this.$store.dispatch('GET_ALL_ACCUSATION_RECORDS');
         },
+        computed: mapState({
+            data: state => state.inquisition.inq_table_data
+        }),
         methods: {
             handleClose() {
                 localStorage.removeItem("par");
@@ -78,37 +86,18 @@
             createNew() {
                 let locality = this.p_locality;
                 let bible = this.p_bible;
-                const store = useStore().state.inquisition;
-                alert(store);
-                store.dispatch('CREATE_NEW_INQ', { locality, bible })
-                    .then(() => this.$router.push({ name: 'proccessing-page' }))
-                    .catch(err => this.showError(err));
+                //this.$store.dispatch('CREATE_NEW_INQ', { locality, bible })
+                //    .then(() => this.$router.push({ name: 'proccessing-acc-page' }))
+                //    .catch(err => this.showError(err));
+                this.$store.dispatch('CREATE_NEW_INQ', { locality, bible });
+                this.$router.push({ name: 'proccessing-acc-page' });
             },
             openCurrent() {
-                this.$router.push({ name: 'auth-page' }); ////FIXME
-            },
-            loadData() {
-                //const requestOptions = {
-                //  method: "GET",
-                //  headers: {"Authorization": "Bearer " + localStorage.getItem("par")},
-                //};
-                //const address = "*******************";
-                //this.sendRequestWithData(address, requestOptions);
-            },
-            sendRequestWithData(address, requestOptions) {
-                fetch(address, requestOptions)
-                    .then(response => {
-                        if (response.ok) return response.json();
-                        else {
-                            return response.text().then(text => {
-                                throw new Error(text)
-                            });
-                        }
-                    }).then(data => {
-                        this.data = data;
-                    }).catch((e) => {
-                        this.showError(e.message);
-                    });
+                //this.$store.dispatch('GET_CUR_INQ')
+                //    .then(() => this.$router.push({ name: 'proccessing-acc-page' }))
+                //    .catch(err => this.showError(err));
+                this.$store.dispatch('GET_CUR_INQ');
+                this.$router.push({ name: 'proccessing-acc-page' });
             },
             showError(text) {
                 this.$notify({
@@ -119,9 +108,6 @@
                 });
             }
         },
-        mounted() {
-            this.loadData();
-        }
     }
 </script>
 <style>

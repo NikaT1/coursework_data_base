@@ -1,6 +1,6 @@
 import Index from "@/components/Index";
 import Main from "@/components/Main";
-import Proccessing from "@/components/Proccessing";
+import ProccessingAccusation from "@/components/Proccessing_accusation";
 import NotFoundError from "@/components/Error";
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -19,23 +19,30 @@ const routes = [
         path: '/main-inquisitor',
         name: 'main-inquisitor-page',
         component: Main,
-        beforeEnter: (to, from, next) =>
-        {
-//            if (localStorage.getItem("par") !== null) {
-//                next()
-//            } else next({name: 'auth-page'}); ------ чтобы тестировать без авторизации
-            next()
+        beforeEnter: (to, from, next) => {
+            if (localStorage.getItem("token") !== null) {
+                if (localStorage.getItem("role") == 0) {
+                    next();
+                }
+                if (localStorage.getItem("role") == 1) {
+                    next({ name: 'proccessing-acc-page' });
+                }
+            } else next({ name: 'auth-page' });
         }
     },
     {
-        path: '/proccessing-inq',
-        name: 'proccessing-inq-page',
-        component: Proccessing,
+        path: '/proccessing-acc',
+        name: 'proccessing-acc-page',
+        component: ProccessingAccusation,
         beforeEnter: (to, from, next) => {
-            //            if (localStorage.getItem("par") !== null) {
-            //                next()
-            //            } else next({name: 'auth-page'}); ------ чтобы тестировать без авторизации
-            next()
+            if (localStorage.getItem("token") !== null) {
+                if (localStorage.getItem("role") == 0) {
+                    next();
+                }
+                if (localStorage.getItem("role") == 1) {
+                    next();
+                }
+            } else next({ name: 'auth-page' });
         }
     },
     {

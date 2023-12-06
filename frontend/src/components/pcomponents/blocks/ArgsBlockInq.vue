@@ -2,7 +2,7 @@
     <div>
         <div class="background">
             <p>Выберите библию:</p>
-            <RadioBoxChain v-model:bible_data="bible_data" v-model:param_bible="bible" radio_name="bibleRadioBox" />
+            <RadioBoxChain v-model:bible_data="bible_data" v-model:p_bible="bible" radio_name="bibleRadioBox" />
         </div>
         <div class="background">
             <p>Выберите местность:</p>
@@ -15,6 +15,7 @@
 
 <script>
     import RadioBoxChain from "@/components/pcomponents/interactiveElements/RadioBoxChain";
+    import { mapState } from 'vuex';
     export default {
         name: "ArgsBlockInq",
         components: {
@@ -24,15 +25,6 @@
         emits: ['update:p_locality', 'update:p_bible'],
         data() {
             return {
-                bible_data: [
-                    { name: 'Библия 1', id: 1 },
-                    { name: 'Библия 2', id: 2 },
-                    { name: 'Библия 3', id: 3 }
-                ],
-                locality_data: [
-                    { name: 'Санкт-Петербург', id: 1 },
-                    { name: 'Нижжжжжний', id: 2 }
-                ],
                 locality: "",
                 bible: "",
             }
@@ -51,62 +43,14 @@
                 this.bible = val;
             },
         },
-        method: {
-            sendRequestWithLocalityData(address, requestOptions) {
-                fetch(address, requestOptions)
-                    .then(response => {
-                        if (response.ok) return response.json();
-                        else {
-                            return response.text().then(text => {
-                                throw new Error(text)
-                            });
-                        }
-                    }).then(data => {
-                        this.locality_data = data;
-                    }).catch((e) => {
-                        this.showError(e.message);
-                    });
-            },
-
-            sendRequestWithBibleData(address, requestOptions) {
-                fetch(address, requestOptions)
-                    .then(response => {
-                        if (response.ok) return response.json();
-                        else {
-                            return response.text().then(text => {
-                                throw new Error(text)
-                            });
-                        }
-                    }).then(data => {
-                        this.bible_data = data;
-                    }).catch((e) => {
-                        this.showError(e.message);
-                    });
-            },
-
-            loadData() {
-                this.bible_data = [
-                    { name: 'Библия 1', id: 1 },
-                    { name: 'Библия 2', id: 2 },
-                    { name: 'Библия 3', id: 3 }
-                ];
-                this.locality_data = [
-                    { name: 'Санкт-Петербург', id: 1 },
-                    { name: 'Нижжжжжний', id: 2 }
-                ];
-                //const requestOptions = {
-                //    method: "GET",
-                //    headers: { "Authorization": "Bearer " + localStorage.getItem("par") },
-                //};
-                //const address = "*******************";
-                //this.sendRequestWithLocalityData(address, requestOptions);
-                //address = "*******************";
-                //this.sendRequestWithBibleData(address, requestOptions);
-            },
+        created() {
+            this.$store.dispatch('GET_ALL_BIBLES');
+            this.$store.dispatch('GET_ALL_LOCALITIES');
         },
-        mounted: function() {
-            //this.loadData();   //FIXME
-        }
+        computed: mapState({
+            bible_data: state => state.inquisition.bible_data,
+            locality_data: state => state.inquisition.locality_data,
+        }),
     }
 </script>
 

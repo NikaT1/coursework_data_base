@@ -8,9 +8,6 @@
 <script>
     export default {
         name: 'App',
-        mounted() {
-            alert(this.store);
-        }
     }
 </script>
 <style>
