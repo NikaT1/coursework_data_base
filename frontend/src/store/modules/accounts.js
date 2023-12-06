@@ -21,12 +21,14 @@ const mutations = {
 };
 
 const actions = {
+
+	//json в формате role, login, password, name, surname, locality_id, birth_date, person_gender -> jwt token
 	CREATE_NEW_ACCOUNT(context, payload) {
 		/*return new Promise((resolve, reject) => {
 			axios({ url: '*********', data: payload, method: 'POST' })
 				.then(resp => {
 					context.commit('SET_TOKEN', resp.data.token);
-					context.commit('SET_ROLE', resp.data.role);
+					context.commit('SET_ROLE', payload.role);
 					resolve(resp);
 				})
 				.catch(err => {
@@ -38,6 +40,8 @@ const actions = {
 		context.commit('SET_ROLE', 0);
 
 	},
+
+	//json в формате login, password -> jwt token, role
 	LOG_IN_ACCOUNT(context, payload) {
 		/*return new Promise((resolve, reject) => {
 			axios({ url: '*********', data: payload, method: 'GET' })

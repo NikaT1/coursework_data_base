@@ -65,6 +65,9 @@ const actions = {
 		});
 
 	},
+	// по official_id определяет текущую иквизицию и возвращает инфу о ней (id, bible (id, name), locality (id, name), step).
+	//step - это этап, на котором находится иквизиция (0 - только создана, 1 - процесс сбора доносов запущен, 2 - процесс сбора доносов окончен (этап формирования дел)
+	// 3 - это этап, когда все дела сформированы (функция get_not_resolved_cases) ничего не возвращает, 4 - все дела закончены, инквизиционный процесс завершен)
 	GET_CUR_INQ(context) {
 		/*return new Promise((resolve, reject) => {
 			const official_id = state.official_id;
@@ -89,6 +92,8 @@ const actions = {
 			step: 0
 		});
 	},
+
+	// accusation_id -> все рекорды, относящиеся к этому процессу сбора доносов в виде массива json (см ниже в методе пример данных)
 	GET_ALL_ACCUSATION_RECORDS(context) {
 		/*return new Promise((resolve, reject) => {
 			const accusation_id = state.accusation_id;
@@ -110,6 +115,8 @@ const actions = {
 			description: 'бла бла бля',
 		}]);
 	},
+
+	// ничего не дается на вход -> все записи об инквизициях в формате см. ниже в методе
 	GET_ALL_INQUISITIONS(context) {
 		/*return new Promise((resolve, reject) => {
 			axios({ url: '*********', method: 'GET' })
@@ -129,6 +136,8 @@ const actions = {
 			end_time: '2023-12-25',
 		}]);
 	},
+
+	// ничего на вход -> массив инфы о всех библиях см ниже формат
 	GET_ALL_BIBLES(context) {
 		/*return new Promise((resolve, reject) => {
 			axios({ url: '*********', method: 'GET' })
@@ -146,6 +155,8 @@ const actions = {
 			{ name: 'Библия 2', id: 2 },
 			{ name: 'Библия 3', id: 3 }]);
 	},
+
+	// ничего на вход -> массив инфы о всех местностях (locality) см ниже формат
 	GET_ALL_LOCALITIES(context) {
 		/*return new Promise((resolve, reject) => {
 			axios({ url: '*********', method: 'GET' })
