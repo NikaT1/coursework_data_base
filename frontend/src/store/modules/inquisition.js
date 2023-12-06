@@ -7,6 +7,8 @@ const state = () => ({
 	accusation_id: 0,
 	inq_table_data: [],
 	acc_table_data: [],
+	acc_nr_table_data: [],
+	cases_data: [],
 	locality_data: [],
 	bible_data: []
 });
@@ -28,6 +30,9 @@ const mutations = {
 	SET_ACC_TABLE_DATA: (state, payload) => {
 		state.acc_table_data = payload;
 	},
+	SET_ACC_NR_TABLE_DATA: (state, payload) => {
+		state.acc_nr_table_data = payload;
+	},
 	SET_INQ_TABLE_DATA: (state, payload) => {
 		state.inq_table_data = payload;
 	},
@@ -36,6 +41,9 @@ const mutations = {
 	},
 	SET_BIBLE_DATA: (state, payload) => {
 		state.bible_data = payload;
+	},
+	SET_CASES_DATA: (state, payload) => {
+		state.cases_data = payload;
 	},
 };
 
@@ -173,7 +181,48 @@ const actions = {
 			{ name: 'Нижжжжжний', id: 2 }
 		]);
 	},
-
+	// на вход accusation_id -> вызвать get_not_resolved_accusation_record и вернуть результат (в формате как для GET_ALL_ACCUSATION_RECORDS)
+	GET_NR_ACCUSATION_RECORDS(context, payload) {
+		/*return new Promise((resolve, reject) => {
+			axios({ url: '*********', data: payload, method: 'GET' })
+				.then(resp => {
+					context.commit('SET_ACC_NR_TABLE_DATA', resp.data);
+					resolve(resp);
+				})
+				.catch(err => {
+					reject(err)
+				})
+		})*/ //пока заглушка
+		console.log(payload);
+		context.commit('SET_ACC_NR_TABLE_DATA', [{
+			informer: 'Виктор Викторович',
+			bishop: 'Виктор Викторович',
+			accused: 'Сергей Сергеевич',
+			violation_place: 'дома',
+			date_time: '2023-12-23',
+			description: 'бла бла бля',
+		}]);
+	},
+	// на вход inq_id -> вызвать finish_accusation_proccess, generate_cases и вернуть результат (формат см ниже, violation_description - это конкатенация всех согрешений челикса)
+	GET_ALL_CASES(context, payload) {
+		/*return new Promise((resolve, reject) => {
+			axios({ url: '*********', data: payload, method: 'GET' })
+				.then(resp => {
+					context.commit('SET_CASES_DATA', resp.data);
+					resolve(resp);
+				})
+				.catch(err => {
+					reject(err)
+				})
+		})*/ //пока заглушка
+		console.log(payload);
+		context.commit('SET_CASES_DATA', [{
+			id: 1,
+			accused: 'Сергей Сергеевич',
+			creation_date: '2023-12-23',
+			violation_description: 'бла бла бля',
+		}]);
+	},
 };
 export default {
 	state,

@@ -6,8 +6,11 @@
                 Идет процесс сбора доносов
             </div>
             <div class="div-block" id="div-inline">
-                <div class="div-inline" id="div-buttons">
-                    <ButtonsBlock v-bind:buttons="buttons" v-on:goBack="goBack" v-on:startNew="startNew" v-on:openCurrent="openCurrent" />
+                <div v-if ="is_inq" class="div-inline" id="div-buttons">
+                    <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:newAcc="newAcc" v-on:finishAcc="finishAcc" />
+                </div>
+                <div v-if ="is_bish" class="div-inline" id="div-buttons">
+                    <ButtonsBlock v-bind:buttons="buttons_for_bish" v-on:goBack="goBack" v-on:newAcc="newAcc" />
                 </div>
             </div>
             <div class="div-block table-name">
@@ -38,10 +41,17 @@
         name: 'Proccessing_accusation',
         data() {
             return {
-                buttons: [
+                buttons_for_inq: [
                     { msg: 'назад', command: 'goBack' },
-                    { msg: 'новый донос', command: 'startNew' },
+                    { msg: 'новый донос', command: 'newAcc' },
+                    { msg: 'закончить сбор доносов', command: 'finishAcc' },
                 ],
+                buttons_for_bish: [
+                    { msg: 'назад', command: 'goBack' },
+                    { msg: 'новый донос', command: 'newAcc' },
+                ],
+                is_inq: (localStorage.getItem("role") == '0'),
+                is_bish: (localStorage.getItem("role") == '1'),
             }
         },
         computed: mapState({
@@ -49,10 +59,21 @@
         }),
         methods: {
             handleClose() {
-                localStorage.removeItem("par");
+                localStorage.removeItem("token");
             },
             goBack() {
-                this.$router.push({ name: 'auth-page' });
+     
+                if (localStorage.getItem("role") == 0) {
+                    this.$router.push({ name: 'main-inquisitor-page' });
+                } else {
+                    this.$router.push({ name: 'auth-page' });
+                } 
+            }, 
+            newAcc() {
+                ////FIXME
+            }, 
+            finishAcc() {
+                this.$router.push({ name: 'proccessing-cases' });
             }, 
             showError(text) {
                 this.$notify({
@@ -71,7 +92,7 @@
 <style>
 
     .table-name {
-        font-size: big;
+        font-size: medium;
         color: #6d747f;
         font-size: 20px;
         padding: 20px;

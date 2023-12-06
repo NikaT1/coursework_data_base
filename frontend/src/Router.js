@@ -1,6 +1,7 @@
 import Index from "@/components/Index";
 import Main from "@/components/Main";
 import ProccessingAccusation from "@/components/Proccessing_accusation";
+import ProccessingCases from "@/components/Proccessing_cases";
 import NotFoundError from "@/components/Error";
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -34,6 +35,21 @@ const routes = [
         path: '/proccessing-acc',
         name: 'proccessing-acc-page',
         component: ProccessingAccusation,
+        beforeEnter: (to, from, next) => {
+            if (localStorage.getItem("token") !== null) {
+                if (localStorage.getItem("role") == 0) {
+                    next();
+                }
+                if (localStorage.getItem("role") == 1) {
+                    next();
+                }
+            } else next({ name: 'auth-page' });
+        }
+    },
+    {
+        path: '/proccessing-cases',
+        name: 'proccessing-cases',
+        component: ProccessingCases,
         beforeEnter: (to, from, next) => {
             if (localStorage.getItem("token") !== null) {
                 if (localStorage.getItem("role") == 0) {
