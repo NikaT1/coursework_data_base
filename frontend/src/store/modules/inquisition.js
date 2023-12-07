@@ -10,7 +10,8 @@ const state = () => ({
 	acc_nr_table_data: [],
 	cases_data: [],
 	locality_data: [],
-	bible_data: []
+	bible_data: [],
+	people_data: [],
 });
 const getters = {
 	CUR_INQ: state => {
@@ -44,6 +45,9 @@ const mutations = {
 	},
 	SET_CASES_DATA: (state, payload) => {
 		state.cases_data = payload;
+	},
+	SET_PEOPLE_DATA: (state, payload) => {
+		state.people_data = payload;
 	},
 };
 
@@ -221,6 +225,26 @@ const actions = {
 			accused: 'Сергей Сергеевич',
 			creation_date: '2023-12-23',
 			violation_description: 'бла бла бля',
+		}]);
+	},
+	// на вход id locality ->  вернуть массив всех людей (формат см ниже)
+	GET_ALL_PEOPLE(context, payload) {
+		/*return new Promise((resolve, reject) => {
+			const locality_id = state.cur_data.locality
+			axios({ url: '*********', data: payload, method: 'GET' })
+				.then(resp => {
+					context.commit('SET_PEOPLE_DATA', resp.data);
+					resolve(resp);
+				})
+				.catch(err => {
+					reject(err)
+				})
+		})*/ //пока заглушка
+		console.log(payload);
+		context.commit('SET_PEOPLE_DATA', [{
+			id: 1,
+			name: 'Сергей',
+			surname: 'Сергеевич',
 		}]);
 	},
 };

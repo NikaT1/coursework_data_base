@@ -41,27 +41,7 @@
         height: 100%;
     }
 
-    input[type="text"] {
-        font-family: inherit;
-        font-size: inherit;
-        line-height: inherit;
-        margin: 0;
-    }
-
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus,
-    textarea:-webkit-autofill,
-    textarea:-webkit-autofill:hover,
-    textarea:-webkit-autofill:focus,
-    select:-webkit-autofill,
-    select:-webkit-autofill:hover,
-    select:-webkit-autofill:focus {
-        border: 1px solid #bdbdbd;
-        -webkit-text-fill-color: #212529;
-        -webkit-box-shadow: 0 0 0px 1000px #fff inset;
-        transition: background-color 5000s ease-in-out 0s;
-    }
+ 
 
     .notify {
         font-family: New Century Schoolbook, TeX Gyre Schola, serif;

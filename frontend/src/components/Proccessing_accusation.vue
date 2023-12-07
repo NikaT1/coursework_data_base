@@ -2,14 +2,18 @@
     <div>
         <Header />
         <div class="main-background div-block">
-            <div class="div-block table-name">
+            <div v-if="main_inf" class="div-block table-name">
                 Идет процесс сбора доносов
             </div>
+            <div v-if="new_rec" class="div-block table-name">
+                Создание нового доноса
+            </div>
             <div class="div-block" id="div-inline">
-                <div v-if ="is_inq" class="div-inline" id="div-buttons">
+                <ArgsBlockRecord v-if="new_rec" class="div-block" v-model:p_accused="p_accused" v-model:p_informer="p_informer" v-model:p_cur_violation_place="p_cur_violation_place" v-model:p_cur_date_time="p_cur_date_time" v-model:p_locality="p_cur_description" />
+                <div v-if="is_inq && main_inf" class="div-inline" id="div-buttons">
                     <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:newAcc="newAcc" v-on:finishAcc="finishAcc" />
                 </div>
-                <div v-if ="is_bish" class="div-inline" id="div-buttons">
+                <div v-if="is_bish && main_inf" class="div-inline" id="div-buttons">
                     <ButtonsBlock v-bind:buttons="buttons_for_bish" v-on:goBack="goBack" v-on:newAcc="newAcc" />
                 </div>
             </div>
@@ -17,8 +21,10 @@
                 Список доносов:
             </div>
         </div>
-        <div class="div-block" id="result-table">
-            <AccusationResultTable v-model:data="data" />
+        <div class="card">
+            <DataTable :value="data" paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem">
+                <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" style="width: 20%"></Column>
+            </DataTable>
         </div>
     </div>
     <Footer />
@@ -27,20 +33,26 @@
 <script>
     import Header from "@/components/pcomponents/blocks/Header";
     import ButtonsBlock from "@/components/pcomponents/blocks/ButtonsBlock";
-    import AccusationResultTable from "@/components/pcomponents/table/AccusationResultTable";
+    import ArgsBlockRecord from "@/components/pcomponents/blocks/ArgsBlockRecord";
     import Footer from "@/components/pcomponents/blocks/Footer";
     import { mapState } from 'vuex';
+    import DataTable from 'primevue/datatable';
+    import Column from 'primevue/column';
 
     export default {
         components: {
             Footer,
             Header,
             ButtonsBlock,
-            AccusationResultTable,
+            DataTable,
+            ArgsBlockRecord,
+            Column,
         },
         name: 'Proccessing_accusation',
         data() {
             return {
+                main_inf: true,
+                new_rec: false,
                 buttons_for_inq: [
                     { msg: 'назад', command: 'goBack' },
                     { msg: 'новый донос', command: 'newAcc' },
@@ -52,6 +64,19 @@
                 ],
                 is_inq: (localStorage.getItem("role") == '0'),
                 is_bish: (localStorage.getItem("role") == '1'),
+                columns: [
+                    { field: 'informer', header: 'Доносчик' },
+                    { field: 'bishop', header: 'Епископ' },
+                    { field: 'accused', header: 'Обвиненный' },
+                    { field: 'violation_place', header: 'Место преступления' },
+                    { field: 'date_time', header: 'Дата' },
+                    { field: 'description', header: 'Описание' },
+                ],
+                p_accused: null,
+                p_informer: null,
+                p_cur_violation_place: "",
+                p_cur_date_time: "",
+                p_cur_description: "",
             }
         },
         computed: mapState({
@@ -62,19 +87,19 @@
                 localStorage.removeItem("token");
             },
             goBack() {
-     
                 if (localStorage.getItem("role") == 0) {
                     this.$router.push({ name: 'main-inquisitor-page' });
                 } else {
                     this.$router.push({ name: 'auth-page' });
-                } 
-            }, 
+                }
+            },
             newAcc() {
-                ////FIXME
-            }, 
+                this.main_inf = false;
+                this.new_rec = true;
+            },
             finishAcc() {
                 this.$router.push({ name: 'proccessing-cases' });
-            }, 
+            },
             showError(text) {
                 this.$notify({
                     group: "error",

@@ -22,7 +22,9 @@
             </div>
         </div>
         <div class="div-block" id="result-table">
-            <ResultTable v-model:data="data" />
+            <DataTable :value="data" paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem">
+                <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" style="width: 24%"></Column>
+            </DataTable>
         </div>
     </div>
     <Footer />
@@ -31,17 +33,19 @@
 <script>
     import Header from "@/components/pcomponents/blocks/Header";
     import ButtonsBlock from "@/components/pcomponents/blocks/ButtonsBlock";
-    import ResultTable from "@/components/pcomponents/table/InquisitionResultTable";
     import Footer from "@/components/pcomponents/blocks/Footer";
     import ArgsBlockInq from "@/components/pcomponents/blocks/ArgsBlockInq";
     import { mapState } from 'vuex';
+    import DataTable from 'primevue/datatable';
+    import Column from 'primevue/column';
     export default {
         components: {
             Footer,
             Header,
             ButtonsBlock,
-            ResultTable,
             ArgsBlockInq,
+            DataTable,
+            Column,
         },
         name: 'Main',
         data() {
@@ -59,24 +63,31 @@
                 main_info: true,
                 p_bible: null,
                 p_locality: null,
+                columns: [
+                    { field: 'start_time', header: 'Дата начала' },
+                    { field: 'locality', header: 'Местность' },
+                    { field: 'inquisitor', header: 'Инквизитор' },
+                    { field: 'cases_count', header: 'Кол-во дел' },
+                    { field: 'end_time', header: 'Дата окончания' },
+                ],
             }
         },
         created() {
-            this.$store.dispatch('GET_ALL_ACCUSATION_RECORDS');
+            this.$store.dispatch('GET_ALL_INQUISITIONS');
         },
         computed: mapState({
             data: state => state.inquisition.inq_table_data
         }),
         methods: {
             handleClose() {
-                localStorage.removeItem("par");
+                localStorage.removeItem("token");
             },
             goBackToMain() {
                 this.new_inq = false;
                 this.main_info = true;
             },
             goBack() {
-                localStorage.removeItem("par");
+                localStorage.removeItem("token");
                 this.$router.push({ name: 'auth-page' });
             },
             startNew() {
@@ -84,8 +95,8 @@
                 this.main_info = false;
             },
             createNew() {
-                let locality = this.p_locality;
-                let bible = this.p_bible;
+                let locality = this.p_locality.id;
+                let bible = this.p_bible.id;
                 //this.$store.dispatch('CREATE_NEW_INQ', { locality, bible })
                 //    .then(() => this.$router.push({ name: 'proccessing-acc-page' }))
                 //    .catch(err => this.showError(err));
