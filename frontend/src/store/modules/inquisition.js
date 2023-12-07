@@ -2,8 +2,11 @@
 const state = () => ({
 	cur_inq: null,
 	token: localStorage.getItem('token') || '',
+
 	person_id: 0,
 	official_id: 0,
+	person_name: "",
+
 	accusation_id: 0,
 	inq_table_data: [],
 	acc_table_data: [],
@@ -19,9 +22,26 @@ const getters = {
 	},
 	CUR_OFFICIAL: state => {
 		return state.official_id;
+	}, 
+	CUR_NAME: state => {
+		return state.person_name;
+	},
+	ACC_TABLE_DATA: state => {
+		return state.acc_table_data;
 	},
 };
+
 const mutations = {
+	SET_INITIAL_INF: (state, payload) => {
+		state.person_id = payload.person_id;
+		state.official_id = payload.official_id;
+		state.person_name = payload.person_name;
+	},
+
+	SET_ACCUSATION_ID: (state, payload) => {
+		state.accusation_id = payload;
+	},
+
 	SET_CUR_INQ: (state, payload) => {
 		state.cur_inq = payload;
 	},
@@ -49,9 +69,38 @@ const mutations = {
 	SET_PEOPLE_DATA: (state, payload) => {
 		state.people_data = payload;
 	},
+	ADD_TO_ACC_TABLE_DATA: (state, payload) => {
+		state.acc_table_data.push(payload);
+	},
 };
 
 const actions = {
+	INCREASE_STEP(context) {
+		const inq = context.getters.CUR_INQ;
+		inq.step = inq.step + 1;
+		context.commit('SET_CUR_INQ', inq);
+	},
+
+	// token -> id person, official id, person_name (то есть full_name = name+surname)
+	INITIAL_ACT(context, payload) {
+		/*return new Promise((resolve, reject) => {
+			axios({ url: '*********', data: payload, method: 'GET' })
+				.then(resp => {
+					context.commit('SET_INITIAL_INF', resp.data);
+					resolve(resp);
+				})
+				.catch(err => {
+					reject(err)
+				})
+		})*/  //пока заглушка
+		context.commit('SET_INITIAL_INF', {
+			person_id: 1,
+			official_id: 1,
+			person_name: "МАРИНА НИКОЛАЕВНА",
+		});
+		console.log(payload)
+
+	},
 	// bible_id, locality_id -> id inq
 	CREATE_NEW_INQ(context, payload) {
 		/*return new Promise((resolve, reject) => {
@@ -69,6 +118,7 @@ const actions = {
 					reject(err)
 				})
 		})*/  //пока заглушка
+		console.log(payload.bible, payload.locality);
 		context.commit('SET_CUR_INQ', {
 			id: 1,
 			bible: payload.bible,
@@ -105,6 +155,24 @@ const actions = {
 		});
 	},
 
+	// inq_id -> вызвать start_accusation_process и вернуть id
+	START_ACCUSATION_PROCESS(context) {
+		/*return new Promise((resolve, reject) => {
+			const inq_id = state.cur_inq.id;
+			axios({ url: '*********', data: inq_id, method: 'GET' })
+				.then(resp => {
+					context.commit('SET_ACCUSATION_ID', resp.data);
+					context.commit('INCREASE_STEP');
+					resolve(resp);
+				})
+				.catch(err => {
+					reject(err)
+				})
+		})*/ //пока заглушка
+		context.commit('SET_ACCUSATION_ID', 3);
+		context.commit('INCREASE_STEP');
+	},
+
 	// accusation_id -> все рекорды, относящиеся к этому процессу сбора доносов в виде массива json (см ниже в методе пример данных)
 	GET_ALL_ACCUSATION_RECORDS(context) {
 		/*return new Promise((resolve, reject) => {
@@ -126,6 +194,7 @@ const actions = {
 			date_time: '2023-12-23',
 			description: 'бла бла бля',
 		}]);
+		console.log(context.getters.ACC_TABLE_DATA);
 	},
 
 	// ничего не дается на вход -> все записи об инквизициях в формате см. ниже в методе
@@ -147,6 +216,22 @@ const actions = {
 			cases_count: 25,
 			end_time: '2023-12-25',
 		}]);
+	},
+
+	// accusation_id -> вызвать finish_accusation_process, ничего не возвращать 
+	FINISH_ACCUSATION_PROCESS(context) {
+		/*return new Promise((resolve, reject) => {
+			const inq_id = state.cur_inq.id;
+			axios({ url: '*********', data: inq_id, method: 'GET' })
+				.then(resp => {
+					context.commit('INCREASE_STEP');
+					resolve(resp);
+				})
+				.catch(err => {
+					reject(err)
+				})
+		})*/ //пока заглушка
+		context.commit('INCREASE_STEP');
 	},
 
 	// ничего на вход -> массив инфы о всех библиях см ниже формат
@@ -207,6 +292,11 @@ const actions = {
 			description: 'бла бла бля',
 		}]);
 	},
+
+	FINISH_RESOLVING_RECORDS(context) {
+		context.commit('INCREASE_STEP');
+	},
+
 	// на вход inq_id -> вызвать finish_accusation_proccess, generate_cases и вернуть результат (формат см ниже, violation_description - это конкатенация всех согрешений челикса)
 	GET_ALL_CASES(context, payload) {
 		/*return new Promise((resolve, reject) => {
@@ -233,7 +323,7 @@ const actions = {
 			const locality_id = state.cur_data.locality
 			axios({ url: '*********', data: payload, method: 'GET' })
 				.then(resp => {
-					context.commit('SET_PEOPLE_DATA', resp.data);
+					context.commit('SET_PEOPLE_DATA', resp.data); // FIXME concat name and surname
 					resolve(resp);
 				})
 				.catch(err => {
@@ -246,6 +336,33 @@ const actions = {
 			name: 'Сергей',
 			surname: 'Сергеевич',
 		}]);
+	},
+	/* на вход эта инфа в виде json:
+	let accused = p_accused.id;
+	let bishop = bishop id;
+	let informer = p_informer.id;
+	let violation_place = p_cur_violation_place;
+	let date_time = p_cur_date_time;
+	let description = p_cur_description; 
+	+ inq id
+	-> вызвать add_accusation_record и вернуть обновленный массив рекордов для этой инквизиции??? или обновление отдельно сделаем??*/
+	ADD_ACC_RECORD(context, payload) {
+		/*return new Promise((resolve, reject) => {
+			payload["inq_id"] = state.cur_inq.id;
+			payload["bishop"] = state.official.id;
+			axios({ url: '*********', data: payload, method: 'POST' })
+				.then(resp => {
+					context.commit('SET_ACC_TABLE_DATA', resp.data); 
+					resolve(resp);
+				})
+				.catch(err => {
+					reject(err)
+				})
+		})*/ //пока заглушка
+		console.log(payload);
+		payload["bishop"] = context.getters.CUR_NAME;
+		context.commit('ADD_TO_ACC_TABLE_DATA', payload);
+		console.log(context.getters.ACC_TABLE_DATA);
 	},
 };
 export default {

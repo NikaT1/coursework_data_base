@@ -47,7 +47,8 @@
 
         computed: mapState({
             token: state => state.accounts.token,
-            role: state => state.accounts.role
+            role: state => state.accounts.role,
+            name: state => state.inquisition.person_name,
         }),
         methods: {
             createUser() {
@@ -57,11 +58,14 @@
                     .then(() => {
                         localStorage.setItem("token", token);
                         localStorage.setItem("role", role);
+                        this.$store.dispatch('INITIAL_ACT');
                         this.$router.push({ name: 'main-inquisitor-page' });
                     })
                     .catch(err => this.showError(err));*/
                 
                 this.$store.dispatch('CREATE_NEW_ACCOUNT', { login, password });
+                this.$store.dispatch('INITIAL_ACT');
+        
                 localStorage.setItem("token", this.token);
                 localStorage.setItem("role", this.role);
                 this.$router.push({ name: 'main-inquisitor-page' });
@@ -73,10 +77,12 @@
                     .then(() => {
                         localStorage.setItem("token", token);
                         localStorage.setItem("role", role);
+                        this.$store.dispatch('INITIAL_ACT');
                         this.$router.push({ name: 'main-inquisitor-page' });
                     })
                     .catch(err => this.showError(err));*/
                 this.$store.dispatch('LOG_IN_ACCOUNT', { login, password });
+                this.$store.dispatch('INITIAL_ACT');
                 localStorage.setItem("token", this.token);
                 localStorage.setItem("role", this.role);
                 this.$router.push({ name: 'main-inquisitor-page' });

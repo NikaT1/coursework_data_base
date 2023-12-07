@@ -95,6 +95,7 @@
                 this.main_info = false;
             },
             createNew() {
+                console.log(this.p_locality, this.p_bible);
                 let locality = this.p_locality.id;
                 let bible = this.p_bible.id;
                 //this.$store.dispatch('CREATE_NEW_INQ', { locality, bible })

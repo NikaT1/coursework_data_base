@@ -2,7 +2,10 @@
     <div>
         <div class="background">
             <p>Выберите библию:</p>
-            <RadioBoxChain v-model:bible_data="bible_data" v-model:param_bible="bible" radio_name="bibleRadioBox" />
+            <div class="card flex justify-content-center">
+                <Dropdown v-model="bible" :options="bible_data" filter optionLabel="name" class="w-full md:w-14rem" />
+            </div>
+
         </div>
         <div class="background">
             <p>Выберите местность:</p>
@@ -16,13 +19,11 @@
 
 
 <script>
-    import RadioBoxChain from "@/components/pcomponents/interactiveElements/RadioBoxChain";
     import { mapState } from 'vuex';
     import Dropdown from 'primevue/dropdown';
     export default {
         name: "ArgsBlockInq",
         components: {
-            RadioBoxChain,
             Dropdown,
         },
         props: ['p_locality', 'p_bible'],
@@ -36,24 +37,10 @@
         },
         watch: {
             locality(val) {
-                alert(val);
-                const locality = val;
-                const result = this.locality_data.filter((loc) => {
-                    if (loc.name == locality) {
-                        return loc;
-                    }
-                });
-                this.$emit('update:p_locality', result);
+                this.$emit('update:p_locality', val);
             },
             bible(val) {
-                alert(val);
-                const bible = val;
-                const result = this.bible_data.filter((bib) => {
-                    if (bib.name == bible) {
-                        return bib;
-                    }
-                });
-                this.$emit('update:p_bible', result);
+                this.$emit('update:p_bible', val);
             },
         },
         created() {
@@ -64,7 +51,7 @@
             bible_data: state => state.inquisition.bible_data,
             locality_data: state => state.inquisition.locality_data,
         }),
-     
+
     }
 </script>
 

@@ -21,7 +21,6 @@ const mutations = {
 };
 
 const actions = {
-
 	//json в формате role, login, password, name, surname, locality_id, birth_date, person_gender -> jwt token
 	CREATE_NEW_ACCOUNT(context, payload) {
 		/*return new Promise((resolve, reject) => {

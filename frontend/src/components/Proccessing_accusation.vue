@@ -9,12 +9,15 @@
                 Создание нового доноса
             </div>
             <div class="div-block" id="div-inline">
-                <ArgsBlockRecord v-if="new_rec" class="div-block" v-model:p_accused="p_accused" v-model:p_informer="p_informer" v-model:p_cur_violation_place="p_cur_violation_place" v-model:p_cur_date_time="p_cur_date_time" v-model:p_locality="p_cur_description" />
+                <ArgsBlockRecord v-if="new_rec" class="div-block" v-model:p_accused="p_accused" v-model:p_informer="p_informer" v-model:p_cur_violation_place="p_cur_violation_place" v-model:p_cur_date_time="p_cur_date_time" v-model:p_cur_description="p_cur_description" />
                 <div v-if="is_inq && main_inf" class="div-inline" id="div-buttons">
                     <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:newAcc="newAcc" v-on:finishAcc="finishAcc" />
                 </div>
                 <div v-if="is_bish && main_inf" class="div-inline" id="div-buttons">
                     <ButtonsBlock v-bind:buttons="buttons_for_bish" v-on:goBack="goBack" v-on:newAcc="newAcc" />
+                </div>
+                <div v-if="new_rec" class="div-inline" id="div-buttons">
+                    <ButtonsBlock v-bind:buttons="buttons_for_new_rec" v-on:goBackToMain="goBackToMain" v-on:createNewAcc="createNewAcc" />
                 </div>
             </div>
             <div class="div-block table-name">
@@ -23,7 +26,7 @@
         </div>
         <div class="card">
             <DataTable :value="data" paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem">
-                <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" style="width: 20%"></Column>
+                <Column v-for="col of columns" :key="col.field" :field="col.field" sortable :header="col.header" style="width: 20%"></Column>
             </DataTable>
         </div>
     </div>
@@ -51,6 +54,7 @@
         name: 'Proccessing_accusation',
         data() {
             return {
+                data: null,
                 main_inf: true,
                 new_rec: false,
                 buttons_for_inq: [
@@ -61,6 +65,10 @@
                 buttons_for_bish: [
                     { msg: 'назад', command: 'goBack' },
                     { msg: 'новый донос', command: 'newAcc' },
+                ],
+                buttons_for_new_rec: [
+                    { msg: 'назад', command: 'goBackToMain' },
+                    { msg: 'создать', command: 'createNewAcc' },
                 ],
                 is_inq: (localStorage.getItem("role") == '0'),
                 is_bish: (localStorage.getItem("role") == '1'),
@@ -80,7 +88,7 @@
             }
         },
         computed: mapState({
-            data: state => state.inquisition.acc_table_data
+            cur_data: state => state.inquisition.acc_table_data
         }),
         methods: {
             handleClose() {
@@ -97,8 +105,31 @@
                 this.main_inf = false;
                 this.new_rec = true;
             },
+            goBackToMain() {
+                this.main_inf = true;
+                this.new_rec = false;
+            },
             finishAcc() {
                 this.$router.push({ name: 'proccessing-cases' });
+            },
+            createNewAcc() {
+                let accused = this.p_accused;
+                let informer = this.p_informer;
+                let violation_place = this.p_cur_violation_place;
+                let date_time = this.p_cur_date_time;
+                let description = this.p_cur_description;
+                console.log(accused, informer, violation_place, date_time, description);
+                //this.$store.dispatch('ADD_ACC_RECORD', { accused, informer, violation_place, date_time, description})
+                //    .then(() => {
+                //          this.main_inf = true;
+                //          this.new_rec = false;
+                //        }))
+                //    .catch(err => this.showError(err));
+                this.$store.dispatch('ADD_ACC_RECORD', { accused, informer, violation_place, date_time, description });
+                this.main_inf = true;
+                this.new_rec = false;
+                this.data = this.cur_data;
+                console.log(this.data);
             },
             showError(text) {
                 this.$notify({
@@ -111,6 +142,7 @@
         },
         created() {
             this.$store.dispatch('GET_ALL_ACCUSATION_RECORDS');
+            this.data = this.cur_data;
         }
     }
 </script>

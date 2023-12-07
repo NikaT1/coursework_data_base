@@ -53,30 +53,18 @@
         },
         watch: {
             accused(val) {
-                const accused = val;
-                const result = this.people_data.filter((loc) => {
-                    if (loc.name == accused) {
-                        return loc;
-                    }
-                });
-                this.$emit('update:p_accused', result);
+                this.$emit('update:p_accused', val);
             },
             informer(val) {
-                const informer = val;
-                const result = this.people_data.filter((bib) => {
-                    if (bib.name == informer) {
-                        return bib;
-                    }
-                });
-                this.$emit('update:p_informer', result);
+                this.$emit('update:p_informer', val);
             },
-            cur_violation_place(val) {
+            cur_violation_place(val) { 
                 this.$emit('update:p_cur_violation_place', val);
             },
             cur_date_time(val) {
                 this.$emit('update:p_cur_date_time', val);
             },
-            cur_description(val) {
+            cur_description(val) { 
                 this.$emit('update:p_cur_description', val);
             },
         },
