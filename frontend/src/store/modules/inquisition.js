@@ -16,6 +16,9 @@ const state = () => ({
     bible_data: [],
     people_data: [],
     commandments_data: [],
+    queue_for_discussion: [],
+    queue_for_torture: [],
+    queue_for_puniishment: [],
 });
 const getters = {
     CUR_INQ: state => {
@@ -75,6 +78,15 @@ const mutations = {
     },
     SET_COMMANDMENTS_DATA: (state, payload) => {
         state.commandments_data = payload;
+    },
+    SET_QUEUE_FOR_DISCUSSION: (state, payload) => {
+        state.queue_for_discussion = payload;
+    },
+    SET_QUEUE_FOR_TORTURE: (state, payload) => {
+        state.queue_for_torture = payload;
+    },
+    SET_QUEUE_FOR_PUNISHMENT: (state, payload) => {
+        state.queue_for_punishment = payload;
     },
 };
 
@@ -504,7 +516,7 @@ const actions = {
                 })
         })*/ //пока заглушка
         console.log(payload);
-        context.commit('*****', [{
+        context.commit('SET_QUEUE_FOR_DISCUSSION', [{
             id: 1,
             accused: 'Сергей Сергеевич',
             creation_date: '2023-12-23',
@@ -524,7 +536,7 @@ const actions = {
                 })
         })*/ //пока заглушка
         console.log(payload);
-        context.commit('*****', [{
+        context.commit('SET_QUEUE_FOR_TORTURE', [{
             id: 1,
             accused: 'Сергей Сергеевич',
             creation_date: '2023-12-23',
@@ -544,7 +556,7 @@ const actions = {
                 })
         })*/ //пока заглушка
         console.log(payload);
-        context.commit('*****', [{
+        context.commit('SET_QUEUE_FOR_PUNISHMENT', [{
             id: 1,
             accused: 'Сергей Сергеевич',
             creation_date: '2023-12-23',

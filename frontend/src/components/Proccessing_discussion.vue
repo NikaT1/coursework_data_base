@@ -12,15 +12,12 @@
                 Для проведения беседы кликните в таблице на нужное дело и нажмите "провести беседу"
             </div>
             <div class="div-block" id="div-inline">
-                <ArgsBlockCase v-if="new_rec" class="div-block" v-model:p_commandments="p_commandments" />
-                <div v-if="is_inq && main_inf" class="div-inline" id="div-buttons">
-                    <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:connectAcc="connectAcc" v-on:startGeneratingCases="startGeneratingCases" />
-                </div>
-                <div v-if="is_bish && main_inf" class="div-inline" id="div-buttons">
-                    <ButtonsBlock v-bind:buttons="buttons_for_bish" v-on:goBack="goBack" v-on:connectAcc="connectAcc" />
+                <ArgsBlockDiscussion v-if="new_rec" class="div-block" v-model:p_discription="p_discription" v-model:p_result="p_result" />
+                <div v-if="main_inf" class="div-inline" id="div-buttons">
+                    <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:connectAcc="startDis" />
                 </div>
                 <div v-if="new_rec" class="div-inline" id="div-buttons">
-                    <ButtonsBlock v-bind:buttons="buttons_for_connect" v-on:goBackToMain="goBackToMain" v-on:doConnect="doConnect" />
+                    <ButtonsBlock v-bind:buttons="buttons_for_connect" v-on:goBackToMain="goBackToMain" v-on:doConnect="finishDis" />
                 </div>
             </div>
             <div class="div-block table-name">
@@ -39,7 +36,7 @@
 <script>
     import Header from "@/components/pcomponents/blocks/Header";
     import ButtonsBlock from "@/components/pcomponents/blocks/ButtonsBlock";
-    import ArgsBlockCase from "@/components/pcomponents/blocks/ArgsBlockCase";
+    import ArgsBlockDiscussion from "@/components/pcomponents/blocks/ArgsBlockDiscussion";
     import Footer from "@/components/pcomponents/blocks/Footer";
     import { mapState } from 'vuex';
     import DataTable from 'primevue/datatable';
@@ -51,10 +48,10 @@
             Header,
             ButtonsBlock,
             DataTable,
-            ArgsBlockCase,
+            ArgsBlockDiscussion,
             Column,
         },
-        name: 'Proccessing_accusation',
+        name: 'Proccessing_discussion',
         data() {
             return {
                 data: null,
@@ -62,19 +59,12 @@
                 new_rec: false,
                 buttons_for_inq: [
                     { msg: 'назад', command: 'goBack' },
-                    { msg: 'утвердить донос', command: 'connectAcc' },
-                    { msg: 'закончить формирование дел', command: 'startGeneratingCases' },
-                ],
-                buttons_for_bish: [
-                    { msg: 'назад', command: 'goBack' },
-                    { msg: 'утвердить донос', command: 'connectAcc' },
+                    { msg: 'провести беседу', command: 'startDis' },
                 ],
                 buttons_for_connect: [
                     { msg: 'назад', command: 'goBackToMain' },
-                    { msg: 'утвердить', command: 'doConnect' },
+                    { msg: 'закончить беседу', command: 'finishDis' },
                 ],
-                is_inq: (localStorage.getItem("role") == '0'),
-                is_bish: (localStorage.getItem("role") == '1'),
                 columns: [
                     { field: 'informer', header: 'Доносчик' },
                     { field: 'bishop', header: 'Епископ' },
@@ -84,16 +74,19 @@
                     { field: 'description', header: 'Описание' },
                 ],
                 selectedData: null,
-                p_commandments: null,
+                p_result: null,
+                p_description: "",
             }
         },
         computed: mapState({
-            cur_data: state => state.inquisition.acc_nr_table_data
+            cur_data: state => state.inquisition.queue_for_disscution,
         }),
         watch: {
-            selectedData(val) {
-                console.log(val);
-            }
+            data(val) {
+                if (val.length == 0) {
+                    this.$router.push({ name: 'proccessing-punishment' });
+                }
+            },
         },
         methods: {
             handleClose() {
@@ -106,37 +99,33 @@
                     this.$router.push({ name: 'auth-page' });
                 }
             },
-            connectAcc() {
+            startDis() {
                 if (this.selectedData !== null && this.selectedData !== undefined ) {
                     this.main_inf = false;
                     this.new_rec = true;
                 } else {
-                    console.log("here");
-                    this.showError("Необходимо выбрать донос!");
+                    this.showError("Необходимо выбрать дело!");
                 }
             },
             goBackToMain() {
                 this.main_inf = true;
                 this.new_rec = false;
             },
-            startGeneratingCases() {
-                this.$store.dispatch('FINISH_ACCUSATION_PROCESS');
-                this.$router.push({ name: 'proccessing-cases' });
-            },
-            doConnect() {
-                let commandments_id = this.p_commandments.map(item => item.id);
-                let record_id = this.selectedData.id;
-                console.log(commandments_id, record_id);
-                //this.$store.dispatch('CONNECT_COMMANDMENT', {commandments_id, record_id})
+            finishDis() {
+                let result_id = this.p_result.id;
+                let description = this.p_description;
+                let case_id = this.selectedData.id;
+                console.log(result_id, description, case_id);
+                //this.$store.dispatch('FINISH_DISCUSSION', {result_id, description, case_id})
                 //    .then(() => {
-                //          this.$store.dispatch('GET_NR_ACCUSATION_RECORDS');
+                //          this.$store.dispatch('GET_QUEUE_FOR_DISCUTTION');
                 //          this.data = this.cur_data;
                 //          this.main_inf = true;
                 //          this.new_rec = false;
                 //        }))
                 //    .catch(err => this.showError(err));
-                this.$store.dispatch('CONNECT_COMMANDMENT', { commandments_id, record_id });
-                this.$store.dispatch('GET_NR_ACCUSATION_RECORDS');
+                this.$store.dispatch('FINISH_DISCUSSION', { result_id, description, case_id });
+                this.$store.dispatch('GET_QUEUE_FOR_DISCUTTION');
                 this.main_inf = true;
                 this.new_rec = false;
                 this.data = this.cur_data;
@@ -152,7 +141,7 @@
             }
         },
         created() {
-            this.$store.dispatch('GET_NR_ACCUSATION_RECORDS');
+            this.$store.dispatch('GET_QUEUE_FOR_DISCUTTION');
             this.data = this.cur_data;
         }
     }

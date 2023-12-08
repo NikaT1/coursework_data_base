@@ -1,6 +1,8 @@
 import Index from "@/components/Index";
 import Main from "@/components/Main";
 import ProccessingAccusation from "@/components/Proccessing_accusation";
+import ProccessingTorture from "@/components/Proccessing_torture";
+import ProccessingPunishment from "@/components/Proccessing_punishment";
 import ProccessingPreparingCases from "@/components/Proccessing_preparing_cases";
 import ProccessingCases from "@/components/Proccessing_cases";
 import NotFoundError from "@/components/Error";
@@ -43,13 +45,15 @@ const routes = [
                 if (localStorage.getItem("role") == 1 && localStorage.getItem("step") == 1) {
                     next();
                 }
-                if (localStorage.getItem("role") == 0 && localStorage.getItem("step") == 2) {
+                if (localStorage.getItem("role") == 0 && localStorage.getItem("step") >= 2) {
                     next({ name: 'proccessing-cases' });
                 }
-                if (localStorage.getItem("role") == 1 && localStorage.getItem("step") == 2) {
+                if (localStorage.getItem("role") == 1 && localStorage.getItem("step") >= 2) {
                     next({ name: 'proccessing-cases' });
                 }
-                ///////// ADD ALL ROUTING
+                if (localStorage.getItem("role") == 2) {
+                    next({ name: 'proccessing-torture' });
+                }
             } else next({ name: 'auth-page' });
         } 
     },
@@ -59,11 +63,26 @@ const routes = [
         component: ProccessingCases,
         beforeEnter: (to, from, next) => {
             if (localStorage.getItem("token") !== null) {
+                if (localStorage.getItem("role") == 0 && localStorage.getItem("step") == 1) {
+                    next({ name: 'auth-page' });
+                }
+                if (localStorage.getItem("role") == 1 && localStorage.getItem("step") == 1) {
+                    next({ name: 'auth-page' });
+                }
                 if (localStorage.getItem("role") == 0 && localStorage.getItem("step") == 2) {
                     next();
                 }
                 if (localStorage.getItem("role") == 1 && localStorage.getItem("step") == 2) {
                     next();
+                }
+                if (localStorage.getItem("role") == 0 && localStorage.getItem("step") >= 3) {
+                    next({ name: 'ProccessingPreparingCases' });
+                }
+                if (localStorage.getItem("role") == 1 && localStorage.getItem("step") >= 3) {
+                    next({ name: 'ProccessingPreparingCases' });
+                }
+                if (localStorage.getItem("role") == 2) {
+                    next({ name: 'proccessing-torture' });
                 }
             } else next({ name: 'auth-page' });
         }
@@ -87,6 +106,48 @@ const routes = [
             } else next({ name: 'auth-page' });
         }
     },
+    {
+        path: '/Proccessing-accusation',
+        name: 'proccessing-accusation',
+        component: ProccessingAccusation,
+        beforeEnter: (to, from, next) => {
+            if (localStorage.getItem("token") !== null) {
+                if (localStorage.getItem("role") == 1) {
+                        next();
+                } else {
+                    next({ name: 'auth-page' });
+                }
+
+            } else next({ name: 'auth-page' });
+        }
+    },
+    {
+        path: '/Proccessing-torture',
+        name: 'proccessing-torture',
+        component: ProccessingTorture,
+        beforeEnter: (to, from, next) => {
+            if (localStorage.getItem("token") !== null) {
+                if (localStorage.getItem("role") == 2) {
+                        next();
+                } else {
+                    next({ name: 'auth-page' });
+                }
+
+            } else next({ name: 'auth-page' });
+        }
+    },
+    {
+        path: '/Proccessing-punishment',
+        name: 'proccessing-punishment',
+        component: ProccessingPunishment,
+        beforeEnter: (to, from, next) => {
+            if (localStorage.getItem("token") !== null) {
+                next()
+
+            } else next({ name: 'auth-page' });
+        }
+    },
+
     {
         path: '/:pathMatch(.*)*',
         name: 'error-page',

@@ -31,7 +31,7 @@ export default {
     return {
       buttons: [
         {msg: "Войти", command: "logIn"},
-        {msg: "Создать", command: "createUser"}
+       // {msg: "Создать", command: "createUser"}
       ]
     }
   }

@@ -28,12 +28,7 @@
         </div>
         <div class="card" v-if="closed == false">
             <DataTable v-model:selection="selectedData" :value="data" paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" selectionMode="single" dataKey="id" tableStyle="min-width: 50rem">
-                <Column v-for="col of columns" :key="col.field" :field="col.field" sortable :header="col.header" style="width: 20%"></Column>
-            </DataTable>
-        </div>
-        <div class="card" v-if="closed == true">
-            <DataTable :value="data" paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem">
-                <Column v-for="col of columns" :key="col.field" :field="col.field" sortable :header="col.header" style="width: 20%"></Column>
+                <Column v-for="col of columns" :key="col.field" :field="col.field" sortable :header="col.header" style="width: 25%"></Column>
             </DataTable>
         </div>
     </div>
@@ -81,7 +76,7 @@
         watch: {
             data(val) {
                 if (val.length == 0) {
-                    this.closed = true;
+                    this.$router.push({ name: 'proccessing-punishment' });
                 }
             },
         },

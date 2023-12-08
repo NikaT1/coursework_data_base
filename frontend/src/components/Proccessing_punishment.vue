@@ -3,28 +3,16 @@
         <Header />
         <div class="main-background div-block">
             <div v-if="main_inf" class="div-block table-name">
-                Процесс проведения пыток
-            </div>
-            <div v-if="new_rec" class="div-block table-name">
-                Добавление результата
-            </div>
-            <div v-if="new_rec" class="div-block table-name">
-                Статус: {{msg}}
-            </div>
-            <div v-if="main_inf" class="div-block table-name">
-                Для проведения пытки кликните в таблице на нужное дело и нажмите "провести пытку"
+                Результаты обработки дел - назначенные наказания 
             </div>
             <div class="div-block" id="div-inline">
-                <ArgsBlockDiscussion v-if="new_rec" class="div-block" v-model:p_discription="p_discription" v-model:p_result="p_result" />
                 <div v-if="main_inf" class="div-inline" id="div-buttons">
                     <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:connectAcc="startDis" />
                 </div>
-                <div v-if="new_rec" class="div-inline" id="div-buttons">
-                    <ButtonsBlock v-bind:buttons="buttons_for_connect" v-on:goBackToMain="goBackToMain" v-on:doConnect="finishDis" />
-                </div>
+      
             </div>
             <div class="div-block table-name">
-                Очередь дел на пытку:
+                Назначенные наказания:
             </div>
         </div>
         <div class="card">
@@ -39,7 +27,6 @@
 <script>
     import Header from "@/components/pcomponents/blocks/Header";
     import ButtonsBlock from "@/components/pcomponents/blocks/ButtonsBlock";
-    import ArgsBlockDiscussion from "@/components/pcomponents/blocks/ArgsBlockDiscussion";
     import Footer from "@/components/pcomponents/blocks/Footer";
     import { mapState } from 'vuex';
     import DataTable from 'primevue/datatable';
@@ -51,23 +38,17 @@
             Header,
             ButtonsBlock,
             DataTable,
-            ArgsBlockDiscussion,
             Column,
         },
-        name: 'Proccessing_torture',
+        name: 'Proccessing_punishment',
         data() {
             return {
                 data: null,
                 main_inf: true,
-                new_rec: false,
                 buttons_for_inq: [
                     { msg: 'назад', command: 'goBack' },
-                    { msg: 'провести пытку', command: 'startDis' },
                 ],
-                buttons_for_connect: [
-                    { msg: 'назад', command: 'goBackToMain' },
-                    { msg: 'закончить пытку', command: 'finishDis' },
-                ],
+       
                 columns: [
                     { field: 'informer', header: 'Доносчик' },
                     { field: 'bishop', header: 'Епископ' },
@@ -76,21 +57,16 @@
                     { field: 'date_time', header: 'Дата' },
                     { field: 'description', header: 'Описание' },
                 ],
-                selectedData: null,
-                p_result: null,
-                p_description: "",
-                msg: "пытка начата!",
+        
             }
         },
         computed: mapState({
-            cur_data: state => state.inquisition.queue_for_torture,
+            cur_data: state => state.inquisition.queue_for_punishment,
         }),
         watch: {
-            data(val) {
-                if (val.length == 0) {
-                    this.$router.push({ name: 'proccessing-punishment' });
-                }
-            },
+            selectedData(val) {
+                console.log(val);
+            }
         },
         methods: {
             handleClose() {
@@ -103,38 +79,7 @@
                     this.$router.push({ name: 'auth-page' });
                 }
             },
-            startDis() {
-                if (this.selectedData !== null && this.selectedData !== undefined ) {
-                    this.main_inf = false;
-                    this.new_rec = true;
-                } else {
-                    this.showError("Необходимо выбрать дело!");
-                }
-            },
-            goBackToMain() {
-                this.main_inf = true;
-                this.new_rec = false;
-            },
-            finishDis() {
-                let result_id = this.p_result.id;
-                let description = this.p_description;
-                let case_id = this.selectedData.id;
-                console.log(result_id, description, case_id);
-                //this.$store.dispatch('FINISH_TORTURE', {result_id, description, case_id})
-                //    .then(() => {
-                //          this.$store.dispatch('GET_QUEUE_FOR_TORTURE');
-                //          this.data = this.cur_data;
-                //          this.main_inf = true;
-                //          this.new_rec = false;
-                //        }))
-                //    .catch(err => this.showError(err));
-                this.$store.dispatch('FINISH_TORTURE', { result_id, description, case_id });
-                this.$store.dispatch('GET_QUEUE_FOR_TORTURE');
-                this.main_inf = true;
-                this.new_rec = false;
-                this.data = this.cur_data;
-                console.log(this.data);
-            },
+       
             showError(text) {
                 this.$notify({
                     group: "error",
@@ -145,7 +90,7 @@
             }
         },
         created() {
-            this.$store.dispatch('GET_QUEUE_FOR_TORTURE');
+            this.$store.dispatch('GET_QUEUE_FOR_PUNISHMENT');
             this.data = this.cur_data;
         }
     }
