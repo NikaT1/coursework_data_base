@@ -1,6 +1,7 @@
 import Index from "@/components/Index";
 import Main from "@/components/Main";
 import ProccessingAccusation from "@/components/Proccessing_accusation";
+import ProccessingPreparingCases from "@/components/Proccessing_preparing_cases";
 import ProccessingCases from "@/components/Proccessing_cases";
 import NotFoundError from "@/components/Error";
 import { createRouter, createWebHistory } from 'vue-router'
@@ -50,7 +51,7 @@ const routes = [
                 }
                 ///////// ADD ALL ROUTING
             } else next({ name: 'auth-page' });
-        }
+        } 
     },
     {
         path: '/proccessing-cases',
@@ -64,6 +65,25 @@ const routes = [
                 if (localStorage.getItem("role") == 1 && localStorage.getItem("step") == 2) {
                     next();
                 }
+            } else next({ name: 'auth-page' });
+        }
+    },
+    {
+        path: '/Proccessing-preparing-cases',
+        name: 'proccessing-preparing-cases',
+        component: ProccessingPreparingCases,
+        beforeEnter: (to, from, next) => {
+            if (localStorage.getItem("token") !== null) {
+                if (localStorage.getItem("role") == 0) {
+                    if (localStorage.getItem("step") == 3) {
+                        next();
+                    } else {
+                        next({ name: 'main-inquisitor-page' });
+                    }
+                } else {
+                    next({ name: 'auth-page' });
+                }
+                
             } else next({ name: 'auth-page' });
         }
     },

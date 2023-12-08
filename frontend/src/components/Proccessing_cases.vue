@@ -5,10 +5,10 @@
             <div v-if="main_inf" class="div-block table-name">
                 Идет процесс обработки доносов
             </div>
-            <div v-if="main_inf" class="div-block table-name">
+            <div v-if="new_rec" class="div-block table-name">
                 Привязка сводов к доносу
             </div>
-            <div v-if="new_rec" class="div-block table-name">
+            <div v-if="main_inf" class="div-block table-name">
                 Для привязки доноса к сводам кликните в таблице на нужный донос и нажмите "утвердить донос"
             </div>
             <div class="div-block" id="div-inline">
@@ -120,8 +120,8 @@
                 this.new_rec = false;
             },
             startGeneratingCases() {
-                this.$store.dispatch('FINISH_ACCUSATION_PROCESS');
-                this.$router.push({ name: 'proccessing-cases' });
+                this.$store.dispatch('FINISH_RESOLVING_RECORDS');
+                this.$router.push({ name: 'proccessing-preparing-cases' });
             },
             doConnect() {
                 let commandments_id = this.p_commandments.map(item => item.id);

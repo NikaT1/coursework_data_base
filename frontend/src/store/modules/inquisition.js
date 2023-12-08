@@ -317,7 +317,7 @@ const actions = {
         localStorage.setItem("step", context.getters.CUR_INQ.step);
     },
 
-    // на вход inq_id -> вернуть все дела этой инквизиции (формат см ниже, violation_description - это конкатенация всех согрешений челикса)
+    // на вход inq_id -> вернуть неразрешенные дела этой инквизиции - функция get_not_resolved_cases (формат см ниже, violation_description - это конкатенация всех согрешений челикса) понадобяться дополнительные запросы
     GET_ALL_CASES(context) {
         /*return new Promise((resolve, reject) => {
             const inq_id = context.getters.CUR_INQ.id;
@@ -330,11 +330,14 @@ const actions = {
                     reject(err)
                 })
         })*/ //пока заглушка
-
+        
         context.commit('SET_CASES_DATA', [{
             id: 1,
             accused: 'Сергей Сергеевич',
             creation_date: '2023-12-23',
+            description: "jhdbf", //описание преступления (ий) - возможно нужна будет конкатенация разных доносов
+            status: "идет беседа", // определяй с помощью доп запроса - обработка не начата (step = 0)/идет беседа (step = 1)/беседа окончена + результат (step = 2)/пытка начата (step = 3)
+            step: 2,
             violation_description: 'бла бла бля',
         }]);
     },
@@ -422,6 +425,134 @@ const actions = {
                 })
         })*/ //пока заглушка
         console.log(payload);
+    },
+    // case_id -> ничего возвращать не нужно
+    SEND_TO_DISCUSSION(context, payload) {
+        /*return new Promise((resolve, reject) => {
+            axios({ url: '*********', data: payload, method: 'POST' })
+                .then(resp => {
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err)
+                })
+        })*/ //пока заглушка
+        console.log(payload);
+    },
+    // функции ниже - все реализовано в функциях sql, ищи примеры применения в script1
+    // case_id, result (1 - да, 0 - нет), description -> ничего возвращать не нужно
+    FINISH_DISCUSSION(context, payload) {
+        /*return new Promise((resolve, reject) => {
+            axios({ url: '*********', data: payload, method: 'POST' })
+                .then(resp => {
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err)
+                })
+        })*/ //пока заглушка
+        console.log(payload);
+    },
+    // case_id -> ничего возвращать не нужно
+    SEND_TO_TORTURE(context, payload) {
+        /*return new Promise((resolve, reject) => {
+            axios({ url: '*********', data: payload, method: 'POST' })
+                .then(resp => {
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err)
+                })
+        })*/ //пока заглушка
+        console.log(payload);
+    },
+    // case_id -> ничего возвращать не нужно
+    MAKE_TORTURE_STEP(context, payload) {
+        /*return new Promise((resolve, reject) => {
+            axios({ url: '*********', data: payload, method: 'POST' })
+                .then(resp => {
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err)
+                })
+        })*/ //пока заглушка
+        console.log(payload);
+    },
+    // case_id, result (1 - да, 0 - нет), description -> ничего возвращать не нужно
+    FINISH_TORTURE(context, payload) {
+        /*return new Promise((resolve, reject) => {
+            axios({ url: '*********', data: payload, method: 'POST' })
+                .then(resp => {
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err)
+                })
+        })*/ //пока заглушка
+        console.log(payload);
+    },
+    // inq_id -> верни массив дел у которых назначена беседа (см формат ниже)
+    GET_QUEUE_FOR_DISCUTTION(context, payload) {
+        /*return new Promise((resolve, reject) => {
+            axios({ url: '*********', data: payload, method: 'POST' })
+                .then(resp => {
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err)
+                })
+        })*/ //пока заглушка
+        console.log(payload);
+        context.commit('*****', [{
+            id: 1,
+            accused: 'Сергей Сергеевич',
+            creation_date: '2023-12-23',
+            description: "jhdbf", //описание преступления (ий) - возможно нужна будет конкатенация разных доносов
+            violation_description: 'бла бла бля',
+        }]);
+    },
+    // inq_id -> верни массив дел у которых назначена пытка (см формат ниже)
+    GET_QUEUE_FOR_TORTURE(context, payload) {
+        /*return new Promise((resolve, reject) => {
+            axios({ url: '*********', data: payload, method: 'POST' })
+                .then(resp => {
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err)
+                })
+        })*/ //пока заглушка
+        console.log(payload);
+        context.commit('*****', [{
+            id: 1,
+            accused: 'Сергей Сергеевич',
+            creation_date: '2023-12-23',
+            description: "jhdbf", //описание преступления (ий) - возможно нужна будет конкатенация разных доносов
+            violation_description: 'бла бла бля',
+        }]);
+    },
+    // inq_id -> верни массив дел у которых назначено наказание (см формат ниже)
+    GET_QUEUE_FOR_PUNISHMENT(context, payload) {
+        /*return new Promise((resolve, reject) => {
+            axios({ url: '*********', data: payload, method: 'POST' })
+                .then(resp => {
+                    resolve(resp);
+                })
+                .catch(err => {
+                    reject(err)
+                })
+        })*/ //пока заглушка
+        console.log(payload);
+        context.commit('*****', [{
+            id: 1,
+            accused: 'Сергей Сергеевич',
+            creation_date: '2023-12-23',
+            description: "jhdbf", //описание преступления (ий) - возможно нужна будет конкатенация разных доносов
+            violation_description: 'бла бла бля',
+            punishment: "jfgmdfms",
+            prison_name: "orejkfdjmn",
+        }]);
     },
 };
 export default {
