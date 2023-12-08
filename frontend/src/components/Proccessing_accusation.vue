@@ -110,6 +110,7 @@
                 this.new_rec = false;
             },
             finishAcc() {
+                this.$store.dispatch('FINISH_ACCUSATION_PROCESS');
                 this.$router.push({ name: 'proccessing-cases' });
             },
             createNewAcc() {

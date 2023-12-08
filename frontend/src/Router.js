@@ -24,8 +24,7 @@ const routes = [
             if (localStorage.getItem("token") !== null) {
                 if (localStorage.getItem("role") == 0) {
                     next();
-                }
-                if (localStorage.getItem("role") == 1) {
+                } else {
                     next({ name: 'proccessing-acc-page' });
                 }
             } else next({ name: 'auth-page' });
@@ -37,12 +36,19 @@ const routes = [
         component: ProccessingAccusation,
         beforeEnter: (to, from, next) => {
             if (localStorage.getItem("token") !== null) {
-                if (localStorage.getItem("role") == 0) {
+                if (localStorage.getItem("role") == 0 && localStorage.getItem("step") == 1) {
                     next();
                 }
-                if (localStorage.getItem("role") == 1) {
+                if (localStorage.getItem("role") == 1 && localStorage.getItem("step") == 1) {
                     next();
                 }
+                if (localStorage.getItem("role") == 0 && localStorage.getItem("step") == 2) {
+                    next({ name: 'proccessing-cases' });
+                }
+                if (localStorage.getItem("role") == 1 && localStorage.getItem("step") == 2) {
+                    next({ name: 'proccessing-cases' });
+                }
+                ///////// ADD ALL ROUTING
             } else next({ name: 'auth-page' });
         }
     },
@@ -52,10 +58,10 @@ const routes = [
         component: ProccessingCases,
         beforeEnter: (to, from, next) => {
             if (localStorage.getItem("token") !== null) {
-                if (localStorage.getItem("role") == 0) {
+                if (localStorage.getItem("role") == 0 && localStorage.getItem("step") == 2) {
                     next();
                 }
-                if (localStorage.getItem("role") == 1) {
+                if (localStorage.getItem("role") == 1 && localStorage.getItem("step") == 2) {
                     next();
                 }
             } else next({ name: 'auth-page' });

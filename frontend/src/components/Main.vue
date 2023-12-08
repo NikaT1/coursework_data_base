@@ -102,6 +102,8 @@
                 //    .then(() => this.$router.push({ name: 'proccessing-acc-page' }))
                 //    .catch(err => this.showError(err));
                 this.$store.dispatch('CREATE_NEW_INQ', { locality, bible });
+                this.$store.dispatch('START_ACCUSATION_PROCESS');
+                console.log(localStorage.getItem('step'));
                 this.$router.push({ name: 'proccessing-acc-page' });
             },
             openCurrent() {
@@ -109,6 +111,7 @@
                 //    .then(() => this.$router.push({ name: 'proccessing-acc-page' }))
                 //    .catch(err => this.showError(err));
                 this.$store.dispatch('GET_CUR_INQ');
+                console.log(localStorage.getItem('step'));
                 this.$router.push({ name: 'proccessing-acc-page' });
             },
             showError(text) {

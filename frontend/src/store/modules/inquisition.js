@@ -1,6 +1,6 @@
 ﻿//import axios from 'axios';
 const state = () => ({
-	cur_inq: null,
+	cur_inq: { step: localStorage.getItem('step') || 0},
 	token: localStorage.getItem('token') || '',
 
 	person_id: 0,
@@ -99,7 +99,6 @@ const actions = {
 			person_name: "МАРИНА НИКОЛАЕВНА",
 		});
 		console.log(payload)
-
 	},
 	// bible_id, locality_id -> id inq
 	CREATE_NEW_INQ(context, payload) {
@@ -112,6 +111,7 @@ const actions = {
 						locality: payload.locality,
 						step: 0
 					});
+					localStorage.setItem("step", "0");
 					resolve(resp);
 				})
 				.catch(err => {
@@ -125,6 +125,7 @@ const actions = {
 			locality: payload.locality,
 			step: 0
 		});
+		localStorage.setItem("step", "0");
 
 	},
 	// по official_id определяет текущую иквизицию и возвращает инфу о ней (id, bible (id, name), locality (id, name), step).
@@ -141,6 +142,7 @@ const actions = {
 						locality: resp.data.locality,
 						step: resp.data.step
 					});
+					localStorage.setItem("step", resp.data.step);
 					resolve(resp);
 				})
 				.catch(err => {
@@ -151,8 +153,9 @@ const actions = {
 			id: 1,
 			bible: "Библия 1",
 			locality: "Нижжжний",
-			step: 0
+			step: 2
 		});
+		localStorage.setItem("step", "2");
 	},
 
 	// inq_id -> вызвать start_accusation_process и вернуть id
@@ -162,7 +165,8 @@ const actions = {
 			axios({ url: '*********', data: inq_id, method: 'GET' })
 				.then(resp => {
 					context.commit('SET_ACCUSATION_ID', resp.data);
-					context.commit('INCREASE_STEP');
+					context.dispatch('INCREASE_STEP');
+					localStorage.setItem("step", context.getters.CUR_INQ.step);
 					resolve(resp);
 				})
 				.catch(err => {
@@ -170,7 +174,8 @@ const actions = {
 				})
 		})*/ //пока заглушка
 		context.commit('SET_ACCUSATION_ID', 3);
-		context.commit('INCREASE_STEP');
+		context.dispatch('INCREASE_STEP');
+		localStorage.setItem("step", context.getters.CUR_INQ.step);
 	},
 
 	// accusation_id -> все рекорды, относящиеся к этому процессу сбора доносов в виде массива json (см ниже в методе пример данных)
@@ -187,6 +192,7 @@ const actions = {
 				})
 		})*/ //пока заглушка
 		context.commit('SET_ACC_TABLE_DATA', [{
+			id: 1,
 			informer: 'Виктор Викторович',
 			bishop: 'Виктор Викторович',
 			accused: 'Сергей Сергеевич',
@@ -224,14 +230,16 @@ const actions = {
 			const inq_id = state.cur_inq.id;
 			axios({ url: '*********', data: inq_id, method: 'GET' })
 				.then(resp => {
-					context.commit('INCREASE_STEP');
+					context.dispatch('INCREASE_STEP');
+					localStorage.setItem("step", context.getters.CUR_INQ.step);
 					resolve(resp);
 				})
 				.catch(err => {
 					reject(err)
 				})
 		})*/ //пока заглушка
-		context.commit('INCREASE_STEP');
+		context.dispatch('INCREASE_STEP');
+		localStorage.setItem("step", context.getters.CUR_INQ.step);
 	},
 
 	// ничего на вход -> массив инфы о всех библиях см ниже формат
@@ -283,24 +291,33 @@ const actions = {
 				})
 		})*/ //пока заглушка
 		console.log(payload);
-		context.commit('SET_ACC_NR_TABLE_DATA', [{
-			informer: 'Виктор Викторович',
-			bishop: 'Виктор Викторович',
-			accused: 'Сергей Сергеевич',
-			violation_place: 'дома',
-			date_time: '2023-12-23',
-			description: 'бла бла бля',
-		}]);
+		context.commit('SET_ACC_NR_TABLE_DATA', context.getters.ACC_TABLE_DATA);
 	},
 
+	// на вход inq_id ->  вызвать finish_accusation_proccess, generate_cases, возвращать ничего не нужно
 	FINISH_RESOLVING_RECORDS(context) {
-		context.commit('INCREASE_STEP');
+		/*return new Promise((resolve, reject) => {
+			const inq_id = context.getters.CUR_INQ.id;
+			axios({ url: '*********', data: inq_id, method: 'GET' })
+				.then(resp => {
+					context.commit('SET_CASES_DATA', resp.data);
+					context.dispatch('INCREASE_STEP');
+					localStorage.setItem("step", context.getters.CUR_INQ.step);
+					resolve(resp);
+				})
+				.catch(err => {
+					reject(err)
+				})
+		})*/ //пока заглушка
+		context.dispatch('INCREASE_STEP');
+		localStorage.setItem("step", context.getters.CUR_INQ.step);
 	},
 
-	// на вход inq_id -> вызвать finish_accusation_proccess, generate_cases и вернуть результат (формат см ниже, violation_description - это конкатенация всех согрешений челикса)
-	GET_ALL_CASES(context, payload) {
+	// на вход inq_id -> вернуть все дела этой инквизиции (формат см ниже, violation_description - это конкатенация всех согрешений челикса)
+	GET_ALL_CASES(context) {
 		/*return new Promise((resolve, reject) => {
-			axios({ url: '*********', data: payload, method: 'GET' })
+			const inq_id = context.getters.CUR_INQ.id;
+			axios({ url: '*********', data: inq_id, method: 'GET' })
 				.then(resp => {
 					context.commit('SET_CASES_DATA', resp.data);
 					resolve(resp);
@@ -309,7 +326,7 @@ const actions = {
 					reject(err)
 				})
 		})*/ //пока заглушка
-		console.log(payload);
+		
 		context.commit('SET_CASES_DATA', [{
 			id: 1,
 			accused: 'Сергей Сергеевич',
@@ -361,6 +378,7 @@ const actions = {
 		})*/ //пока заглушка
 		console.log(payload);
 		payload["bishop"] = context.getters.CUR_NAME;
+		payload["id"] = 3;
 		context.commit('ADD_TO_ACC_TABLE_DATA', payload);
 		console.log(context.getters.ACC_TABLE_DATA);
 	},
