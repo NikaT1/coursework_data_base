@@ -98,13 +98,15 @@
                 console.log(this.p_locality, this.p_bible);
                 let locality = this.p_locality.id;
                 let bible = this.p_bible.id;
-                //this.$store.dispatch('CREATE_NEW_INQ', { locality, bible })
-                //    .then(() => this.$router.push({ name: 'proccessing-acc-page' }))
-                //    .catch(err => this.showError(err));
-                this.$store.dispatch('CREATE_NEW_INQ', { locality, bible });
-                this.$store.dispatch('START_ACCUSATION_PROCESS');
-                console.log(localStorage.getItem('step'));
-                this.$router.push({ name: 'proccessing-acc-page' });
+                this.$store.dispatch('CREATE_NEW_INQ', { locality, bible })
+                    .then(() => {
+                        this.$store.dispatch('START_ACCUSATION_PROCESS');
+                        console.log(localStorage.getItem('step'));
+                        this.$router.push({ name: 'proccessing-acc-page' });
+                        this.$router.push({ name: 'proccessing-acc-page' });
+                    })
+                    .catch(err => this.showError(err));
+               
             },
             openCurrent() {
                 //this.$store.dispatch('GET_CUR_INQ')

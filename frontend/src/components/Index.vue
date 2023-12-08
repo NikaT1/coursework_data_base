@@ -55,40 +55,29 @@
             createUser() {
                 const login = this.login;
                 const password = this.password;
-                /*this.$store.dispatch('CREATE_NEW_ACCOUNT', { login, password })
+                this.$store.dispatch('CREATE_NEW_ACCOUNT', { login, password })
                     .then(() => {
-                        localStorage.setItem("token", token);
-                        localStorage.setItem("role", role);
                         this.$store.dispatch('INITIAL_ACT');
+                        this.$store.dispatch('GET_CUR_INQ');
                         this.$router.push({ name: 'main-inquisitor-page' });
                     })
-                    .catch(err => this.showError(err));*/
-                
-                this.$store.dispatch('CREATE_NEW_ACCOUNT', { login, password });
-                this.$store.dispatch('INITIAL_ACT');
-                this.$store.dispatch('GET_CUR_INQ');
+                    .catch(err => this.showError(err));
                 localStorage.setItem("token", this.token);
                 localStorage.setItem("role", this.role);
-                this.$router.push({ name: 'main-inquisitor-page' });
+
             },
             logIn() {
                 const login = this.login;
                 const password = this.password;
-                /*this.$store.dispatch('CREATE_NEW_ACCOUNT', { login, password })
+                this.$store.dispatch('CREATE_NEW_ACCOUNT', { login, password })
                     .then(() => {
-                        localStorage.setItem("token", token);
-                        localStorage.setItem("role", role);
                         this.$store.dispatch('INITIAL_ACT');
+                        this.$store.dispatch('GET_CUR_INQ');
                         this.$router.push({ name: 'main-inquisitor-page' });
                     })
-                    .catch(err => this.showError(err));*/
-                this.$store.dispatch('LOG_IN_ACCOUNT', { login, password });
-                this.$store.dispatch('INITIAL_ACT'); 
-                this.$store.dispatch('GET_CUR_INQ');
+                    .catch(err => this.showError(err));
                 localStorage.setItem("token", this.token);
                 localStorage.setItem("role", this.role);
-                
-                this.$router.push({ name: 'main-inquisitor-page' });
             },
             start() {
                 this.account = true

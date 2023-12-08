@@ -1,4 +1,4 @@
-﻿//import axios from 'axios';
+﻿import axios from 'axios';
 const state = () => ({
     cur_inq: { step: localStorage.getItem('step') || 0 },
     token: localStorage.getItem('token') || '',
@@ -118,8 +118,8 @@ const actions = {
     },
     // bible_id, locality_id -> id inq
     CREATE_NEW_INQ(context, payload) {
-        /*return new Promise((resolve, reject) => {
-            axios({ url: '*********', data: payload, method: 'POST' })
+        return new Promise((resolve, reject) => {
+            axios({ url: '/inquisitions/start', data: payload, method: 'POST' })
                 .then(resp => {
                     context.commit('SET_CUR_INQ', {
                         id: resp.data.id,
@@ -133,15 +133,7 @@ const actions = {
                 .catch(err => {
                     reject(err)
                 })
-        })*/  //пока заглушка
-        console.log(payload.bible, payload.locality);
-        context.commit('SET_CUR_INQ', {
-            id: 1,
-            bible: payload.bible,
-            locality: payload.locality,
-            step: 0
-        });
-        localStorage.setItem("step", "0");
+        })
 
     },
     // по official_id определяет текущую иквизицию и возвращает инфу о ней (id, bible (id, name), locality (id, name), step).
@@ -478,7 +470,7 @@ const actions = {
         })*/ //пока заглушка
         console.log(payload);
     },
-    // case_id -> ничего возвращать не нужно
+    // case_id, step -> ничего возвращать не нужно
     MAKE_TORTURE_STEP(context, payload) {
         /*return new Promise((resolve, reject) => {
             axios({ url: '*********', data: payload, method: 'POST' })

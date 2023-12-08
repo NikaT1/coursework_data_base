@@ -1,4 +1,4 @@
-//import axios from 'axios';
+import axios from 'axios';
 const state = () => ({
 	role: -1,
 	token: localStorage.getItem('token') || '',
@@ -23,8 +23,8 @@ const mutations = {
 const actions = {
 	//json в формате role, login, password, name, surname, locality_id, birth_date, person_gender -> jwt token
 	CREATE_NEW_ACCOUNT(context, payload) {
-		/*return new Promise((resolve, reject) => {
-			axios({ url: '*********', data: payload, method: 'POST' })
+		return new Promise((resolve, reject) => {
+			axios({ url: '/api/auth/signin', data: payload, method: 'POST' })
 				.then(resp => {
 					context.commit('SET_TOKEN', resp.data.token);
 					context.commit('SET_ROLE', payload.role);
@@ -33,29 +33,23 @@ const actions = {
 				.catch(err => {
 					reject(err)
 				})
-		})*/  //пока заглушка
-		console.log(payload);
-		context.commit('SET_TOKEN', "sjfs");
-		context.commit('SET_ROLE', 0);
+		})
 
 	},
 
 	//json в формате login, password -> jwt token, role
 	LOG_IN_ACCOUNT(context, payload) {
-		/*return new Promise((resolve, reject) => {
-			axios({ url: '*********', data: payload, method: 'GET' })
+		return new Promise((resolve, reject) => {
+			axios({ url: '/api/auth/signin', data: payload, method: 'POST' })
 				.then(resp => {
 					context.commit('SET_TOKEN', resp.data.token);
-					context.commit('SET_ROLE', resp.data.role);
+					context.commit('SET_ROLE', payload.role);
 					resolve(resp);
 				})
 				.catch(err => {
 					reject(err)
 				})
-		})*/  //пока заглушка
-		console.log(payload);
-		context.commit('SET_TOKEN', "sjfs");
-		context.commit('SET_ROLE', 0);
+		})
 
 	},
 
