@@ -16,17 +16,18 @@ export default {
 </script>
 
 <style scoped>
-footer {
-  font-size: medium;
-  display: table;
-  padding: 2em 5% 2% 5%;
-  background: #55555d;
-  color: #cac8c8;
-  width: 100%;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  alignment: left;
-}
+    footer {
+        height: 80px;
+        font-size: medium;
+        display: table;
+        padding: 1em 3% 1% 3%;
+        background: #55555d;
+        color: #cac8c8;
+        width: 100%;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        alignment: left;
+    }
 
 div p {
   color: #cac8c8;

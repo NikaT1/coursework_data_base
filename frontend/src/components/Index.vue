@@ -9,9 +9,7 @@
                 Роль Епископ позволяет фиксировать доносы и проводить беседы в церкви. <br>
                 Роль Фискал позволяет проводить пыточный процесс.
             </TextBlock>
-            <AccountBlock v-if="account" v-model:login="login" v-model:password="password"
-                          v-on:createUser="createUser($event)"
-                          v-on:logIn="logIn($event)" />
+            <AccountBlock v-if="account" />
         </div>
     </div>
     <Footer />
@@ -22,7 +20,6 @@
     import TextBlock from "@/components/pcomponents/blocks/TextBlock";
     import AccountBlock from "@/components/pcomponents/blocks/AccountBlock";
     import Footer from "@/components/pcomponents/blocks/Footer";
-    import { mapState } from 'vuex';
 
     export default {
         components: {
@@ -34,8 +31,6 @@
         name: "Index",
         data() {
             return {
-                login: "",
-                password: "",
                 account: false,
                 info: true,
             }
@@ -46,43 +41,31 @@
             localStorage.removeItem('step');
         },
 
-        computed: mapState({
-            token: state => state.accounts.token,
-            role: state => state.accounts.role,
-            name: state => state.inquisition.person_name,
-        }),
-        methods: {
-            createUser() {
-                const login = this.login;
-                const password = this.password;
-                this.$store.dispatch('CREATE_NEW_ACCOUNT', { login, password })
-                    .then(() => {
-                        this.$store.dispatch('INITIAL_ACT');
-                        this.$store.dispatch('GET_CUR_INQ');
-                        this.$router.push({ name: 'main-inquisitor-page' });
-                    })
-                    .catch(err => this.showError(err));
-                localStorage.setItem("token", this.token);
-                localStorage.setItem("role", this.role);
 
-            },
-            logIn() {
-                const login = this.login;
-                const password = this.password;
-                this.$store.dispatch('CREATE_NEW_ACCOUNT', { login, password })
-                    .then(() => {
-                        this.$store.dispatch('INITIAL_ACT');
-                        this.$store.dispatch('GET_CUR_INQ');
-                        this.$router.push({ name: 'main-inquisitor-page' });
-                    })
-                    .catch(err => this.showError(err));
-                localStorage.setItem("token", this.token);
-                localStorage.setItem("role", this.role);
-            },
+        methods: {
             start() {
                 this.account = true
                 this.info = false
             },
+            showError(err) {
+                console.log(err );
+                let text = "Произошла непредвиденная ошибка";
+                if (err.code == 500 || err.response.status == 500) {
+                    text = "Проблема с подключением к серверу";
+                }
+                if (err.code == 404 || err.response.status == 404) {
+                    text = "Неверный запрос к серверу";
+                }
+                if (err.code == 401 || err.response.status == 401) {
+                    text = "Данного аккаунта не существует";
+                }
+                this.$notify({
+                    group: "error",
+                    title: 'Ошибка',
+                    text: text,
+                    type: 'error'
+                });
+            }
         }
     }
 </script>
@@ -91,7 +74,9 @@
 
     #main-div {
         min-width: 100%;
-        min-height: 100%;
+        box-sizing: border-box;
+        min-height: calc(100vh - 80px);
+        padding-bottom: 90px;
         position: relative;
     }
 

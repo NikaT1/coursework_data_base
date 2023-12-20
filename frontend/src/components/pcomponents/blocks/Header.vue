@@ -1,25 +1,21 @@
 <template>
   <header>
     <div id="title"><h1>Испанская инквизиция</h1></div>
-    <div class="name-div">
-      Овчаренко Александр, Тройникова Вероника
-    </div>
-    <div class="variant-div">
-      Группа Р33302
-    </div>
     <nav>
-      <Link href="https://vk.com/akino_rev" name="ВКонтакте"/>
-      <Link href="https://vk.com/some_link" name="Telegram"/>
+        <div class="name-div">
+            Овчаренко Александр, Тройникова Вероника
+        </div>
+        <div class="variant-div">
+            Группа Р33302
+        </div>
     </nav>
   </header>
 </template>
 
 <script>
-import Link from "@/components/pcomponents/interactiveElements/Link";
 
 export default {
   name: "Header",
-  components: {Link}
 }
 </script>
 
@@ -27,7 +23,7 @@ export default {
 header {
   font-size: medium;
   display: table;
-  padding: 2em 5% 2% 5%;
+  padding: 1em 2% 1% 2%;
   background: #55555d;
   color: #cac8c8;
   width: 100%;
@@ -57,7 +53,7 @@ header nav a {
   background: #413f47;
   margin: 0 0 1% 0;
   width: fit-content;
-  padding: 2em 2em 2em 2em;
+  padding: 1em 1em 1em 1em;
   border-radius: 2px;
 }
 

@@ -64,11 +64,11 @@
                 p_bible: null,
                 p_locality: null,
                 columns: [
-                    { field: 'start_time', header: 'Дата начала' },
+                    { field: 'startTime', header: 'Дата начала' },
                     { field: 'locality', header: 'Местность' },
                     { field: 'inquisitor', header: 'Инквизитор' },
-                    { field: 'cases_count', header: 'Кол-во дел' },
-                    { field: 'end_time', header: 'Дата окончания' },
+                    { field: 'caseCount', header: 'Кол-во дел' },
+                    { field: 'endTime', header: 'Дата окончания' },
                 ],
             }
         },
@@ -96,24 +96,29 @@
             },
             createNew() {
                 console.log(this.p_locality, this.p_bible);
-                let locality = this.p_locality.id;
-                let bible = this.p_bible.id;
-                this.$store.dispatch('CREATE_NEW_INQ', { locality, bible })
-                    .then(() => {
-                        this.$store.dispatch('START_ACCUSATION_PROCESS');
-                        console.log(localStorage.getItem('step'));
-                        this.$router.push({ name: 'proccessing-acc-page' });
-                        this.$router.push({ name: 'proccessing-acc-page' });
-                    })
-                    .catch(err => this.showError(err));
-               
+                let localityId = this.p_locality.id;
+                let bibleId = this.p_bible.id;
+                this.$store.dispatch('CREATE_NEW_INQ', { localityId, bibleId })
+                    .then(resp => {
+                        localStorage.setItem("token", resp.data.token);
+                        localStorage.setItem("role", resp.data.role);
+                        this.$store.dispatch('GET_CUR_INQ');
+                        this.$router.push({ name: 'main-inquisitor-page' });
+                    },
+                        err => (this.showError(err)));
+                //this.$store.dispatch('CREATE_NEW_INQ', { locality, bible })
+                //    .then(() => this.$router.push({ name: 'proccessing-acc-page' }))
+                //    .catch(err => this.showError(err));
+                this.$store.dispatch('CREATE_NEW_INQ', { locality, bible });
+                this.$store.dispatch('START_ACCUSATION_PROCESS');
+                console.log(localStorage.getItem('step'))
+                this.$router.push({ name: 'proccessing-acc-page' });
             },
             openCurrent() {
                 //this.$store.dispatch('GET_CUR_INQ')
                 //    .then(() => this.$router.push({ name: 'proccessing-acc-page' }))
                 //    .catch(err => this.showError(err));
                 this.$store.dispatch('GET_CUR_INQ');
-                console.log(localStorage.getItem('step'));
                 this.$router.push({ name: 'proccessing-acc-page' });
             },
             showError(text) {
@@ -144,6 +149,7 @@
     }
 
     .main-background > div:first-child {
+        min-height: calc(100vh - 80px);
         display: table;
         margin: 0 auto;
     }

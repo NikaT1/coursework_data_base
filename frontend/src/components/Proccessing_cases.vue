@@ -79,8 +79,8 @@
                     { field: 'informer', header: 'Доносчик' },
                     { field: 'bishop', header: 'Епископ' },
                     { field: 'accused', header: 'Обвиненный' },
-                    { field: 'violation_place', header: 'Место преступления' },
-                    { field: 'date_time', header: 'Дата' },
+                    { field: 'violationPlace', header: 'Место преступления' },
+                    { field: 'dateTime', header: 'Дата' },
                     { field: 'description', header: 'Описание' },
                 ],
                 selectedData: null,
@@ -124,10 +124,10 @@
                 this.$router.push({ name: 'proccessing-preparing-cases' });
             },
             doConnect() {
-                let commandments_id = this.p_commandments.map(item => item.id);
+                let commandments = this.p_commandments.map(item => item.id);
                 let record_id = this.selectedData.id;
                 console.log(commandments_id, record_id);
-                //this.$store.dispatch('CONNECT_COMMANDMENT', {commandments_id, record_id})
+                //this.$store.dispatch('CONNECT_COMMANDMENT', {commandments, record_id})
                 //    .then(() => {
                 //          this.$store.dispatch('GET_NR_ACCUSATION_RECORDS');
                 //          this.data = this.cur_data;
@@ -135,7 +135,7 @@
                 //          this.new_rec = false;
                 //        }))
                 //    .catch(err => this.showError(err));
-                this.$store.dispatch('CONNECT_COMMANDMENT', { commandments_id, record_id });
+                this.$store.dispatch('CONNECT_COMMANDMENT', { commandments, record_id });
                 this.$store.dispatch('GET_NR_ACCUSATION_RECORDS');
                 this.main_inf = true;
                 this.new_rec = false;
