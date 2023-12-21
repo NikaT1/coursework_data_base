@@ -12,16 +12,17 @@ export default {
 </script>
 
 <style scoped>
-.button {
-  font-weight: 700;
-  text-decoration: none;
-  padding: .8em 5em calc(.8em + 3px);
-  border-radius: 1px;
-  border-width: thin;
-  border-color: rgba(2, 2, 2, 0.4);
-  background: rgba(181, 183, 181, 0.76);
-  transition: 0.2s;
-}
+    .button {
+        font-weight: 700;
+        text-decoration: none;
+        padding: .8em 5em calc(.8em + 3px);
+        border-radius: 1px;
+        border-width: thin;
+        border-color: rgba(2, 2, 2, 0.4);
+        background: rgba(181, 183, 181, 0.76);
+        transition: 0.2s;
+        display: inline-block;
+    }
 
 .button:hover {
   background: rgba(229, 229, 229, 0.73);

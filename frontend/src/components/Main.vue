@@ -1,19 +1,19 @@
 <template>
-    <div>
+    <div id="div-main">
         <Header />
-        <div class="main-background div-block">
-            <div class="div-block" id="div-inline">
-                <div v-if="new_inq" class="div-block table-name">
+        <div class="main-background">
+            <div id="div-inline">
+                <div v-if="new_inq" class="table-name">
                     Создание нового инквизиционного процесса
                 </div>
-                <div v-if="main_info" class="div-block table-name">
+                <div v-if="main_info" class="table-name">
                     Возможные действия для Инквизитора
                 </div>
                 <ArgsBlockInq v-if="new_inq" class="div-block" v-model:p_locality="p_locality" v-model:p_bible="p_bible" />
-                <div v-if="new_inq" class="div-inline" id="div-buttons">
+                <div v-if="new_inq">
                     <ButtonsBlock v-bind:buttons="new_inq_buttons" v-on:goBackToMain="goBackToMain" v-on:createNew="createNew" />
                 </div>
-                <div v-if="main_info" class="div-inline" id="div-buttons">
+                <div v-if="main_info">
                     <ButtonsBlock v-bind:buttons="start_buttons" v-on:goBack="goBack" v-on:startNew="startNew" v-on:openCurrent="openCurrent" />
                 </div>
             </div>
@@ -21,9 +21,9 @@
                 Список прошлых инквизиционных процессов:
             </div>
         </div>
-        <div class="div-block" id="result-table">
+        <div>
             <DataTable :value="data" paginator :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem">
-                <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" style="width: 24%"></Column>
+                <Column v-for="col of columns" :key="col.field" :field="col.field" sortable :header="col.header" style="width: 24%"></Column>
             </DataTable>
         </div>
     </div>
@@ -56,8 +56,8 @@
                     { msg: 'текущий инквизиционный процесс', command: 'openCurrent' }
                 ],
                 new_inq_buttons: [
+                    { msg: 'назад', command: 'goBackToMain' },
                     { msg: 'создать', command: 'createNew' },
-                    { msg: 'назад', command: 'goBackToMain' }
                 ],
                 new_inq: false,
                 main_info: true,
@@ -101,9 +101,8 @@
                 this.$store.dispatch('CREATE_NEW_INQ', { localityId, bibleId })
                     .then(resp => {
                         console.log(resp);
-                        this.$store.dispatch('START_ACCUSATION_PROCESS');
-                        console.log(localStorage.getItem('step'));
-                        this.$router.push({ name: 'proccessing-acc-page' });
+                        this.$store.dispatch('START_ACCUSATION_PROCESS')
+                            .then(() => this.$router.push({ name: 'proccessing-acc-page' }));
                     },
                         err => (this.showError(err)));
             },
@@ -138,54 +137,8 @@
     }
 </script>
 <style>
-
-    .table-name {
-        font-size: medium;
-        color: #6d747f;
-        font-size: 20px;
-        padding: 20px;
-        font-weight: bold;
-    }
-
-    #div-inline div {
-        vertical-align: middle;
-        margin: 20px 20px 20px;
-        text-align: center;
-    }
-
-    .main-background > div:first-child {
-        min-height: calc(100vh - 80px);
-        display: table;
-        margin: 0 auto;
-    }
-
-    #result-table {
-        overflow-x: auto;
-        height: 300px;
-        margin: 10px 20px;
-    }
-
-    .div-block {
-        display: block;
-    }
-
-    .div-inline {
-        display: inline-block;
-    }
-
-    #div-buttons {
-        padding: 1.5% 1.5% 1.5% 1.5%;
-    }
-
-    @media (max-width: 1228px) {
-        #div-inline div {
-            margin: 10px 10px 10px;
-        }
-    }
-
-    @media (max-width: 892px) {
-        #div-inline div {
-            margin: 5px 5px 5px;
-        }
+    #div-inline {
+        width: 100%;
+        justify-content: center;
     }
 </style>

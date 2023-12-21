@@ -23,11 +23,20 @@ const state = () => ({
     queue_for_puniishment: [],
 });
 const getters = {
+    CUR_BIBLE: state => {
+        return state.cur_inq.bible;
+    },
+    CUR_LOCALITY: state => {
+        return state.cur_inq.locality;
+    },
     CUR_INQ: state => {
         return state.cur_inq;
     },
-    CUR_OFFICIAL: state => {
+    CUR_OFFICIAL: state => {  
         return state.official_id;
+    },
+    CUR_ACCUSATION: state => {
+        return state.accusation_id;
     },
     CUR_NAME: state => {
         return state.person_name;
@@ -45,9 +54,10 @@ const getters = {
 
 const mutations = {
     SET_INITIAL_INF: (state, payload) => {
-        state.person_id = payload.person_id;
-        state.official_id = payload.official_id;
-        state.person_name = payload.person_name;
+        console.log(payload)
+        state.person_id = payload.personId;
+        state.official_id = payload.officialId;
+        state.person_name = payload.personName;
     },
 
     SET_ACCUSATION_ID: (state, payload) => {
@@ -97,10 +107,32 @@ const mutations = {
         state.queue_for_punishment = payload;
     },
     SET_TOKEN: (state, payload) => {
+        localStorage.setItem("token", payload);
         state.token = payload;
     },
     SET_ROLE: (state, payload) => {
-        state.role = payload;
+        switch (payload) {
+            case 'INQUISITOR':
+                localStorage.setItem("role", 0);
+                state.role = 0;
+                break
+            case 'BISHOP':
+                localStorage.setItem("role", 1);
+                state.role = 1;
+                break
+            case 'FISCAL':
+                localStorage.setItem("role", 2);
+                state.role = 2;
+                break
+            case 'SECULAR_AUTHORITY':
+                localStorage.setItem("role", 3);
+                state.role = 3;
+                break
+            default:
+                localStorage.setItem("role", 4);
+                state.role = 4;
+                break
+        }
     },
 };
 
@@ -115,12 +147,12 @@ const actions = {
     CREATE_NEW_ACCOUNT(context, payload) {
         console.log(payload);
         return new Promise((resolve, reject) => {
-            axios({ url: '/api/auth/signin', data: payload, method: 'POST' })
+            axios({ url: '/auth/signup', data: payload, method: 'POST', headers: { "Authorization": "Bearer", "Content-type": "application/json" } })
                 .then(resp => {
                     if (resp.status == 200) {
-                        context.commit('SET_TOKEN', resp.data.token);
-                        context.commit('SET_ROLE', resp.data.role);
-                        context.commit('SET_INITIAL_INF', resp.data);
+                        context.commit('SET_TOKEN', resp.data.data.jwt);
+                        context.commit('SET_ROLE', resp.data.data.role);
+                        context.commit('SET_INITIAL_INF', resp.data.data);
                         resolve(resp);
                     } else {
                         var err = new Error(resp.statusText);
@@ -139,12 +171,12 @@ const actions = {
     LOG_IN_ACCOUNT(context, payload) {
         console.log(payload);
         return new Promise((resolve, reject) => {
-            axios({ url: '/api/auth/signin', data: payload, method: 'POST' })
+            axios({ url: '/auth/signin', data: payload, method: 'POST', headers: { "Authorization": "Bearer" } })
                 .then(resp => {
                     if (resp.status == 200) {
-                        context.commit('SET_TOKEN', resp.data.token);
-                        context.commit('SET_ROLE', resp.data.role);
-                        context.commit('SET_INITIAL_INF', resp.data);
+                        context.commit('SET_TOKEN', resp.data.data.jwt);
+                        context.commit('SET_ROLE', resp.data.data.role);
+                        context.commit('SET_INITIAL_INF', resp.data.data);
                         resolve(resp);
                     } else {
                         var err = new Error(resp.statusText);
@@ -161,14 +193,14 @@ const actions = {
     // bible_id, locality_id -> id inq
     CREATE_NEW_INQ(context, payload) {
         return new Promise((resolve, reject) => {
-            axios({ url: '/inquisitions/start', data: payload, method: 'POST' })
+            axios({ url: '/inquisitions/start', data: payload, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
                         context.commit('SET_CUR_INQ', {
-                            id: resp.data.processId, /////?
-                            bible: payload.bible,
-                            locality: payload.locality,
+                            id: resp.data.data,
+                            bible: payload.bibleId,
+                            locality: payload.localityId,
                             step: 0
                         });
                         localStorage.setItem("step", "0");
@@ -189,18 +221,18 @@ const actions = {
     // 3 - это этап, когда все дела сформированы (функция get_not_resolved_cases) ничего не возвращает, 4 - все дела закончены, инквизиционный процесс завершен)
     GET_CUR_INQ(context) {
         return new Promise((resolve, reject) => {
-            const official_id = state.official_id;
-            axios({ url: '/inquisitions/getCurrent/' + official_id, method: 'GET' })
+            const official_id = context.getters.CUR_OFFICIAL;
+            axios({ url: '/inquisitions/getCurrent/' + official_id, method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
                         context.commit('SET_CUR_INQ', {
-                            id: resp.data.id,
-                            bible: resp.data.bible,
-                            locality: resp.data.locality,
-                            step: resp.data.step
+                            id: resp.data.data.id,
+                            bible: resp.data.data.bible,
+                            locality: resp.data.data.locality,
+                            step: resp.data.data.step
                         });
-                        localStorage.setItem("step", resp.data.step);
+                        localStorage.setItem("step", resp.data.data.step);
                         resolve(resp);
                     } else {
                         var err = new Error(resp.statusText);
@@ -217,12 +249,13 @@ const actions = {
     // inq_id -> вызвать start_accusation_process и вернуть id
     START_ACCUSATION_PROCESS(context) {
         return new Promise((resolve, reject) => {
-            const inquisitionProcessId = state.cur_inq.id;
-            axios({ url: '/accusations/start', data: inquisitionProcessId, method: 'POST' })
+            const inquisitionProcessId = context.getters.CUR_INQ.id;
+            console.log(inquisitionProcessId)
+            axios({ url: '/accusations/start', data: { inquisitionProcessId }, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
-                        context.commit('SET_ACCUSATION_ID', resp.data.processId); /////?
+                        context.commit('SET_ACCUSATION_ID', resp.data.data);
                         context.dispatch('INCREASE_STEP');
                         localStorage.setItem("step", context.getters.CUR_INQ.step);
                         resolve(resp);
@@ -241,12 +274,12 @@ const actions = {
     // accusation_id -> все рекорды, относящиеся к этому процессу сбора доносов в виде массива json (см ниже в методе пример данных)
     GET_ALL_ACCUSATION_RECORDS(context) {
         return new Promise((resolve, reject) => {
-            const accusation_id = state.accusation_id;
-            axios({ url: '/accusations/accusationRecords/' + accusation_id, method: 'GET' })
+            const accusation_id = context.getters.CUR_ACCUSATION;
+            axios({ url: '/accusations/accusationRecords/' + accusation_id, method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
-                        context.commit('SET_ACC_TABLE_DATA', resp.data);
+                        context.commit('SET_ACC_TABLE_DATA', resp.data.collection);
                         resolve(resp);
                     } else {
                         var err = new Error(resp.statusText);
@@ -263,11 +296,11 @@ const actions = {
     // ничего не дается на вход -> все записи об инквизициях 
     GET_ALL_INQUISITIONS(context) {
         return new Promise((resolve, reject) => {
-            axios({ url: '/inquisitions/getAllInquisitions', method: 'GET' })
+            axios({ url: '/inquisitions/getAllInquisitions', method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
-                        context.commit('SET_INQ_TABLE_DATA', resp.data);
+                        context.commit('SET_INQ_TABLE_DATA', resp.data.collection);
                         resolve(resp);
                     } else {
                         var err = new Error(resp.statusText);
@@ -284,8 +317,8 @@ const actions = {
     // accusation_id -> вызвать finish_accusation_process, ничего не возвращать 
     FINISH_ACCUSATION_PROCESS(context) {
         return new Promise((resolve, reject) => {
-            const accusationId = state.accusation_id;
-            axios({ url: '/accusations/finish', data: accusationId, method: 'POST' })
+            const accusationId = context.getters.CUR_ACCUSATION;
+            axios({ url: '/accusations/finish', data: { accusationId }, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
@@ -307,11 +340,11 @@ const actions = {
     // ничего на вход -> массив инфы о всех библиях см ниже формат
     GET_ALL_BIBLES(context) {
         return new Promise((resolve, reject) => {
-            axios({ url: '/bibles/', method: 'GET' })
+            axios({ url: '/bibles/', method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
-                        context.commit('SET_BIBLE_DATA', resp.data);
+                        context.commit('SET_BIBLE_DATA', resp.data.collection);
                         resolve(resp);
                     } else {
                         var err = new Error(resp.statusText);
@@ -328,11 +361,11 @@ const actions = {
     // ничего на вход -> массив инфы о всех местностях (locality) см ниже формат
     GET_ALL_LOCALITIES(context) {
         return new Promise((resolve, reject) => {
-            axios({ url: '/localities/', method: 'GET' })
+            axios({ url: '/localities/', method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
-                        context.commit('SET_LOCALITY_DATA', resp.data);
+                        context.commit('SET_LOCALITY_DATA', resp.data.collection);
                         resolve(resp);
                     } else {
                         var err = new Error(resp.statusText);
@@ -347,13 +380,13 @@ const actions = {
     },
     // на вход accusation_id -> вызвать get_not_resolved_accusation_record и вернуть результат (в формате как для GET_ALL_ACCUSATION_RECORDS)
     GET_NR_ACCUSATION_RECORDS(context) {
-        const accusationId = state.accusation_id;
+        const accusationId = context.getters.CUR_ACCUSATION;
         return new Promise((resolve, reject) => {
-            axios({ url: '/accusations/notResolvedRecords/' + accusationId, method: 'GET' })
+            axios({ url: '/accusations/notResolvedRecords/' + accusationId, method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
-                        context.commit('SET_ACC_NR_TABLE_DATA', resp.data);
+                        context.commit('SET_ACC_NR_TABLE_DATA', resp.data.collection);
                         resolve(resp);
                     } else {
                         var err = new Error(resp.statusText);
@@ -369,9 +402,9 @@ const actions = {
 
     // на вход inq_id ->  вызвать generate_cases, возвращать ничего не нужно
     FINISH_RESOLVING_RECORDS(context) {
-        const accusationId = state.accusation_id;
+        const accusationId = context.getters.CUR_ACCUSATION;
         return new Promise((resolve, reject) => {
-            axios({ url: '/accusations/generateCases', data: accusationId, method: 'POST' })
+            axios({ url: '/accusations/generateCases', data: { accusationId }, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
@@ -394,11 +427,11 @@ const actions = {
     GET_ALL_CASES(context) {
         return new Promise((resolve, reject) => {
             const inq_id = context.getters.CUR_INQ.id;
-            axios({ url: '/inquisitions/allCases/' + inq_id, method: 'GET' })
+            axios({ url: '/inquisitions/allCases/' + inq_id, method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
-                        context.commit('SET_CASES_DATA', resp.data);  //////чекнуть формат
+                        context.commit('SET_CASES_DATA', resp.data.collection);  //////чекнуть формат
                         resolve(resp);
                     } else {
                         var err = new Error(resp.statusText);
@@ -414,12 +447,12 @@ const actions = {
     // на вход id locality ->  вернуть массив всех людей (формат см ниже)
     GET_ALL_PEOPLE(context, payload) {
         return new Promise((resolve, reject) => {
-            const locality_id = state.cur_data.locality
-            axios({ url: '/persons/' + locality_id, data: payload, method: 'GET' })
+            const locality_id = context.getters.CUR_LOCALITY;
+            axios({ url: '/persons/' + locality_id, data: payload, method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
-                        context.commit('SET_PEOPLE_DATA', resp.data); // FIXME concat name and surname
+                        context.commit('SET_PEOPLE_DATA', resp.data.collection); // FIXME concat name and surname
                         resolve(resp);
                     } else {
                         var err = new Error(resp.statusText);
@@ -443,9 +476,9 @@ const actions = {
     -> вызвать add_accusation_record */
     ADD_ACC_RECORD(context, payload) {
         return new Promise((resolve, reject) => {
-            payload["accusationId"] = state.accusation_id;
-            payload["bishop"] = state.official_id;
-            axios({ url: '/accusations/add', data: payload, method: 'POST' })
+            payload["accusationId"] = context.getters.CUR_ACCUSATION;
+            payload["bishop"] = context.getters.CUR_OFFICIAL;
+            axios({ url: '/accusations/add', data: payload, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
@@ -466,12 +499,12 @@ const actions = {
     // на вход id bible ->  вернуть массив всех commandment (вызвать функцию read_bible) (формат см ниже)
     GET_ALL_COMMANDMENTS(context, payload) {
         return new Promise((resolve, reject) => {
-            const bible_id = state.cur_inq.bible
-            axios({ url: '/bibles/commandments/' + bible_id, data: payload, method: 'GET' })
+            const bible_id = context.getters.CUR_BIBLE;
+            axios({ url: '/bibles/commandments/' + bible_id, data: payload, method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
-                        context.commit('SET_COMMANDMENTS_DATA', resp.data);
+                        context.commit('SET_COMMANDMENTS_DATA', resp.data.collection);
                         resolve(resp);
                     } else {
                         var err = new Error(resp.statusText);
@@ -488,7 +521,7 @@ const actions = {
     CONNECT_COMMANDMENT(context, payload) {
         const commandments = payload.commandments;
         return new Promise((resolve, reject) => {
-            axios({ url: '/accusations/connectCommandment/' + payload.record_id, data: commandments, method: 'POST' })
+            axios({ url: '/accusations/connectCommandment/' + payload.record_id, data: commandments, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
@@ -507,7 +540,7 @@ const actions = {
     // case_id -> ничего возвращать не нужно
     SEND_TO_DISCUSSION(context, payload) {
         return new Promise((resolve, reject) => {
-            axios({ url: '/case/sendToDiscussion', data: payload, method: 'POST' })
+            axios({ url: '/cases/sendToDiscussion', data: payload, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
@@ -527,7 +560,7 @@ const actions = {
     // case_id, result (1 - да, 0 - нет), description -> ничего возвращать не нужно
     FINISH_DISCUSSION(context, payload) {
         return new Promise((resolve, reject) => {
-            axios({ url: 'case/finishDiscussion', data: payload, method: 'POST' })
+            axios({ url: 'cases/finishDiscussion', data: payload, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     if (resp.status == 200) {
                         resolve(resp);
@@ -545,7 +578,7 @@ const actions = {
     // case_id -> ничего возвращать не нужно
     SEND_TO_TORTURE(context, payload) {
         return new Promise((resolve, reject) => {
-            axios({ url: '/case/sendToTorture', data: payload, method: 'POST' })
+            axios({ url: '/cases/sendToTorture', data: payload, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
@@ -564,7 +597,7 @@ const actions = {
     // case_id -> ничего возвращать не нужно
     MAKE_TORTURE_STEP(context, payload) {
         return new Promise((resolve, reject) => {
-            axios({ url: '/case/makeTortureStep', data: payload, method: 'POST' })
+            axios({ url: '/cases/makeTortureStep', data: payload, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     if (resp.status == 200) {
                         resolve(resp);
@@ -582,7 +615,7 @@ const actions = {
     // case_id, result (1 - да, 0 - нет), description -> ничего возвращать не нужно
     FINISH_TORTURE(context, payload) {
         return new Promise((resolve, reject) => {
-            axios({ url: '/case/finishTorture', data: payload, method: 'POST' })
+            axios({ url: '/cases/finishTorture', data: payload, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     if (resp.status == 200) {
                         resolve(resp);
@@ -596,12 +629,11 @@ const actions = {
                     reject(err)
                 })
         })
-        console.log(payload);
     },
     // inq_id -> верни массив дел у которых назначена беседа (см формат ниже)
     GET_QUEUE_FOR_DISCUTTION(context, payload) {
-        return new Promise((resolve, reject) => {
-            axios({ url: '*********', data: payload, method: 'POST' })
+        /*return new Promise((resolve, reject) => {
+            axios({ url: '*********', data: payload, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     context.commit('SET_QUEUE_FOR_DISCUSSION', resp.data);
                     resolve(resp);
@@ -609,7 +641,7 @@ const actions = {
                 .catch(err => {
                     reject(err)
                 })
-        })
+        })*/
         console.log(payload);
         context.commit('SET_QUEUE_FOR_DISCUSSION', [{
             id: 1,
@@ -622,7 +654,7 @@ const actions = {
     // inq_id -> верни массив дел у которых назначена пытка (см формат ниже)
     GET_QUEUE_FOR_TORTURE(context, payload) {
         /*return new Promise((resolve, reject) => {
-            axios({ url: '*********', data: payload, method: 'POST' })
+            axios({ url: '*********', data: payload, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     resolve(resp);
                 })
@@ -642,7 +674,7 @@ const actions = {
     // inq_id -> верни массив дел у которых назначено наказание (см формат ниже)
     GET_QUEUE_FOR_PUNISHMENT(context, payload) {
         /*return new Promise((resolve, reject) => {
-            axios({ url: '*********', data: payload, method: 'POST' })
+            axios({ url: '*********', data: payload, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     resolve(resp);
                 })
@@ -660,6 +692,28 @@ const actions = {
             punishment: "jfgmdfms",
             prison_name: "orejkfdjmn",
         }]);
+    },
+    // inq_id как параметр пути -> вызвать finish_inquisition_process, ничего не возвращать 
+    FINISH_INQUISITION_PROCESS(context) {
+        return new Promise((resolve, reject) => {
+            const incId = context.getters.CUR_INQ.id;
+            axios({ url: '/inquisitions/finish' + incId, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
+                .then(resp => {
+                    console.log(resp);
+                    if (resp.status == 200) {
+                        context.dispatch('INCREASE_STEP');
+                        localStorage.setItem("step", context.getters.CUR_INQ.step);
+                        resolve(resp);
+                    } else {
+                        var err = new Error(resp.statusText);
+                        err.code = resp.status;
+                        reject(err);
+                    }
+                })
+                .catch(err => {
+                    reject(err)
+                })
+        })
     },
 };
 export default {

@@ -119,7 +119,7 @@
                 let resultId = this.p_result.id;
                 let description = this.p_description;
                 let id = this.selectedData.id;
-                console.log(result_id, description, id);
+                console.log(resultId, description, id);
                 this.$store.dispatch('FINISH_TORTURE', { resultId, description, id })
                     .then((resp) => {
                         console.log(resp);

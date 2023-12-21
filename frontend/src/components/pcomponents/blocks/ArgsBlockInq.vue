@@ -1,15 +1,10 @@
 <template>
     <div>
         <div class="background">
-            <p>Выберите библию:</p>
             <div class="card flex justify-content-center">
+                <div>Выберите библию:</div>
                 <Dropdown v-model="bible" :options="bible_data" filter optionLabel="name" class="w-full md:w-14rem" />
-            </div>
-
-        </div>
-        <div class="background">
-            <p>Выберите местность:</p>
-            <div class="card flex justify-content-center">
+                <div>Выберите местность:</div>
                 <Dropdown v-model="locality" :options="locality_data" filter optionLabel="name" class="w-full md:w-14rem" />
             </div>
         </div>

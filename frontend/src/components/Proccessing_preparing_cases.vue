@@ -2,20 +2,20 @@
     <div>
         <Header />
         <div class="main-background div-block">
-            <div v-if="closed == false" class="div-block table-name">
+            <div v-if="closed == false" class="table-name">
                 Идет процесс разрешения дел
             </div>
-            <div v-if="closed == true" class="div-block table-name">
+            <div v-if="closed == true" class="table-name">
                 Инквизиционный процесс окончен
             </div>
-            <div v-if="closed == false" class="div-block table-name">
-                Выберите дело (кликнув по нужной строке в таблице) и нажмите на кнопку нужной команды
-            </div>
-            <div class="div-block" id="div-inline">
-                <div v-if="closed == false" class="div-inline" id="div-buttons">
+            <div class="background" id="div-inline">
+                <div v-if="closed == false">
+                    <div>
+                        Выберите дело (кликнув по нужной строке в таблице) и нажмите на "отправить на следующий этап"
+                    </div>
                     <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:doNextStep="doNextStep" />
                 </div>
-                <div v-if="closed == true" class="div-inline" id="div-buttons">
+                <div v-if="closed == true">
                     <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:doNextStep="doNextStep" />
                 </div>
             </div>
@@ -76,7 +76,12 @@
         watch: {
             data(val) {
                 if (val.length == 0) {
-                    this.$router.push({ name: 'proccessing-punishment' });
+                    this.$store.dispatch('FINISH_INQUISITION_PROCESS')
+                        .then((resp) => {
+                            console.log(resp);
+                            this.$router.push({ name: 'proccessing-punishment' });
+                        },
+                            err => this.showError(err));
                 }
             },
         },
@@ -160,46 +165,5 @@
         font-size: 20px;
         padding: 20px;
         font-weight: bold;
-    }
-
-    #div-inline div {
-        vertical-align: middle;
-        margin: 20px 20px 20px;
-        text-align: center;
-    }
-
-    .main-background > div:first-child {
-        display: table;
-        margin: 0 auto;
-    }
-
-    #result-table {
-        overflow-x: auto;
-        height: 300px;
-        margin: 10px 20px;
-    }
-
-    .div-block {
-        display: block;
-    }
-
-    .div-inline {
-        display: inline-block;
-    }
-
-    #div-buttons {
-        padding: 1.5% 1.5% 1.5% 1.5%;
-    }
-
-    @media (max-width: 1228px) {
-        #div-inline div {
-            margin: 10px 10px 10px;
-        }
-    }
-
-    @media (max-width: 892px) {
-        #div-inline div {
-            margin: 5px 5px 5px;
-        }
     }
 </style>

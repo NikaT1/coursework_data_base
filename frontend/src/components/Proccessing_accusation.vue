@@ -1,26 +1,26 @@
 <template>
-    <div>
+    <div id="div-main">
         <Header />
-        <div class="main-background div-block">
-            <div v-if="main_inf" class="div-block table-name">
+        <div class="main-background">
+            <div v-if="main_inf" class="table-name">
                 Идет процесс сбора доносов
             </div>
-            <div v-if="new_rec" class="div-block table-name">
+            <div v-if="new_rec" class="table-name">
                 Создание нового доноса
             </div>
-            <div class="div-block" id="div-inline">
-                <ArgsBlockRecord v-if="new_rec" class="div-block" v-model:p_accused="p_accused" v-model:p_informer="p_informer" v-model:p_cur_violation_place="p_cur_violation_place" v-model:p_cur_date_time="p_cur_date_time" v-model:p_cur_description="p_cur_description" />
-                <div v-if="is_inq && main_inf" class="div-inline" id="div-buttons">
+            <div id="div-inline">
+                <ArgsBlockRecord v-if="new_rec" v-model:p_accused="p_accused" v-model:p_informer="p_informer" v-model:p_cur_violation_place="p_cur_violation_place" v-model:p_cur_date_time="p_cur_date_time" v-model:p_cur_description="p_cur_description" />
+                <div v-if="is_inq && main_inf">
                     <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:newAcc="newAcc" v-on:finishAcc="finishAcc" />
                 </div>
-                <div v-if="is_bish && main_inf" class="div-inline" id="div-buttons">
+                <div v-if="is_bish && main_inf">
                     <ButtonsBlock v-bind:buttons="buttons_for_bish" v-on:goBack="goBack" v-on:newAcc="newAcc" />
                 </div>
-                <div v-if="new_rec" class="div-inline" id="div-buttons">
+                <div v-if="new_rec">
                     <ButtonsBlock v-bind:buttons="buttons_for_new_rec" v-on:goBackToMain="goBackToMain" v-on:createNewAcc="createNewAcc" />
                 </div>
             </div>
-            <div class="div-block table-name">
+            <div class="table-name">
                 Список доносов:
             </div>
         </div>
@@ -110,14 +110,14 @@
                 this.new_rec = false;
             },
             finishAcc() {
-                this.$store.dispatch('FINISH_ACCUSATION_PROCESS');
-                this.$router.push({ name: 'proccessing-cases' });
+                this.$store.dispatch('FINISH_ACCUSATION_PROCESS')
+                    .then(() => this.$router.push({ name: 'proccessing-cases' }));
             },
             createNewAcc() {
-                let accused = this.p_accused;
-                let informer = this.p_informer;
+                let accused = this.p_accused.id;
+                let informer = this.p_informer.id;
                 let violationPlace = this.p_cur_violation_place;
-                let dateTime = this.p_cur_date_time;
+                let dateTime = this.p_cur_date_time.getFullYear() + '-' + (this.p_cur_date_time.getMonth() + 1) + '-' + this.p_cur_date_time.getDate();
                 let description = this.p_cur_description;
                 console.log(accused, informer, violationPlace, dateTime, description);
                 this.$store.dispatch('ADD_ACC_RECORD', { accused, informer, violationPlace, dateTime, description })
@@ -156,53 +156,16 @@
     }
 </script>
 <style>
-
-    .table-name {
-        font-size: medium;
-        color: #6d747f;
-        font-size: 20px;
-        padding: 20px;
-        font-weight: bold;
+    #div-inline {
+        width: 100%;
+        justify-content: center;
     }
 
-    #div-inline div {
-        vertical-align: middle;
-        margin: 20px 20px 20px;
-        text-align: center;
-    }
-
-    .main-background > div:first-child {
-        display: table;
-        margin: 0 auto;
-    }
-
-    #result-table {
-        overflow-x: auto;
-        height: 300px;
-        margin: 10px 20px;
-    }
-
-    .div-block {
-        display: block;
-    }
-
-    .div-inline {
-        display: inline-block;
-    }
-
-    #div-buttons {
-        padding: 1.5% 1.5% 1.5% 1.5%;
-    }
-
-    @media (max-width: 1228px) {
-        #div-inline div {
-            margin: 10px 10px 10px;
-        }
-    }
-
-    @media (max-width: 892px) {
-        #div-inline div {
-            margin: 5px 5px 5px;
-        }
+    #main-div {
+        min-width: 100%;
+        box-sizing: border-box;
+        min-height: calc(100vh - 80px);
+        padding-bottom: 90px;
+        position: relative;
     }
 </style>

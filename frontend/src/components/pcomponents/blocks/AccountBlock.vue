@@ -8,28 +8,33 @@
             <div class="card flex justify-content-center">
                 <div v-if="new_acc">Введите имя:</div>
                 <InputText v-if="new_acc" type="text" v-model="name" />
+                <div></div>
                 <div v-if="new_acc">Введите фамилию:</div>
                 <InputText v-if="new_acc" type="text" v-model="surname" />
             </div>
             <div class="card flex justify-content-center">
-                <div>Логин</div>
+                <div>Логин:</div>
                 <InputText type="text" v-model="login" />
-                <div>Пароль</div>
+                <div></div>
+                <div>Пароль:</div>
                 <InputText type="password" v-model="password" />
             </div>
             <div class="card flex justify-content-center">
                 <div v-if="new_acc">Выберите местность:</div>
                 <Dropdown v-if="new_acc" v-model="locality" :options="locality_data" filter optionLabel="name" class="w-full md:w-14rem" />
+                <div></div>
                 <div v-if="new_acc">Выберите пол:</div>
                 <Dropdown v-if="new_acc" v-model="gender" :options="gender_data" filter optionLabel="msg" class="w-full md:w-14rem" />
             </div>
             <div class="card flex justify-content-center">
                 <div v-if="new_acc">Дата рождения:</div>
-                <Calendar v-if="new_acc" v-model="birthday" dateFormat="dd.mm.yy" />
+                <Calendar v-if="new_acc" v-model="birthday" dateFormat="yy-mm-dd" />
             </div>
         </div>
-        <ButtonsBlock v-if="!new_acc" v-bind:buttons="buttons" v-on:logIn="logIn" v-on:createUser="createUser" />
-        <ButtonsBlock v-if="new_acc" v-bind:buttons="buttons_for_new_user" v-on:goBack="goBack" v-on:addUser="addUser" />
+        <div class="card flex justify-content-center" id="div-inline">
+            <ButtonsBlock v-if="!new_acc" v-bind:buttons="buttons" v-on:logIn="logIn" v-on:createUser="createUser" />
+            <ButtonsBlock v-if="new_acc" v-bind:buttons="buttons_for_new_user" v-on:goBack="goBack" v-on:addUser="addUser" />
+        </div>
     </div>
 </template>
 
@@ -79,42 +84,64 @@
                 this.new_acc = false;
             },
             addUser() {
-                const name = this.name;
-                const surname = this.surname;
-                const birthDate = this.birthday;
-                const personGender = this.gender.code;
-                const locality = this.locality.id;
-                const username = this.login;
-                const password = this.password;
-                
-                this.$store.dispatch('CREATE_NEW_ACCOUNT', { name, surname, birthDate, personGender, locality, username, password })
-                    .then(resp => {
-                        localStorage.setItem("token", resp.data.token);
-                        localStorage.setItem("role", resp.data.role);
-                        this.$store.dispatch('GET_CUR_INQ');
-                        this.$router.push({ name: 'main-inquisitor-page' });
-                    },
-                        err => (this.showError(err)));
+                if (this.check_params_for_new_user()) {
+                    const name = this.name;
+                    const surname = this.surname;
+                    const birthDate = this.birthday.getFullYear() + "-" + (this.birthday.getMonth() + 1) + "-" + this.birthday.getDate();
+                    const personGender = this.gender.code;
+                    const locality = this.locality.id;
+                    const username = this.login;
+                    const password = this.password;
+
+                    this.$store.dispatch('CREATE_NEW_ACCOUNT', { name, surname, birthDate, personGender, locality, username, password })
+                        .then(resp => {
+                            console.log(resp);
+                            this.$store.dispatch('GET_CUR_INQ');
+                            this.$router.push({ name: 'main-inquisitor-page' });
+                        },
+                            err => (this.showError(err)));
+                } else {
+                    this.showErrorFromFront("Необходимо заполнить все поля!");
+                }
 
             },
             logIn() {
-                const username = this.login;
-                const password = this.password;
-                this.$store.dispatch('LOG_IN_ACCOUNT', { username, password })
-                    .then(resp => {
-                        localStorage.setItem("token", resp.data.token);
-                        localStorage.setItem("role", resp.data.role);
-                        this.$store.dispatch('GET_CUR_INQ');
-                        this.$router.push({ name: 'main-inquisitor-page' });
-                    },
-                        err => {
-                            this.showError(err);
-                            localStorage.setItem("token", "rjkfgvc");
-                            localStorage.setItem("role", 0);
+                if (this.check_params_for_user()) {
+                    const username = this.login;
+                    const password = this.password;
+                    this.$store.dispatch('LOG_IN_ACCOUNT', { username, password })
+                        .then(resp => {
+                            console.log(resp);
                             this.$store.dispatch('GET_CUR_INQ');
                             this.$router.push({ name: 'main-inquisitor-page' });
-                        });
-                
+                        },
+                            err => {
+                                this.showError(err);
+                            });
+                } else {
+                    this.showErrorFromFront("Необходимо заполнить все поля!");
+                }
+
+            },
+
+            check_params_for_new_user() {
+                return this.name != "" && this.surname != "" && this.birthday != "" && this.birthday != null &&
+                    this.gender != null && this.gender != undefined && this.locality != null &&
+                    this.locality != undefined && this.login != "" && this.password != "";
+            },
+
+
+            check_params_for_user() {
+                return this.login != "" && this.password != "";
+            },
+
+            showErrorFromFront(text) {
+                this.$notify({
+                    group: "error",
+                    title: 'Ошибка',
+                    text: text,
+                    type: 'error'
+                });
             },
 
             showError(err) {
@@ -126,7 +153,7 @@
                 if (err.code == 404 || err.response.status == 404) {
                     text = "Неверный запрос к серверу";
                 }
-                if (err.code == 401 || err.response.status == 401) {
+                if (err.code == 400 || err.response.status == 400) {
                     text = "Данного аккаунта не существует";
                 }
                 this.$notify({
@@ -138,7 +165,12 @@
             }
         },
         created() {
-            this.$store.dispatch('GET_ALL_LOCALITIES');
+            this.$store.dispatch('GET_ALL_LOCALITIES')
+                .then((resp) => {
+                    console.log(resp);
+                    this.data = this.cur_data;
+                },
+                    err => this.showError(err));
         },
         computed: mapState({
             locality_data: state => state.inquisition.locality_data,
@@ -153,17 +185,9 @@
 
     .background, .background div {
         margin: 0 auto;
-        padding: 10px 10px 10px 10px;
+        padding: 5px 5px 5px 5px;
         width: 60%;
     }
-
-        .background div input {
-            margin: 10px 0;
-        }
-
-        .background div Button {
-            margin: 0;
-        }
 
     .title {
         text-align: center;

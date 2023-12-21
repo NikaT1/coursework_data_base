@@ -7,17 +7,12 @@
                 <div>Выберите обвиненного:</div>
                 <Dropdown v-model="accused" :options="people_data" filter optionLabel="name" class="w-full md:w-14rem" />
             </div>
-        </div>
-        <div class="background">
-            
             <div class="card flex justify-content-center">
                 <div>Выберите дату преступления:</div>
                 <Calendar v-model="cur_date_time" dateFormat="dd.mm.yy" />
                 <div>Опишите место преступления:</div>
                 <InputText type="text" v-model="cur_violation_place" />
             </div>
-        </div>
-        <div class="background">
             <div class="card flex justify-content-center">
                 <div>Опишите ситуацию:</div>
                 <InputText type="text" v-model="cur_description" />
@@ -58,13 +53,13 @@
             informer(val) {
                 this.$emit('update:p_informer', val);
             },
-            cur_violation_place(val) { 
+            cur_violation_place(val) {
                 this.$emit('update:p_cur_violation_place', val);
             },
             cur_date_time(val) {
                 this.$emit('update:p_cur_date_time', val);
             },
-            cur_description(val) { 
+            cur_description(val) {
                 this.$emit('update:p_cur_description', val);
             },
         },
@@ -80,11 +75,4 @@
 
 <style scoped>
 
-    .background {
-        background: rgba(255, 255, 255, 0.7);
-        -webkit-background-size: cover;
-        -moz-background-size: cover;
-        -o-background-size: cover;
-        border-radius: 5px;
-    }
 </style>

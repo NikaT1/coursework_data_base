@@ -13,8 +13,8 @@
 <style>
 
     * {
-        padding: 0;
-        margin: 0;
+        padding: 0%;
+        margin: 0%;
     }
 
     html, body {
@@ -45,7 +45,7 @@
 
     .notify {
         font-family: New Century Schoolbook, TeX Gyre Schola, serif;
-        font-size: 30px;
+        font-size: 50px;
     }
 
     p {

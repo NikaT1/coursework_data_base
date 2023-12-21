@@ -19,8 +19,7 @@ export default {
 </script>
 
 <style scoped>
-.buttons-inline {
-  display: inline-block;
-  margin: 0 2% 0 0;
-}
+    .buttons-inline {
+        display: inline-block;
+    }
 </style>

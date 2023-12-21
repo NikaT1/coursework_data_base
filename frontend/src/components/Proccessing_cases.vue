@@ -1,25 +1,25 @@
 <template>
     <div>
         <Header />
-        <div class="main-background div-block">
-            <div v-if="main_inf" class="div-block table-name">
+        <div class="main-background">
+            <div v-if="main_inf" class="table-name">
                 Идет процесс обработки доносов
             </div>
-            <div v-if="new_rec" class="div-block table-name">
+            <div v-if="new_rec" class="table-name">
                 Привязка сводов к доносу
             </div>
-            <div v-if="main_inf" class="div-block table-name">
-                Для привязки доноса к сводам кликните в таблице на нужный донос и нажмите "утвердить донос"
-            </div>
-            <div class="div-block" id="div-inline">
+            <div class="background" id="div-inline">
+              
                 <ArgsBlockCase v-if="new_rec" class="div-block" v-model:p_commandments="p_commandments" />
-                <div v-if="is_inq && main_inf" class="div-inline" id="div-buttons">
+                <div v-if="is_inq && main_inf">
+                    <div>Для привязки доноса к сводам кликните в таблице на нужный донос и нажмите "утвердить донос" </div>
                     <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:connectAcc="connectAcc" v-on:startGeneratingCases="startGeneratingCases" />
                 </div>
-                <div v-if="is_bish && main_inf" class="div-inline" id="div-buttons">
+                <div v-if="is_bish && main_inf">
+                    <div>Для привязки доноса к сводам кликните в таблице на нужный донос и нажмите "утвердить донос" </div>
                     <ButtonsBlock v-bind:buttons="buttons_for_bish" v-on:goBack="goBack" v-on:connectAcc="connectAcc" />
                 </div>
-                <div v-if="new_rec" class="div-inline" id="div-buttons">
+                <div v-if="new_rec">
                     <ButtonsBlock v-bind:buttons="buttons_for_connect" v-on:goBackToMain="goBackToMain" v-on:doConnect="doConnect" />
                 </div>
             </div>
@@ -120,13 +120,14 @@
                 this.new_rec = false;
             },
             startGeneratingCases() {
-                this.$store.dispatch('FINISH_RESOLVING_RECORDS');
-                this.$router.push({ name: 'proccessing-preparing-cases' });
+                this.$store.dispatch('FINISH_RESOLVING_RECORDS')
+                    .then(() => this.$router.push({ name: 'proccessing-preparing-cases' }));
+               
             },
             doConnect() {
                 let commandments = this.p_commandments.map(item => item.id);
                 let record_id = this.selectedData.id;
-                console.log(commandments_id, record_id);
+                console.log(commandments, record_id);
                 this.$store.dispatch('CONNECT_COMMANDMENT', { commandments, record_id })
                     .then((resp) => {
                         console.log(resp);
@@ -175,44 +176,4 @@
         font-weight: bold;
     }
 
-    #div-inline div {
-        vertical-align: middle;
-        margin: 20px 20px 20px;
-        text-align: center;
-    }
-
-    .main-background > div:first-child {
-        display: table;
-        margin: 0 auto;
-    }
-
-    #result-table {
-        overflow-x: auto;
-        height: 300px;
-        margin: 10px 20px;
-    }
-
-    .div-block {
-        display: block;
-    }
-
-    .div-inline {
-        display: inline-block;
-    }
-
-    #div-buttons {
-        padding: 1.5% 1.5% 1.5% 1.5%;
-    }
-
-    @media (max-width: 1228px) {
-        #div-inline div {
-            margin: 10px 10px 10px;
-        }
-    }
-
-    @media (max-width: 892px) {
-        #div-inline div {
-            margin: 5px 5px 5px;
-        }
-    }
 </style>
