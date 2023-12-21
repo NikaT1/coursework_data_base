@@ -107,7 +107,7 @@
                 }
             },
             connectAcc() {
-                if (this.selectedData !== null && this.selectedData !== undefined ) {
+                if (this.selectedData !== null && this.selectedData !== undefined) {
                     this.main_inf = false;
                     this.new_rec = true;
                 } else {
@@ -127,22 +127,30 @@
                 let commandments = this.p_commandments.map(item => item.id);
                 let record_id = this.selectedData.id;
                 console.log(commandments_id, record_id);
-                //this.$store.dispatch('CONNECT_COMMANDMENT', {commandments, record_id})
-                //    .then(() => {
-                //          this.$store.dispatch('GET_NR_ACCUSATION_RECORDS');
-                //          this.data = this.cur_data;
-                //          this.main_inf = true;
-                //          this.new_rec = false;
-                //        }))
-                //    .catch(err => this.showError(err));
-                this.$store.dispatch('CONNECT_COMMANDMENT', { commandments, record_id });
-                this.$store.dispatch('GET_NR_ACCUSATION_RECORDS');
-                this.main_inf = true;
-                this.new_rec = false;
-                this.data = this.cur_data;
-                console.log(this.data);
+                this.$store.dispatch('CONNECT_COMMANDMENT', { commandments, record_id })
+                    .then((resp) => {
+                        console.log(resp);
+                        this.$store.dispatch('GET_NR_ACCUSATION_RECORDS');
+                        this.data = this.cur_data;
+                        this.main_inf = true;
+                        this.new_rec = false;
+                        this.data = this.cur_data;
+                    },
+                        err => this.showError(err));
+
             },
-            showError(text) {
+            showError(err) {
+                console.log(err);
+                let text = "Произошла непредвиденная ошибка";
+                if (err.code == 500 || err.response.status == 500) {
+                    text = "Проблема с подключением к серверу";
+                }
+                if (err.code == 404 || err.response.status == 404) {
+                    text = "Неверный запрос к серверу";
+                }
+                if (err.code == 401 || err.response.status == 401) {
+                    text = "Данного аккаунта не существует";
+                }
                 this.$notify({
                     group: "error",
                     title: 'Ошибка',

@@ -80,7 +80,18 @@
                 }
             },
        
-            showError(text) {
+            showError(err) {
+                console.log(err);
+                let text = "Произошла непредвиденная ошибка";
+                if (err.code == 500 || err.response.status == 500) {
+                    text = "Проблема с подключением к серверу";
+                }
+                if (err.code == 404 || err.response.status == 404) {
+                    text = "Неверный запрос к серверу";
+                }
+                if (err.code == 401 || err.response.status == 401) {
+                    text = "Данного аккаунта не существует";
+                }
                 this.$notify({
                     group: "error",
                     title: 'Ошибка',
@@ -90,8 +101,12 @@
             }
         },
         created() {
-            this.$store.dispatch('GET_QUEUE_FOR_PUNISHMENT');
-            this.data = this.cur_data;
+            this.$store.dispatch('GET_QUEUE_FOR_PUNISHMENT')
+                .then((resp) => {
+                    console.log(resp);
+                    this.data = this.cur_data;
+                },
+                    err => this.showError(err));
         }
     }
 </script>

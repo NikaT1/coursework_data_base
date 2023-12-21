@@ -116,23 +116,31 @@
             createNewAcc() {
                 let accused = this.p_accused;
                 let informer = this.p_informer;
-                let violation_place = this.p_cur_violation_place;
-                let date_time = this.p_cur_date_time;
+                let violationPlace = this.p_cur_violation_place;
+                let dateTime = this.p_cur_date_time;
                 let description = this.p_cur_description;
-                console.log(accused, informer, violation_place, date_time, description);
-                //this.$store.dispatch('ADD_ACC_RECORD', { accused, informer, violation_place, date_time, description})
-                //    .then(() => {
-                //          this.main_inf = true;
-                //          this.new_rec = false;
-                //        }))
-                //    .catch(err => this.showError(err));
-                this.$store.dispatch('ADD_ACC_RECORD', { accused, informer, violation_place, date_time, description });
-                this.main_inf = true;
-                this.new_rec = false;
-                this.data = this.cur_data;
-                console.log(this.data);
+                console.log(accused, informer, violationPlace, dateTime, description);
+                this.$store.dispatch('ADD_ACC_RECORD', { accused, informer, violationPlace, dateTime, description })
+                    .then((resp) => {
+                        console.log(resp);
+                        this.main_inf = true;
+                        this.new_rec = false;
+                        this.data = this.cur_data;
+                    },
+                        err => this.showError(err));
             },
-            showError(text) {
+            showError(err) {
+                console.log(err);
+                let text = "Произошла непредвиденная ошибка";
+                if (err.code == 500 || err.response.status == 500) {
+                    text = "Проблема с подключением к серверу";
+                }
+                if (err.code == 404 || err.response.status == 404) {
+                    text = "Неверный запрос к серверу";
+                }
+                if (err.code == 401 || err.response.status == 401) {
+                    text = "Данного аккаунта не существует";
+                }
                 this.$notify({
                     group: "error",
                     title: 'Ошибка',

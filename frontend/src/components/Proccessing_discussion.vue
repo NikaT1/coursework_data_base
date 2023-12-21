@@ -100,7 +100,7 @@
                 }
             },
             startDis() {
-                if (this.selectedData !== null && this.selectedData !== undefined ) {
+                if (this.selectedData !== null && this.selectedData !== undefined) {
                     this.main_inf = false;
                     this.new_rec = true;
                 } else {
@@ -112,26 +112,34 @@
                 this.new_rec = false;
             },
             finishDis() {
-                let result_id = this.p_result.id;
+                let resultId = this.p_result.id;
                 let description = this.p_description;
-                let case_id = this.selectedData.id;
-                console.log(result_id, description, case_id);
-                //this.$store.dispatch('FINISH_DISCUSSION', {result_id, description, case_id})
-                //    .then(() => {
-                //          this.$store.dispatch('GET_QUEUE_FOR_DISCUTTION');
-                //          this.data = this.cur_data;
-                //          this.main_inf = true;
-                //          this.new_rec = false;
-                //        }))
-                //    .catch(err => this.showError(err));
-                this.$store.dispatch('FINISH_DISCUSSION', { result_id, description, case_id });
-                this.$store.dispatch('GET_QUEUE_FOR_DISCUTTION');
-                this.main_inf = true;
-                this.new_rec = false;
-                this.data = this.cur_data;
-                console.log(this.data);
+                let id = this.selectedData.id;
+
+                this.$store.dispatch('FINISH_DISCUSSION', { resultId, description, id })
+                    .then((resp) => {
+                        console.log(resp);
+                        this.$store.dispatch('GET_QUEUE_FOR_DISCUTTION');
+                        this.data = this.cur_data;
+                        this.main_inf = true;
+                        this.new_rec = false;
+                        this.data = this.cur_data;
+                    },
+                        err => this.showError(err));
+
             },
-            showError(text) {
+            showError(err) {
+                console.log(err);
+                let text = "Произошла непредвиденная ошибка";
+                if (err.code == 500 || err.response.status == 500) {
+                    text = "Проблема с подключением к серверу";
+                }
+                if (err.code == 404 || err.response.status == 404) {
+                    text = "Неверный запрос к серверу";
+                }
+                if (err.code == 401 || err.response.status == 401) {
+                    text = "Данного аккаунта не существует";
+                }
                 this.$notify({
                     group: "error",
                     title: 'Ошибка',

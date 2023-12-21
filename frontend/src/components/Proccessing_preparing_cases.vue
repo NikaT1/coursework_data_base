@@ -92,45 +92,52 @@
                 }
             },
             doNextStep() {
-                if (this.selectedData !== null && this.selectedData !== undefined ) {
-                    let case_id = this.selectedData.id;
-                    console.log(case_id);
+                if (this.selectedData !== null && this.selectedData !== undefined) {
+                    let id = this.selectedData.id;
+                    console.log(id);
                     if (this.selectedData.step == 0) {
-                        //this.$store.dispatch('SEND_TO_DISCUSSION', {case_id})
-                        //    .then(() => {
-                        //          this.$store.dispatch('GET_ALL_CASES');
-                        //          this.data = this.cur_data;
-                        //          this.main_inf = true;
-                        //          this.new_rec = false;
-                        //        }))
-                        //    .catch(err => this.showError(err));
-                        this.$store.dispatch('SEND_TO_DISCUSSION', { case_id });
-                        this.$store.dispatch('GET_ALL_CASES');
-                        this.data = this.cur_data;
-                        console.log(this.data);
+                        this.$store.dispatch('SEND_TO_DISCUSSION', { id })
+                            .then((resp) => {
+                                console.log(resp);
+                                this.$store.dispatch('GET_ALL_CASES');
+                                this.data = this.cur_data;
+                                this.main_inf = true;
+                                this.new_rec = false;
+                            },
+                                err => this.showError(err));
+
                     } else if (this.selectedData.step == 2) {
-                        //this.$store.dispatch('SEND_TO_TORTURE', {case_id})
-                        //    .then(() => {
-                        //          this.$store.dispatch('GET_ALL_CASES');
-                        //          this.data = this.cur_data;
-                        //          this.main_inf = true;
-                        //          this.new_rec = false;
-                        //        }))
-                        //    .catch(err => this.showError(err));
-                        this.$store.dispatch('SEND_TO_TORTURE', { case_id });
-                        this.$store.dispatch('GET_ALL_CASES');
-                        this.data = this.cur_data;
-                        console.log(this.data);
+                        this.$store.dispatch('SEND_TO_TORTURE', { id })
+                            .then((resp) => {
+                                console.log(resp);
+                                this.$store.dispatch('GET_ALL_CASES');
+                                this.data = this.cur_data;
+                                this.main_inf = true;
+                                this.new_rec = false;
+                            },
+                                err => this.showError(err));
+
                     } else {
                         this.showError("Данное дело нельзя выбрать, так как текущий процесс еще не окончен!");
                     }
-                    
+
                 } else {
                     this.showError("Необходимо выбрать дело!");
                 }
             },
-           
-            showError(text) {
+
+            showError(err) {
+                console.log(err);
+                let text = "Произошла непредвиденная ошибка";
+                if (err.code == 500 || err.response.status == 500) {
+                    text = "Проблема с подключением к серверу";
+                }
+                if (err.code == 404 || err.response.status == 404) {
+                    text = "Неверный запрос к серверу";
+                }
+                if (err.code == 401 || err.response.status == 401) {
+                    text = "Данного аккаунта не существует";
+                }
                 this.$notify({
                     group: "error",
                     title: 'Ошибка',

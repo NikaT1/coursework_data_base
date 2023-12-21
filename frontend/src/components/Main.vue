@@ -97,31 +97,36 @@
             createNew() {
                 console.log(this.p_locality, this.p_bible);
                 let localityId = this.p_locality.id;
-                let bibleId = this.p_bible.id;
+                let bibleId = this.p_bible.version;
                 this.$store.dispatch('CREATE_NEW_INQ', { localityId, bibleId })
                     .then(resp => {
-                        localStorage.setItem("token", resp.data.token);
-                        localStorage.setItem("role", resp.data.role);
-                        this.$store.dispatch('GET_CUR_INQ');
-                        this.$router.push({ name: 'main-inquisitor-page' });
+                        console.log(resp);
+                        this.$store.dispatch('START_ACCUSATION_PROCESS');
+                        console.log(localStorage.getItem('step'));
+                        this.$router.push({ name: 'proccessing-acc-page' });
                     },
                         err => (this.showError(err)));
-                //this.$store.dispatch('CREATE_NEW_INQ', { locality, bible })
-                //    .then(() => this.$router.push({ name: 'proccessing-acc-page' }))
-                //    .catch(err => this.showError(err));
-                this.$store.dispatch('CREATE_NEW_INQ', { locality, bible });
-                this.$store.dispatch('START_ACCUSATION_PROCESS');
-                console.log(localStorage.getItem('step'))
-                this.$router.push({ name: 'proccessing-acc-page' });
             },
             openCurrent() {
-                //this.$store.dispatch('GET_CUR_INQ')
-                //    .then(() => this.$router.push({ name: 'proccessing-acc-page' }))
-                //    .catch(err => this.showError(err));
-                this.$store.dispatch('GET_CUR_INQ');
-                this.$router.push({ name: 'proccessing-acc-page' });
+                this.$store.dispatch('GET_CUR_INQ')
+                    .then(resp => {
+                        console.log(resp);
+                        this.$router.push({ name: 'proccessing-acc-page' });
+                    },
+                        err => (this.showError(err)));
             },
-            showError(text) {
+            showError(err) {
+                console.log(err);
+                let text = "Произошла непредвиденная ошибка";
+                if (err.code == 500 || err.response.status == 500) {
+                    text = "Проблема с подключением к серверу";
+                }
+                if (err.code == 404 || err.response.status == 404) {
+                    text = "Неверный запрос к серверу";
+                }
+                if (err.code == 401 || err.response.status == 401) {
+                    text = "Данного аккаунта не существует";
+                }
                 this.$notify({
                     group: "error",
                     title: 'Ошибка',
