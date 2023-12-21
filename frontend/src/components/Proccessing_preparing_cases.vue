@@ -127,10 +127,18 @@
                     }
 
                 } else {
-                    this.showError("Необходимо выбрать дело!");
+                    this.showErrorFromFront("Необходимо выбрать дело!");
                 }
             },
 
+            showErrorFromFront(text) {
+                this.$notify({
+                    group: "error",
+                    title: 'Ошибка',
+                    text: text,
+                    type: 'error'
+                });
+            },
             showError(err) {
                 console.log(err);
                 let text = "Произошла непредвиденная ошибка";

@@ -114,20 +114,37 @@
                     .then(() => this.$router.push({ name: 'proccessing-cases' }));
             },
             createNewAcc() {
-                let accused = this.p_accused.id;
-                let informer = this.p_informer.id;
-                let violationPlace = this.p_cur_violation_place;
-                let dateTime = this.p_cur_date_time.getFullYear() + '-' + (this.p_cur_date_time.getMonth() + 1) + '-' + this.p_cur_date_time.getDate();
-                let description = this.p_cur_description;
-                console.log(accused, informer, violationPlace, dateTime, description);
-                this.$store.dispatch('ADD_ACC_RECORD', { accused, informer, violationPlace, dateTime, description })
-                    .then((resp) => {
-                        console.log(resp);
-                        this.main_inf = true;
-                        this.new_rec = false;
-                        this.data = this.cur_data;
-                    },
-                        err => this.showError(err));
+                if (this.check_new_acc()) {
+                    let accused = this.p_accused.id;
+                    let informer = this.p_informer.id;
+                    let violationPlace = this.p_cur_violation_place;
+                    let dateTime = this.p_cur_date_time.getFullYear() + '-' + (this.p_cur_date_time.getMonth() + 1) + '-' + this.p_cur_date_time.getDate();
+                    let description = this.p_cur_description;
+                    console.log(accused, informer, violationPlace, dateTime, description);
+                    this.$store.dispatch('ADD_ACC_RECORD', { accused, informer, violationPlace, dateTime, description })
+                        .then((resp) => {
+                            console.log(resp);
+                            this.main_inf = true;
+                            this.new_rec = false;
+                            this.data = this.cur_data;
+                        },
+                            err => this.showError(err));
+                } else {
+                    this.showErrorFromFront("Необходимо заполнить все поля!");
+                }
+            },
+            check_new_acc() {
+                return this.p_accused != null && this.p_accused != undefined && this.p_informer != null && this.p_informer != undefined &&
+                    this.p_cur_violation_place != "" && this.p_cur_date_time != undefined && this.p_cur_date_time != null && this.p_cur_description != "";
+            },
+
+            showErrorFromFront(text) {
+                this.$notify({
+                    group: "error",
+                    title: 'Ошибка',
+                    text: text,
+                    type: 'error'
+                });
             },
             showError(err) {
                 console.log(err);

@@ -116,20 +116,37 @@
                 this.new_rec = false;
             },
             finishDis() {
-                let resultId = this.p_result.id;
-                let description = this.p_description;
-                let id = this.selectedData.id;
-                console.log(resultId, description, id);
-                this.$store.dispatch('FINISH_TORTURE', { resultId, description, id })
-                    .then((resp) => {
-                        console.log(resp);
-                        this.$store.dispatch('GET_QUEUE_FOR_TORTURE');
-                        this.data = this.cur_data;
-                        this.main_inf = true;
-                        this.new_rec = false;
-                    },
-                        err => this.showError(err));
+                if (this.check_new_dis()) {
+                    let resultId = this.p_result.id;
+                    let description = this.p_description;
+                    let id = this.selectedData.id;
+                    console.log(resultId, description, id);
+                    this.$store.dispatch('FINISH_TORTURE', { resultId, description, id })
+                        .then((resp) => {
+                            console.log(resp);
+                            this.$store.dispatch('GET_QUEUE_FOR_TORTURE');
+                            this.data = this.cur_data;
+                            this.main_inf = true;
+                            this.new_rec = false;
+                        },
+                            err => this.showError(err));
 
+                } else {
+                    this.showErrorFromFront("Необходимо заполнить все поля!");
+                }
+            },
+            check_new_dis() {
+                return this.p_result != null && this.p_result != undefined && this.selectedData != null && this.selectedData != undefined &&
+                    this.p_description != "";
+            },
+
+            showErrorFromFront(text) {
+                this.$notify({
+                    group: "error",
+                    title: 'Ошибка',
+                    text: text,
+                    type: 'error'
+                });
             },
             showError(err) {
                 console.log(err);

@@ -107,12 +107,12 @@
                 }
             },
             connectAcc() {
-                if (this.selectedData !== null && this.selectedData !== undefined) {
+                if (this.selectedData != null && this.selectedData != undefined) {
                     this.main_inf = false;
                     this.new_rec = true;
                 } else {
                     console.log("here");
-                    this.showError("Необходимо выбрать донос!");
+                    this.showErrorFromFront("Необходимо выбрать донос!");
                 }
             },
             goBackToMain() {
@@ -125,20 +125,36 @@
                
             },
             doConnect() {
-                let commandments = this.p_commandments.map(item => item.id);
-                let record_id = this.selectedData.id;
-                console.log(commandments, record_id);
-                this.$store.dispatch('CONNECT_COMMANDMENT', { commandments, record_id })
-                    .then((resp) => {
-                        console.log(resp);
-                        this.$store.dispatch('GET_NR_ACCUSATION_RECORDS');
-                        this.data = this.cur_data;
-                        this.main_inf = true;
-                        this.new_rec = false;
-                        this.data = this.cur_data;
-                    },
-                        err => this.showError(err));
+                if (this.check_new_connect()) {
+                    let commandments = this.p_commandments.map(item => item.id);
+                    let record_id = this.selectedData.id;
+                    console.log(commandments, record_id);
+                    this.$store.dispatch('CONNECT_COMMANDMENT', { commandments, record_id })
+                        .then((resp) => {
+                            console.log(resp);
+                            this.$store.dispatch('GET_NR_ACCUSATION_RECORDS');
+                            this.data = this.cur_data;
+                            this.main_inf = true;
+                            this.new_rec = false;
+                            this.data = this.cur_data;
+                        },
+                            err => this.showError(err));
+                } else {
+                    this.showErrorFromFront("Необходимо выбрать хотя бы один свод!");
+                }
 
+            },
+            check_new_connect() {
+                return this.p_commandments != null && this.p_commandments != undefined && this.selectedData != null && this.selectedData != undefined;
+            },
+
+            showErrorFromFront(text) {
+                this.$notify({
+                    group: "error",
+                    title: 'Ошибка',
+                    text: text,
+                    type: 'error'
+                });
             },
             showError(err) {
                 console.log(err);

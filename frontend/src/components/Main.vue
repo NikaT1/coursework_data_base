@@ -95,16 +95,20 @@
                 this.main_info = false;
             },
             createNew() {
-                console.log(this.p_locality, this.p_bible);
-                let localityId = this.p_locality.id;
-                let bibleId = this.p_bible.version;
-                this.$store.dispatch('CREATE_NEW_INQ', { localityId, bibleId })
-                    .then(resp => {
-                        console.log(resp);
-                        this.$store.dispatch('START_ACCUSATION_PROCESS')
-                            .then(() => this.$router.push({ name: 'proccessing-acc-page' }));
-                    },
-                        err => (this.showError(err)));
+                if (check_new_inq()) {
+                    console.log(this.p_locality, this.p_bible);
+                    let localityId = this.p_locality.id;
+                    let bibleId = this.p_bible.version;
+                    this.$store.dispatch('CREATE_NEW_INQ', { localityId, bibleId })
+                        .then(resp => {
+                            console.log(resp);
+                            this.$store.dispatch('START_ACCUSATION_PROCESS')
+                                .then(() => this.$router.push({ name: 'proccessing-acc-page' }));
+                        },
+                            err => (this.showError(err)));
+                } else {
+                    this.showErrorFromFront("Необходимо заполнить все поля!");
+                }
             },
             openCurrent() {
                 this.$store.dispatch('GET_CUR_INQ')
@@ -113,6 +117,18 @@
                         this.$router.push({ name: 'proccessing-acc-page' });
                     },
                         err => (this.showError(err)));
+            },
+            check_new_inq() {
+                return this.p_locality != null && this.p_locality != undefined && this.p_bible != null && this.p_bible != undefined;
+            },
+
+            showErrorFromFront(text) {
+                this.$notify({
+                    group: "error",
+                    title: 'Ошибка',
+                    text: text,
+                    type: 'error'
+                });
             },
             showError(err) {
                 console.log(err);
