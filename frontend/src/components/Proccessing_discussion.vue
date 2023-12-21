@@ -5,6 +5,9 @@
             <div v-if="main_inf" class="div-block table-name">
                 Процесс проведения беседы
             </div>
+            <div v-if="is_empty" class="div-block table-name">
+                Очередь на беседу пока что пуста!
+            </div>
             <div v-if="new_rec" class="div-block table-name">
                 Добавление результата
             </div>
@@ -76,6 +79,7 @@
                 selectedData: null,
                 p_result: null,
                 p_description: "",
+                is_empty: false,
             }
         },
         computed: mapState({
@@ -84,7 +88,9 @@
         watch: {
             data(val) {
                 if (val.length == 0) {
-                    this.$router.push({ name: 'proccessing-punishment' });
+                    this.is_empty = true;
+                } else {
+                    this.is_empty = false;
                 }
             },
         },

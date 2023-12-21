@@ -5,6 +5,9 @@
             <div v-if="main_inf" class="div-block table-name">
                 Процесс проведения пыток
             </div>
+            <div v-if="is_empty" class="div-block table-name">
+                Очередь на пытки пока что пуста!
+            </div>
             <div v-if="new_rec" class="div-block table-name">
                 Добавление результата
             </div>
@@ -76,6 +79,7 @@
                     { field: 'date_time', header: 'Дата' },
                     { field: 'description', header: 'Описание' },
                 ],
+                is_empty: false,
                 selectedData: null,
                 p_result: null,
                 p_description: "",
@@ -88,7 +92,9 @@
         watch: {
             data(val) {
                 if (val.length == 0) {
-                    this.$router.push({ name: 'proccessing-punishment' });
+                    this.is_empty = true;
+                } else {
+                    this.is_empty = false;
                 }
             },
         },
@@ -108,7 +114,7 @@
                     this.main_inf = false;
                     this.new_rec = true;
                 } else {
-                    this.showError("Необходимо выбрать дело!");
+                    this.showErrorFromFront("Необходимо выбрать дело!");
                 }
             },
             goBackToMain() {

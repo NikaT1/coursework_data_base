@@ -95,7 +95,7 @@
                 this.main_info = false;
             },
             createNew() {
-                if (check_new_inq()) {
+                if (this.check_new_inq()) {
                     console.log(this.p_locality, this.p_bible);
                     let localityId = this.p_locality.id;
                     let bibleId = this.p_bible.version;
