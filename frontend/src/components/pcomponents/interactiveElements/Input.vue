@@ -38,23 +38,6 @@ input::placeholder {
 .error-input {
   border-color: red;
   background-color: rgba(234, 111, 145, 0.97);
-}
 
-@media (max-width: 1228px) {
-  input {
-    height: calc(2em + 2px);
-    padding: 0.3em 0.5em 0.3em 0.5em;
-    font-size: 0.8em;
-    line-height: 1;
-  }
-}
-
-@media (max-width: 892px) {
-  input {
-    height: calc(2em + 1px);
-    padding: 0.2em 0.3em 0.2em 0.3em;
-    font-size: 0.5em;
-    line-height: 0.5;
-  }
 }
 </style>

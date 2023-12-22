@@ -211,16 +211,4 @@
     #div-buttons {
         padding: 1.5% 1.5% 1.5% 1.5%;
     }
-
-    @media (max-width: 1228px) {
-        #div-inline div {
-            margin: 10px 10px 10px;
-        }
-    }
-
-    @media (max-width: 892px) {
-        #div-inline div {
-            margin: 5px 5px 5px;
-        }
-    }
 </style>

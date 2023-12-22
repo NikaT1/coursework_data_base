@@ -46,23 +46,4 @@ footer nav a {
   font-size: larger;
 }
 
-@media (max-width: 1228px) {
-  div {
-    font-size: 20px;
-    padding: 6px;
-    border-radius: 6px;
-    border-spacing: 6px;
-  }
-
-}
-
-@media (max-width: 892px) {
-  div {
-    font-size: 16px;
-    padding: 4px;
-    border-radius: 4px;
-    border-spacing: 4px;
-  }
-
-}
 </style>

@@ -28,15 +28,4 @@ export default {
   text-align: center;
 }
 
-@media (max-width: 1228px) {
-  * {
-    font-size: 14px;
-  }
-}
-
-@media (max-width: 892px) {
-  * {
-    font-size: 13px;
-  }
-}
 </style>
