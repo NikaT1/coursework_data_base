@@ -118,7 +118,7 @@
                     let accused = this.p_accused.id;
                     let informer = this.p_informer.id;
                     let violationPlace = this.p_cur_violation_place;
-                    let dateTime = this.p_cur_date_time.getFullYear() + '-' + (this.p_cur_date_time.getMonth() + 1) + '-' + this.p_cur_date_time.getDate();
+                    let dateTime = this.getStringDate(this.p_cur_date_time);
                     let description = this.p_cur_description;
                     console.log(accused, informer, violationPlace, dateTime, description);
                     this.$store.dispatch('ADD_ACC_RECORD', { accused, informer, violationPlace, dateTime, description })
@@ -126,12 +126,23 @@
                             console.log(resp);
                             this.main_inf = true;
                             this.new_rec = false;
-                            this.data = this.cur_data;
+                            this.$store.dispatch('GET_ALL_ACCUSATION_RECORDS')
+                                .then(() => this.data = this.cur_data);
+                            
                         },
                             err => this.showError(err));
                 } else {
                     this.showErrorFromFront("Необходимо заполнить все поля!");
                 }
+            },
+            getStringDate(date) {
+                let str_date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-";
+                if (date.getDate() < 10) {
+                    str_date = str_date + "0" + date.getDate();
+                } else {
+                    str_date = str_date + date.getDate();
+                }
+                return str_date;
             },
             check_new_acc() {
                 return this.p_accused != null && this.p_accused != undefined && this.p_informer != null && this.p_informer != undefined &&
@@ -167,8 +178,9 @@
             }
         },
         created() {
-            this.$store.dispatch('GET_ALL_ACCUSATION_RECORDS');
-            this.data = this.cur_data;
+            this.$store.dispatch('GET_ALL_ACCUSATION_RECORDS')
+                .then(() => this.data = this.cur_data);
+           
         }
     }
 </script>

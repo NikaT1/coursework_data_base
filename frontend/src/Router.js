@@ -54,6 +54,9 @@ const routes = [
                 if (localStorage.getItem("role") == 2) {
                     next({ name: 'proccessing-torture' });
                 }
+                if (localStorage.getItem("role") == 3) {
+                    next({ name: 'proccessing-punishment' });
+                }
             } else next({ name: 'auth-page' });
         } 
     },
@@ -76,10 +79,10 @@ const routes = [
                     next();
                 }
                 if (localStorage.getItem("role") == 0 && localStorage.getItem("step") >= 3) {
-                    next({ name: 'ProccessingPreparingCases' });
+                    next({ name: 'proccessing-preparing-cases' });
                 }
                 if (localStorage.getItem("role") == 1 && localStorage.getItem("step") >= 3) {
-                    next({ name: 'ProccessingPreparingCases' });
+                    next({ name: 'proccessing-preparing-cases' });
                 }
                 if (localStorage.getItem("role") == 2) {
                     next({ name: 'proccessing-torture' });

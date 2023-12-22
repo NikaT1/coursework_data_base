@@ -232,6 +232,7 @@ const actions = {
                             locality: resp.data.data.locality,
                             step: resp.data.data.step
                         });
+                        console.log(context.getters.CUR_INQ);
                         localStorage.setItem("step", resp.data.data.step);
                         resolve(resp);
                     } else {
@@ -519,9 +520,11 @@ const actions = {
     },
     // { commandments_id: Array(), record_id: 5 } -> ничего возвращать не нужно
     CONNECT_COMMANDMENT(context, payload) {
+        console.log(payload);
         const commandments = payload.commandments;
+        const record = payload.record_id;
         return new Promise((resolve, reject) => {
-            axios({ url: '/accusations/connectCommandment/' + payload.record_id, data: commandments, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
+            axios({ url: '/accusations/connectCommandment/' + record, data: { commandments }, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
@@ -632,72 +635,75 @@ const actions = {
     },
     // inq_id -> верни массив дел у которых назначена беседа (см формат ниже)
     GET_QUEUE_FOR_DISCUTTION(context, payload) {
-        /*return new Promise((resolve, reject) => {
-            axios({ url: '*********', data: payload, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
+        return new Promise((resolve, reject) => {
+            console.log(payload);
+            const inq_id = context.getters.CUR_INQ.id;
+            axios({ url: '/cases/forDiscussion/' + inq_id, method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
-                    context.commit('SET_QUEUE_FOR_DISCUSSION', resp.data);
-                    resolve(resp);
+                    console.log(resp);
+                    if (resp.status == 200) {
+                        context.commit('SET_QUEUE_FOR_DISCUSSION', resp.data.collection);
+                        resolve(resp);
+                    } else {
+                        var err = new Error(resp.statusText);
+                        err.code = resp.status;
+                        reject(err);
+                    }
                 })
                 .catch(err => {
                     reject(err)
                 })
-        })*/
-        console.log(payload);
-        context.commit('SET_QUEUE_FOR_DISCUSSION', [{
-            id: 1,
-            accused: 'Сергей Сергеевич',
-            creation_date: '2023-12-23',
-            description: "jhdbf", //описание преступления (ий) - возможно нужна будет конкатенация разных доносов
-            violation_description: 'бла бла бла',
-        }]);
+        })
     },
     // inq_id -> верни массив дел у которых назначена пытка (см формат ниже)
     GET_QUEUE_FOR_TORTURE(context, payload) {
-        /*return new Promise((resolve, reject) => {
-            axios({ url: '*********', data: payload, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
+        return new Promise((resolve, reject) => {
+            console.log(payload);
+            const inq_id = context.getters.CUR_INQ.id;
+            axios({ url: '/cases/forTorture/' + inq_id, method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
-                    resolve(resp);
+                    console.log(resp);
+                    if (resp.status == 200) {
+                        context.commit('SET_QUEUE_FOR_TORTURE', resp.data.collection);
+                        resolve(resp);
+                    } else {
+                        var err = new Error(resp.statusText);
+                        err.code = resp.status;
+                        reject(err);
+                    }
                 })
                 .catch(err => {
                     reject(err)
                 })
-        })*/ //пока заглушка
-        console.log(payload);
-        context.commit('SET_QUEUE_FOR_TORTURE', [{
-            id: 1,
-            accused: 'Сергей Сергеевич',
-            creation_date: '2023-12-23',
-            description: "jhdbf", //описание преступления (ий) - возможно нужна будет конкатенация разных доносов
-            violation_description: 'бла бла бла',
-        }]);
+        })
     },
     // inq_id -> верни массив дел у которых назначено наказание (см формат ниже)
     GET_QUEUE_FOR_PUNISHMENT(context, payload) {
-        /*return new Promise((resolve, reject) => {
-            axios({ url: '*********', data: payload, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
+        return new Promise((resolve, reject) => {
+            console.log(payload);
+            const inq_id = context.getters.CUR_INQ.id;
+            axios({ url: '/cases/forPunishment/' + inq_id, method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
-                    resolve(resp);
+                    console.log(resp);
+                    if (resp.status == 200) {
+                        context.commit('SET_QUEUE_FOR_PUNISHMENT', resp.data.collection);
+                        resolve(resp);
+                    } else {
+                        var err = new Error(resp.statusText);
+                        err.code = resp.status;
+                        reject(err);
+                    }
                 })
                 .catch(err => {
                     reject(err)
                 })
-        })*/ //пока заглушка
-        console.log(payload);
-        context.commit('SET_QUEUE_FOR_PUNISHMENT', [{
-            id: 1,
-            accused: 'Сергей Сергеевич',
-            creation_date: '2023-12-23',
-            description: "jhdbf", //описание преступления (ий) - возможно нужна будет конкатенация разных доносов
-            violation_description: 'бла бла бла',
-            punishment: "jfgmdfms",
-            prison_name: "orejkfdjmn",
-        }]);
+        })
     },
     // inq_id как параметр пути -> вызвать finish_inquisition_process, ничего не возвращать 
     FINISH_INQUISITION_PROCESS(context) {
         return new Promise((resolve, reject) => {
-            const incId = context.getters.CUR_INQ.id;
-            axios({ url: '/inquisitions/finish' + incId, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
+            const inquisitionId = context.getters.CUR_INQ.id;
+            axios({ url: '/inquisitions/finish', data: { inquisitionId }, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {

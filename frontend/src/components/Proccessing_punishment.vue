@@ -47,14 +47,14 @@
                 main_inf: true,
                 buttons_for_inq: [
                     { msg: 'назад', command: 'goBack' },
-                ],
+                ], 
        
                 columns: [
-                    { field: 'informer', header: 'Доносчик' },
-                    { field: 'bishop', header: 'Епископ' },
                     { field: 'accused', header: 'Обвиненный' },
-                    { field: 'violation_place', header: 'Место преступления' },
-                    { field: 'date_time', header: 'Дата' },
+                    { field: 'punishment', header: 'Наказание' },
+                    { field: 'prisonName', header: 'Тюрьма' },
+                    { field: 'violationDescription', header: 'Описание преступления' },
+                    { field: 'creationDate', header: 'Дата' },
                     { field: 'description', header: 'Описание' },
                 ],
         

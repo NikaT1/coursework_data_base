@@ -87,7 +87,7 @@
                 if (this.check_params_for_new_user()) {
                     const name = this.name;
                     const surname = this.surname;
-                    const birthDate = this.birthday.getFullYear() + "-" + (this.birthday.getMonth() + 1) + "-" + this.birthday.getDate();
+                    const birthDate = this.getStringDate(this.birthday);
                     const personGender = this.gender.code;
                     const locality = this.locality.id;
                     const username = this.login;
@@ -104,6 +104,15 @@
                     this.showErrorFromFront("Необходимо заполнить все поля!");
                 }
 
+            },
+            getStringDate(date) {
+                let str_date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-";
+                if (date.getDate() < 10) {
+                    str_date = str_date + "0" + date.getDate();
+                } else {
+                    str_date = str_date + date.getDate();
+                }
+                return str_date;
             },
             logIn() {
                 if (this.check_params_for_user()) {
