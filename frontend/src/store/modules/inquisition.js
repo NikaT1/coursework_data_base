@@ -159,7 +159,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -182,7 +183,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -208,7 +210,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -237,7 +240,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -261,7 +265,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -282,7 +287,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -302,7 +308,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -324,7 +331,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -344,7 +352,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -364,7 +373,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -384,7 +394,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -406,7 +417,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -427,7 +439,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -447,7 +460,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -476,7 +490,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -497,7 +512,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -518,7 +534,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -536,7 +553,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -554,7 +572,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -572,7 +591,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -589,7 +609,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -606,7 +627,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -627,7 +649,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -648,7 +671,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -669,7 +693,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
@@ -690,7 +715,8 @@ const actions = {
                         reject(err);
                     }
                 })
-                .catch(err => {
+                .catch(error => {
+                    var err = error.response.data;
                     reject(err);
                 })
         })
