@@ -106,7 +106,12 @@
 
             },
             getStringDate(date) {
-                let str_date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-";
+                let str_date = date.getFullYear() + "-";
+                if (date.getMonth() < 10) {
+                    str_date = str_date + "0" + (date.getMonth() + 1) + "-"; 
+                } else {
+                    str_date = str_date + (date.getMonth() + 1) + "-"; 
+                }
                 if (date.getDate() < 10) {
                     str_date = str_date + "0" + date.getDate();
                 } else {
