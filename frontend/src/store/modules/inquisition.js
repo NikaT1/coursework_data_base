@@ -160,8 +160,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
 
@@ -184,8 +183,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -211,8 +209,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -241,8 +238,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -266,8 +262,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -288,8 +283,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -309,8 +303,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -332,8 +325,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -353,8 +345,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -374,8 +365,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -395,8 +385,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -418,8 +407,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -440,8 +428,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -461,8 +448,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -491,8 +477,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -513,8 +498,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -535,8 +519,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -554,8 +537,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -573,8 +555,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -592,8 +573,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -610,8 +590,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -628,8 +607,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -650,8 +628,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -672,8 +649,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -694,8 +670,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
@@ -716,8 +691,7 @@ const actions = {
                     }
                 })
                 .catch(err => {
-                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
-                    reject(err)
+                    reject(err);
                 })
         })
     },
