@@ -160,20 +160,10 @@
 
             showError(err) {
                 console.log(err);
-                let text = "Произошла непредвиденная ошибка";
-                if (err.code == 500 || err.response.status == 500) {
-                    text = "Проблема с подключением к серверу";
-                }
-                if (err.code == 404 || err.response.status == 404) {
-                    text = "Неверный запрос к серверу";
-                }
-                if (err.code == 400 || err.response.status == 400) {
-                    text = "Данного аккаунта не существует";
-                }
                 this.$notify({
                     group: "error",
                     title: 'Ошибка',
-                    text: text,
+                    text: err.message,
                     type: 'error'
                 });
             }
