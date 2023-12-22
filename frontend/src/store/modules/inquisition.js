@@ -155,11 +155,12 @@ const actions = {
                         context.commit('SET_INITIAL_INF', resp.data.data);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -178,11 +179,12 @@ const actions = {
                         context.commit('SET_INITIAL_INF', resp.data.data);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -204,11 +206,12 @@ const actions = {
                         localStorage.setItem("step", "0");
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -233,11 +236,12 @@ const actions = {
                         localStorage.setItem("step", resp.data.data.step);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -257,11 +261,12 @@ const actions = {
                         localStorage.setItem("step", context.getters.CUR_INQ.step);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -278,11 +283,12 @@ const actions = {
                         context.commit('SET_ACC_TABLE_DATA', resp.data.collection);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -298,11 +304,12 @@ const actions = {
                         context.commit('SET_INQ_TABLE_DATA', resp.data.collection);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -320,11 +327,12 @@ const actions = {
                         localStorage.setItem("step", context.getters.CUR_INQ.step);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -340,11 +348,12 @@ const actions = {
                         context.commit('SET_BIBLE_DATA', resp.data.collection);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -360,11 +369,12 @@ const actions = {
                         context.commit('SET_LOCALITY_DATA', resp.data.collection);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -380,11 +390,12 @@ const actions = {
                         context.commit('SET_ACC_NR_TABLE_DATA', resp.data.collection);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -402,11 +413,12 @@ const actions = {
                         localStorage.setItem("step", context.getters.CUR_INQ.step);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -423,11 +435,12 @@ const actions = {
                         context.commit('SET_CASES_DATA', resp.data.collection);  //////чекнуть формат
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -443,11 +456,12 @@ const actions = {
                         context.commit('SET_PEOPLE_DATA', resp.data.collection); // FIXME concat name and surname
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -472,11 +486,12 @@ const actions = {
                         ///////////FIXME добавить вызов обновления табрицы record-ов
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -493,11 +508,12 @@ const actions = {
                         context.commit('SET_COMMANDMENTS_DATA', resp.data.collection);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -514,11 +530,12 @@ const actions = {
                     if (resp.status == 200) {
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -532,11 +549,12 @@ const actions = {
                     if (resp.status == 200) {
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -550,11 +568,12 @@ const actions = {
                     if (resp.status == 200) {
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -568,11 +587,12 @@ const actions = {
                     if (resp.status == 200) {
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -585,11 +605,12 @@ const actions = {
                     if (resp.status == 200) {
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -602,11 +623,12 @@ const actions = {
                     if (resp.status == 200) {
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                       var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -623,11 +645,12 @@ const actions = {
                         context.commit('SET_QUEUE_FOR_DISCUSSION', resp.data.collection);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -644,11 +667,12 @@ const actions = {
                         context.commit('SET_QUEUE_FOR_TORTURE', resp.data.collection);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -665,11 +689,12 @@ const actions = {
                         context.commit('SET_QUEUE_FOR_PUNISHMENT', resp.data.collection);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
@@ -686,11 +711,12 @@ const actions = {
                         localStorage.setItem("step", context.getters.CUR_INQ.step);
                         resolve(resp);
                     } else {
-                        var err = { message: "Непредвиденные проблемы с подключением к серверу" };
+                        var err = { message: resp.message };
                         reject(err);
                     }
                 })
                 .catch(err => {
+                    var err = { message: "Непредвиденные проблемы с подключением к серверу" };
                     reject(err)
                 })
         })
