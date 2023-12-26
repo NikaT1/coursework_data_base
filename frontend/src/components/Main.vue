@@ -76,7 +76,8 @@
             this.$store.dispatch('GET_ALL_INQUISITIONS');
         },
         computed: mapState({
-            data: state => state.inquisition.inq_table_data
+            data: state => state.inquisition.inq_table_data,
+            cur_inq: state => state.cur_inq
         }),
         methods: {
             handleClose() {
@@ -114,7 +115,11 @@
                 this.$store.dispatch('GET_CUR_INQ')
                     .then(resp => {
                         console.log(resp);
-                        this.$router.push({ name: 'proccessing-acc-page' });
+                        if (localStorage.getItem("inq_id") == 0) {
+                            this.showInfo("Текущая инквизиция не найдена");
+                        } else {
+                            this.$router.push({ name: 'proccessing-acc-page' });
+                        }
                     },
                         err => (this.showError(err)));
             },
@@ -136,6 +141,14 @@
                     title: 'Ошибка',
                     text: err.message,
                     type: 'error'
+                });
+            },
+            showInfo(msg) {
+                this.$notify({
+                    group: "info",
+                    title: 'Внимание!',
+                    text: msg,
+                    type: 'info'
                 });
             }
         },

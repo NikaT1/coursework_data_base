@@ -66,6 +66,7 @@ const mutations = {
 
     SET_CUR_INQ: (state, payload) => {
         state.cur_inq = payload;
+        localStorage.setItem("inq_id", payload.id);
     },
     SET_OFFICIAL_ID: (state, payload) => {
         state.official_id = payload;
@@ -140,6 +141,12 @@ const actions = {
     INCREASE_STEP(context) {
         const inq = context.getters.CUR_INQ;
         inq.step = inq.step + 1;
+        context.commit('SET_CUR_INQ', inq);
+    },
+
+    SELECT_BIBLE(context, payload) {
+        const inq = context.getters.CUR_INQ;
+        inq.bible = payload.version;
         context.commit('SET_CUR_INQ', inq);
     },
 
@@ -221,8 +228,7 @@ const actions = {
     // 3 - это этап, когда все дела сформированы (функция get_not_resolved_cases) ничего не возвращает, 4 - все дела закончены, инквизиционный процесс завершен)
     GET_CUR_INQ(context) {
         return new Promise((resolve, reject) => {
-            const official_id = context.getters.CUR_OFFICIAL;
-            axios({ url: '/inquisitions/getCurrent/' + official_id, method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
+            axios({ url: '/inquisitions/getCurrentForPerson', method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
@@ -232,6 +238,7 @@ const actions = {
                             locality: resp.data.data.locality,
                             step: resp.data.data.step
                         });
+                        context.commit('SET_ACCUSATION_ID', resp.data.data.currentAccusationProcess);
                         console.log(context.getters.CUR_INQ);
                         localStorage.setItem("step", resp.data.data.step);
                         resolve(resp);
@@ -500,7 +507,10 @@ const actions = {
     // на вход id bible ->  вернуть массив всех commandment (вызвать функцию read_bible) (формат см ниже)
     GET_ALL_COMMANDMENTS(context, payload) {
         return new Promise((resolve, reject) => {
-            const bible_id = context.getters.CUR_BIBLE;
+            let bible_id = context.getters.CUR_BIBLE;
+            if (bible_id == 0 || bible_id == undefined || bible_id == null) {
+                bible_id = 1;
+            }
             axios({ url: '/bibles/commandments/' + bible_id, data: payload, method: 'GET', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);

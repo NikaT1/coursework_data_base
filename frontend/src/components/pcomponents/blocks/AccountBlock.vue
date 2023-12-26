@@ -96,8 +96,9 @@
                     this.$store.dispatch('CREATE_NEW_ACCOUNT', { name, surname, birthDate, personGender, locality, username, password })
                         .then(resp => {
                             console.log(resp);
-                            this.$store.dispatch('GET_CUR_INQ');
-                            this.$router.push({ name: 'main-inquisitor-page' });
+                            this.$store.dispatch('GET_CUR_INQ')
+                                .then(() => this.$router.push({ name: 'main-inquisitor-page' }));
+                           
                         },
                             err => (this.showError(err)));
                 } else {
@@ -126,8 +127,9 @@
                     this.$store.dispatch('LOG_IN_ACCOUNT', { username, password })
                         .then(resp => {
                             console.log(resp);
-                            this.$store.dispatch('GET_CUR_INQ');
-                            this.$router.push({ name: 'main-inquisitor-page' });
+                            this.$store.dispatch('GET_CUR_INQ')
+                                .then(() => this.$router.push({ name: 'main-inquisitor-page' }));
+
                         },
                             err => {
                                 this.showError(err);

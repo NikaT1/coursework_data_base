@@ -1,10 +1,13 @@
 import Index from "@/components/Index";
 import Main from "@/components/Main";
+import SharePage from "@/components/Share_page";
 import ProccessingAccusation from "@/components/Proccessing_accusation";
 import ProccessingTorture from "@/components/Proccessing_torture";
+import ProccessingDiscussion from "@/components/Proccessing_discussion";
 import ProccessingPunishment from "@/components/Proccessing_punishment";
 import ProccessingPreparingCases from "@/components/Proccessing_preparing_cases";
 import ProccessingCases from "@/components/Proccessing_cases";
+import AccusationRecord from "@/components/Accusation_record";
 import NotFoundError from "@/components/Error";
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -39,6 +42,9 @@ const routes = [
         component: ProccessingAccusation,
         beforeEnter: (to, from, next) => {
             if (localStorage.getItem("token") !== null) {
+                if (localStorage.getItem("role") != 0 && localStorage.getItem("inq_id") == 0) {
+                    next({ name: 'share-page' });
+                }
                 if (localStorage.getItem("role") == 0 && localStorage.getItem("step") == 1) {
                     next();
                 }
@@ -56,6 +62,9 @@ const routes = [
                 }
                 if (localStorage.getItem("role") == 3) {
                     next({ name: 'proccessing-punishment' });
+                }
+                if (localStorage.getItem("role") == 4) {
+                    next({ name: 'accusation-record' });
                 }
             } else next({ name: 'auth-page' });
         } 
@@ -110,9 +119,9 @@ const routes = [
         }
     },
     {
-        path: '/Proccessing-accusation',
-        name: 'proccessing-accusation',
-        component: ProccessingAccusation,
+        path: '/Proccessing-discussion',
+        name: 'proccessing-discussion',
+        component: ProccessingDiscussion,
         beforeEnter: (to, from, next) => {
             if (localStorage.getItem("token") !== null) {
                 if (localStorage.getItem("role") == 1) {
@@ -143,6 +152,28 @@ const routes = [
         path: '/Proccessing-punishment',
         name: 'proccessing-punishment',
         component: ProccessingPunishment,
+        beforeEnter: (to, from, next) => {
+            if (localStorage.getItem("token") !== null) {
+                next()
+
+            } else next({ name: 'auth-page' });
+        }
+    },
+    {
+        path: '/share-page',
+        name: 'share-page',
+        component: SharePage,
+        beforeEnter: (to, from, next) => {
+            if (localStorage.getItem("token") !== null) {
+                next()
+
+            } else next({ name: 'auth-page' });
+        }
+    },
+    {
+        path: '/Accusation-record',
+        name: 'accusation-record',
+        component: AccusationRecord,
         beforeEnter: (to, from, next) => {
             if (localStorage.getItem("token") !== null) {
                 next()
