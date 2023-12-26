@@ -57,38 +57,4 @@ header nav a {
   border-radius: 2px;
 }
 
-@media (max-width: 1228px) {
-  div {
-    font-size: 20px;
-    padding: 6px;
-    border-radius: 6px;
-    border-spacing: 6px;
-  }
-
-  .variant-div {
-    font-size: 15px;
-    border-spacing: 4px;
-  }
-  header nav a {
-    font-size: medium;
-  }
-}
-
-@media (max-width: 892px) {
-  div {
-    font-size: 16px;
-    padding: 4px;
-    border-radius: 4px;
-    border-spacing: 4px;
-  }
-
-  .variant-div {
-    font-size: 12px;
-    border-spacing: 3px;
-  }
-
-  header nav a {
-    font-size: small;
-  }
-}
 </style>
