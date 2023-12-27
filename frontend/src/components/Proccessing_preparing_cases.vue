@@ -63,7 +63,7 @@
                 columns: [
                     { field: 'creationDate', header: 'Дата создания' },
                     { field: 'accused', header: 'Обвиненный' },
-                    { field: 'violation_description', header: 'Своды' },
+                    { field: 'violationDescription', header: 'Своды' },
                     { field: 'description', header: 'Описание' },
                     { field: 'status', header: 'Статус' },
                 ],
@@ -104,10 +104,13 @@
                         this.$store.dispatch('SEND_TO_DISCUSSION', { id })
                             .then((resp) => {
                                 console.log(resp);
-                                this.$store.dispatch('GET_ALL_CASES');
-                                this.data = this.cur_data;
-                                this.main_inf = true;
-                                this.new_rec = false;
+                                this.$store.dispatch('GET_ALL_CASES')
+                                    .then(() => {
+                                        this.data = this.cur_data;
+                                        this.main_inf = true;
+                                        this.new_rec = false;
+                                    });
+
                             },
                                 err => this.showError(err));
 
@@ -115,10 +118,12 @@
                         this.$store.dispatch('SEND_TO_TORTURE', { id })
                             .then((resp) => {
                                 console.log(resp);
-                                this.$store.dispatch('GET_ALL_CASES');
-                                this.data = this.cur_data;
-                                this.main_inf = true;
-                                this.new_rec = false;
+                                this.$store.dispatch('GET_ALL_CASES')
+                                    .then(() => {
+                                        this.data = this.cur_data;
+                                        this.main_inf = true;
+                                        this.new_rec = false;
+                                    });
                             },
                                 err => this.showError(err));
 
@@ -152,10 +157,9 @@
         created() {
             this.$store.dispatch('GET_ALL_CASES')
                 .then(() => this.data = this.cur_data);
-            
+
         }
     }
 </script>
 <style>
-
 </style>
