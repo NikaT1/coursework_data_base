@@ -51,18 +51,6 @@
     }
 </script>
 
-<style scoped>
+<style >
 
-    #main-div {
-        min-width: 100%;
-        box-sizing: border-box;
-        min-height: calc(100vh - 80px);
-        padding-bottom: 90px;
-        position: relative;
-    }
-
-    .div-block {
-        display: block;
-        margin: 6% 0 0 0;
-    }
 </style>

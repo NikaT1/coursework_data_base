@@ -61,7 +61,7 @@
                     { msg: 'отправить на следующий этап', command: 'doNextStep' },
                 ],
                 columns: [
-                    { field: 'creation_date', header: 'Дата создания' },
+                    { field: 'creationDate', header: 'Дата создания' },
                     { field: 'accused', header: 'Обвиненный' },
                     { field: 'violation_description', header: 'Своды' },
                     { field: 'description', header: 'Описание' },
@@ -123,7 +123,7 @@
                                 err => this.showError(err));
 
                     } else {
-                        this.showError("Данное дело нельзя выбрать, так как текущий процесс еще не окончен!");
+                        this.showErrorFromFront("Данное дело нельзя выбрать, так как текущий процесс еще не окончен!");
                     }
 
                 } else {
@@ -150,18 +150,12 @@
             }
         },
         created() {
-            this.$store.dispatch('GET_ALL_CASES');
-            this.data = this.cur_data;
+            this.$store.dispatch('GET_ALL_CASES')
+                .then(() => this.data = this.cur_data);
+            
         }
     }
 </script>
 <style>
 
-    .table-name {
-        font-size: medium;
-        color: #6d747f;
-        font-size: 20px;
-        padding: 20px;
-        font-weight: bold;
-    }
 </style>

@@ -21,9 +21,9 @@ export default {
 
 <style scoped>
 header {
-  font-size: medium;
+  font-size: 12px;
   display: table;
-  padding: 1em 2% 1% 2%;
+  padding: 0.5em 1% 0.5% 1%;
   background: #55555d;
   color: #cac8c8;
   width: 100%;
@@ -34,7 +34,7 @@ header {
 
 header nav {
   display: table-cell;
-  vertical-align: middle;
+  vertical-align: 10px;
   text-align: right;
   color: #ababab;
 }

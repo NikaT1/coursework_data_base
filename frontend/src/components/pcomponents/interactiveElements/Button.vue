@@ -13,9 +13,10 @@ export default {
 
 <style scoped>
     .button {
+        font-size: 12px;
         font-weight: 700;
         text-decoration: none;
-        padding: .8em 5em calc(.8em + 3px);
+        padding: .5em 3em calc(.5em + 2px);
         border-radius: 1px;
         border-width: thin;
         border-color: rgba(2, 2, 2, 0.4);

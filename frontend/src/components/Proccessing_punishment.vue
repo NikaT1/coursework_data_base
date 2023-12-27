@@ -102,40 +102,4 @@
 </script>
 <style>
 
-    .table-name {
-        font-size: medium;
-        color: #6d747f;
-        font-size: 20px;
-        padding: 20px;
-        font-weight: bold;
-    }
-
-    #div-inline div {
-        vertical-align: middle;
-        margin: 20px 20px 20px;
-        text-align: center;
-    }
-
-    .main-background > div:first-child {
-        display: table;
-        margin: 0 auto;
-    }
-
-    #result-table {
-        overflow-x: auto;
-        height: 300px;
-        margin: 10px 20px;
-    }
-
-    .div-block {
-        display: block;
-    }
-
-    .div-inline {
-        display: inline-block;
-    }
-
-    #div-buttons {
-        padding: 1.5% 1.5% 1.5% 1.5%;
-    }
 </style>

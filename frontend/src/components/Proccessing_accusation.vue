@@ -1,5 +1,5 @@
 <template>
-    <div id="div-main">
+    <div id="main-div">
         <Header />
         <div class="main-background">
             <div v-if="main_inf" class="table-name">
@@ -180,16 +180,5 @@
     }
 </script>
 <style>
-    #div-inline {
-        width: 100%;
-        justify-content: center;
-    }
-
-    #main-div {
-        min-width: 100%;
-        box-sizing: border-box;
-        min-height: calc(100vh - 80px);
-        padding-bottom: 90px;
-        position: relative;
-    }
+  
 </style>

@@ -111,13 +111,6 @@
         }
     }
 </script>
-<style>
+<style >
 
-    .table-name {
-        font-size: medium;
-        color: #6d747f;
-        font-size: 20px;
-        padding: 20px;
-        font-weight: bold;
-    }
 </style>

@@ -64,7 +64,7 @@ const routes = [
                     next({ name: 'proccessing-punishment' });
                 }
                 if (localStorage.getItem("role") == 4) {
-                    next({ name: 'accusation-record' });
+                    next({ name: 'share-page' });
                 }
             } else next({ name: 'auth-page' });
         } 
@@ -91,7 +91,7 @@ const routes = [
                     next({ name: 'proccessing-preparing-cases' });
                 }
                 if (localStorage.getItem("role") == 1 && localStorage.getItem("step") >= 3) {
-                    next({ name: 'proccessing-preparing-cases' });
+                    next({ name: 'proccessing-discussion' });
                 }
                 if (localStorage.getItem("role") == 2) {
                     next({ name: 'proccessing-torture' });

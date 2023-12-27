@@ -9,7 +9,7 @@
                 Привязка сводов к доносу
             </div>
             <div class="background" id="div-inline">
-              
+
                 <ArgsBlockCase v-if="new_rec" class="div-block" v-model:p_commandments="p_commandments" />
                 <div v-if="is_inq && main_inf">
                     <div>Для привязки доноса к сводам кликните в таблице на нужный донос и нажмите "утвердить донос" </div>
@@ -121,8 +121,15 @@
             },
             startGeneratingCases() {
                 this.$store.dispatch('FINISH_RESOLVING_RECORDS')
-                    .then(() => this.$router.push({ name: 'proccessing-preparing-cases' }));
-               
+                    .then((resp) => {
+                        console.log(resp);
+                        this.$router.push({ name: 'proccessing-preparing-cases' });
+                    },
+                        (err) => {
+                            console.log(err);
+                            this.$router.push({ name: 'proccessing-preparing-cases' });
+                        });
+
             },
             doConnect() {
                 if (this.check_new_connect()) {
@@ -168,18 +175,9 @@
         created() {
             this.$store.dispatch('GET_NR_ACCUSATION_RECORDS')
                 .then(() => this.data = this.cur_data);
-           
+
         }
     }
 </script>
 <style>
-
-    .table-name {
-        font-size: medium;
-        color: #6d747f;
-        font-size: 20px;
-        padding: 20px;
-        font-weight: bold;
-    }
-
 </style>

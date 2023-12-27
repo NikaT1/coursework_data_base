@@ -1,15 +1,18 @@
 <template>
-    <div id="div-main">
+    <div id="main-div">
         <Header />
         <div class="main-background">
             <div id="div-inline">
-                <div v-if="new_inq" class="table-name">
+                <div v-if="new_inq" class="table-name div-block">
                     Создание нового инквизиционного процесса
+                    <ArgsBlockInq v-if="new_inq" class="div-block" v-model:p_locality="p_locality" v-model:p_bible="p_bible" />
+
                 </div>
-                <div v-if="main_info" class="table-name">
+                <div v-if="main_info" class="table-name div-block">
                     Возможные действия для Инквизитора
+                    <ArgsBlockInq v-if="new_inq" class="div-block" v-model:p_locality="p_locality" v-model:p_bible="p_bible" />
+
                 </div>
-                <ArgsBlockInq v-if="new_inq" class="div-block" v-model:p_locality="p_locality" v-model:p_bible="p_bible" />
                 <div v-if="new_inq">
                     <ButtonsBlock v-bind:buttons="new_inq_buttons" v-on:goBackToMain="goBackToMain" v-on:createNew="createNew" />
                 </div>
@@ -155,8 +158,30 @@
     }
 </script>
 <style>
+
+    .table-name {
+        color: #6d747f;
+        font-size: 15px;
+        padding: 5px;
+        font-weight: bold;
+    }
+
+    #main-div {
+        min-width: 100%;
+        box-sizing: border-box;
+        min-height: calc(100vh - 50px);
+        position: relative;
+        padding-bottom: 90px;
+    }
+
     #div-inline {
         width: 100%;
         justify-content: center;
+    }
+
+    .div-block {
+        justify-content: center;
+        display: inline-block;
+        margin: 1% 1% 0 0;
     }
 </style>

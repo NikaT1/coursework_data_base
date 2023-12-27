@@ -17,8 +17,8 @@ export default {
 
 <style scoped>
     footer {
-        height: 80px;
-        font-size: medium;
+        height: 50px;
+        font-size: 12px;
         display: table;
         padding: 1em 3% 1% 3%;
         background: #55555d;
@@ -31,7 +31,7 @@ export default {
 
 div p {
   color: #cac8c8;
-  font-size: larger;
+  font-size: 14px;
 }
 
 footer nav {
