@@ -20,14 +20,4 @@ export default {
 
 <style scoped>
 
-.background, .background div {
-  margin: 0 auto;
-  padding: 10px 10px 10px 10px;
-  width: 60%;
-}
-
-.info-div * {
-  margin: 10px 10px 10px 10px;
-}
-
 </style>

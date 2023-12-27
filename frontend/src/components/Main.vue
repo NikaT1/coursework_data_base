@@ -2,8 +2,8 @@
     <div id="main-div">
         <Header />
         <div class="main-background">
-            <div id="div-inline">
-                <div v-if="new_inq" class="table-name div-block">
+            <div class="background">
+                <div v-if="new_inq" class="table-name">
                     Создание нового инквизиционного процесса
                     <ArgsBlockInq v-if="new_inq" class="div-block" v-model:p_locality="p_locality" v-model:p_bible="p_bible" />
 
@@ -158,6 +158,16 @@
     }
 </script>
 <style>
+    .background, .background div {
+        margin: 0 auto;
+        padding: 5px 5px 5px 5px;
+        width: 100%;
+    }
+
+    .title {
+        text-align: center;
+    }
+
 
     .table-name {
         color: #6d747f;
@@ -171,7 +181,7 @@
         box-sizing: border-box;
         min-height: calc(100vh - 50px);
         position: relative;
-        padding-bottom: 90px;
+        padding-bottom: 60px;
     }
 
     #div-inline {
@@ -179,9 +189,12 @@
         justify-content: center;
     }
 
+    .main-background div {
+        margin: 0 auto;
+    }
     .div-block {
         justify-content: center;
         display: inline-block;
-        margin: 1% 1% 0 0;
+        margin: 0 auto;
     }
 </style>

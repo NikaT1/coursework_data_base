@@ -128,7 +128,7 @@
                                 err => this.showError(err));
 
                     } else {
-                        this.showErrorFromFront("Данное дело нельзя выбрать, так как текущий процесс еще не окончен!");
+                        this.showErrorFromFront("Данное дело нельзя выбрать!");
                     }
 
                 } else {

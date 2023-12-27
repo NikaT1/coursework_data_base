@@ -1,5 +1,5 @@
 <template>
-    <div class="background" id="account">
+    <div class="background justify-content-center" id="account">
         <div class="title">
             <h2 v-if="!new_acc">Вход в аккаунт</h2>
             <h2 v-if="new_acc">Создание аккаунта</h2>
@@ -189,25 +189,5 @@
 
 <style scoped>
 
-    .background, .background div {
-        margin: 0 auto;
-        padding: 5px 5px 5px 5px;
-        width: 60%;
-    }
-
-    .title {
-        text-align: center;
-    }
-
-    @media (max-width: 1228px) {
-        #password, #loginInput {
-            font-size: 10px;
-        }
-    }
-
-    @media (max-width: 892px) {
-        #password, #loginInput {
-            font-size: 8px;
-        }
-    }
+    
 </style>
