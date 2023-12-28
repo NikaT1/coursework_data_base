@@ -119,11 +119,11 @@
             },
             finishDis() {
                 if (this.check_new_dis()) {
-                    let resultId = this.p_result.id;
+                    let result = this.p_result.id;
                     let description = this.p_description;
                     let id = this.selectedData.id;
 
-                    this.$store.dispatch('FINISH_DISCUSSION', { resultId, description, id })
+                    this.$store.dispatch('FINISH_DISCUSSION', { result, description, id })
                         .then((resp) => {
                             console.log(resp);
                             this.$store.dispatch('GET_QUEUE_FOR_DISCUTTION')

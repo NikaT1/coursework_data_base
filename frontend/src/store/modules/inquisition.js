@@ -1,15 +1,17 @@
 ﻿import axios from 'axios';
 const state = () => ({
 
-    role: -1,
+    role: localStorage.getItem('role') || -1,
     token: localStorage.getItem('token') || '',
-    cur_inq: { step: localStorage.getItem('step') || 0 },
+    cur_inq: {
+        id: localStorage.getItem('cur_inq_id'), bible: localStorage.getItem("cur_inq_bible"), locality: localStorage.getItem("cur_inq_locality"), step: localStorage.getItem("cur_inq_step")
+    },
+    
+    person_id: localStorage.getItem('person_id') || 0,
+    official_id: localStorage.getItem('official_id') || 0,
+    person_name: localStorage.getItem('person_name') || "",
 
-    person_id: 0,
-    official_id: 0,
-    person_name: "",
-
-    accusation_id: 0,
+    accusation_id: localStorage.getItem('accusation_id') || 0,
     inq_table_data: [],
     acc_table_data: [],
     acc_nr_table_data: [],
@@ -56,19 +58,28 @@ const mutations = {
     SET_INITIAL_INF: (state, payload) => {
         console.log(payload)
         state.person_id = payload.personId;
+        localStorage.setItem("person_id", payload);
         state.official_id = payload.officialId;
+        localStorage.setItem("official_id", payload);
         state.person_name = payload.personName;
+        localStorage.setItem("person_name", payload);
     },
 
     SET_ACCUSATION_ID: (state, payload) => {
+        localStorage.setItem("accusation_id", payload);
         state.accusation_id = payload;
     },
 
     SET_CUR_INQ: (state, payload) => {
         state.cur_inq = payload;
         localStorage.setItem("inq_id", payload.id);
+        localStorage.setItem("cur_inq_id", payload.id);
+        localStorage.setItem("cur_inq_bible", payload.bible);
+        localStorage.setItem("cur_inq_locality", payload.locality);
+        localStorage.setItem("cur_inq_step", payload.step);
     },
     SET_OFFICIAL_ID: (state, payload) => {
+        localStorage.setItem("official_id", payload);
         state.official_id = payload;
     },
     SET_ACC_TABLE_DATA: (state, payload) => {
