@@ -158,10 +158,22 @@
     }
 </script>
 <style>
-    .background, .background div {
+    .background {
         margin: 0 auto;
         padding: 5px 5px 5px 5px;
-        width: 100%;
+        width: 60%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .background div {
+        
+        display: inline-block;
+    }
+
+
+    .main-background {
+        
     }
 
     .title {
@@ -186,15 +198,11 @@
 
     #div-inline {
         width: 100%;
-        justify-content: center;
     }
 
-    .main-background div {
-        margin: 0 auto;
-    }
     .div-block {
         justify-content: center;
-        display: inline-block;
+        display: flex;
         margin: 0 auto;
     }
 </style>

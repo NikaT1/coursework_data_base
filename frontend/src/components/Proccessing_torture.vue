@@ -131,7 +131,10 @@
                         .then((resp) => {
                             console.log(resp);
                             this.$store.dispatch('GET_QUEUE_FOR_TORTURE')
-                                .then(() => this.data = this.cur_data);
+                                .then((resp) => {
+                                    console.log(resp);
+                                    this.data = this.cur_data
+                                });
                             this.main_inf = true;
                             this.new_rec = false;
                         },
