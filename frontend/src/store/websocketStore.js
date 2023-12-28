@@ -1,6 +1,6 @@
 import { reactive } from "vue";
 import SockJS from "sockjs-client";
-import { Stomp } from "@stomp/stompjs";
+import Stomp from "webstomp-client";
 
 const state = reactive({
   socket: null,
