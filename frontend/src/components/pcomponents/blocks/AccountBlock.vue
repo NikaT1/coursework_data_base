@@ -44,6 +44,7 @@
     import Calendar from 'primevue/calendar';
     import InputText from 'primevue/inputtext';
     import { mapState } from 'vuex';
+    import websocketStore from "../../../store/websocketStore";
 
     export default {
         name: "AccountBlock",
@@ -96,6 +97,10 @@
                     this.$store.dispatch('CREATE_NEW_ACCOUNT', { name, surname, birthDate, personGender, locality, username, password })
                         .then(resp => {
                             console.log(resp);
+                            websocketStore.subscribe("/user/" + this.person_id + "/notification", function (notification) {
+                                console.log(JSON.parse(notification.body));
+                                this.$store.dispatch('SET_UPDATE_INFO', JSON.parse(notification.body));
+                            });
                             this.$store.dispatch('GET_CUR_INQ')
                                 .then(() => this.$router.push({ name: 'main-inquisitor-page' }));
                            
@@ -127,6 +132,11 @@
                     this.$store.dispatch('LOG_IN_ACCOUNT', { username, password })
                         .then(resp => {
                             console.log(resp);
+
+                            websocketStore.subscribe("/user/" + this.person_id + "/notification", function (notification) {
+                                console.log(JSON.parse(notification.body));
+                                return JSON.parse(notification.body);
+                            });
                             this.$store.dispatch('GET_CUR_INQ')
                                 .then(() => this.$router.push({ name: 'main-inquisitor-page' }));
 
@@ -180,6 +190,7 @@
         },
         computed: mapState({
             locality_data: state => state.inquisition.locality_data,
+            person_id: state => state.inquisition.person_id,
             token: state => state.inquisition.token,
             role: state => state.inquisition.role,
             name: state => state.inquisition.person_name,

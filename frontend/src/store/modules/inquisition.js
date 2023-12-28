@@ -1,6 +1,8 @@
 ﻿import axios from 'axios';
 const state = () => ({
 
+    update_info: { step: -1, isUpdated: false },
+
     role: localStorage.getItem('role') || -1,
     token: localStorage.getItem('token') || '',
     cur_inq: {
@@ -68,6 +70,10 @@ const mutations = {
     SET_ACCUSATION_ID: (state, payload) => {
         localStorage.setItem("accusation_id", payload);
         state.accusation_id = payload;
+    },
+
+    SET_UPDATE_INFO: (state, payload) => {
+        state.update_info = payload;
     },
 
     SET_CUR_INQ: (state, payload) => {
@@ -153,6 +159,10 @@ const actions = {
         const inq = context.getters.CUR_INQ;
         inq.step = inq.step + 1;
         context.commit('SET_CUR_INQ', inq);
+    },
+
+    UPDATE_INFO(context, payload) {
+        context.commit('SET_UPDATE_INFO', payload);
     },
 
     SELECT_BIBLE(context, payload) {
