@@ -427,7 +427,7 @@ const actions = {
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
-                        context.dispatch('INCREASE_STEP'); ///////FIX ME точно ли ок?
+                        context.dispatch('INCREASE_STEP'); ///////FIXME точно ли ок?
                         localStorage.setItem("step", context.getters.CUR_INQ.step);
                         resolve(resp);
                     } else {

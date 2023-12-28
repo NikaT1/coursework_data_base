@@ -18,12 +18,12 @@
                 Для проведения пытки кликните в таблице на нужное дело и нажмите "провести пытку"
             </div>
             <div class="div-block" id="div-inline">
-                <ArgsBlockDiscussion v-if="new_rec" class="div-block" v-model:p_discription="p_discription" v-model:p_result="p_result" />
+                <ArgsBlockDiscussion v-if="new_rec" class="div-block" v-model:p_description="p_description" v-model:p_result="p_result" />
                 <div v-if="main_inf" class="div-inline" id="div-buttons">
-                    <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:connectAcc="startDis" />
+                    <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:startDis="startDis" />
                 </div>
                 <div v-if="new_rec" class="div-inline" id="div-buttons">
-                    <ButtonsBlock v-bind:buttons="buttons_for_connect" v-on:goBackToMain="goBackToMain" v-on:doConnect="finishDis" />
+                    <ButtonsBlock v-bind:buttons="buttons_for_connect" v-on:goBackToMain="goBackToMain" v-on:finishDis="finishDis" />
                 </div>
             </div>
             <div class="div-block table-name">

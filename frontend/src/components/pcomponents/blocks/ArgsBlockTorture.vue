@@ -8,7 +8,7 @@
                 </div>
                 <div class="card flex justify-content-center">
                     <div>Опишите, как прошла пытка:</div>
-                    <InputText type="text" v-model="discription" />
+                    <InputText type="text" v-model="description" />
                 </div>
             </div>
         </div>
