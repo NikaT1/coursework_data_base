@@ -1,8 +1,6 @@
 ﻿import axios from 'axios';
 const state = () => ({
 
-    update_info: { step: -1, isUpdated: false },
-
     role: localStorage.getItem('role') || -1,
     token: localStorage.getItem('token') || '',
     cur_inq: {
@@ -60,11 +58,11 @@ const mutations = {
     SET_INITIAL_INF: (state, payload) => {
         console.log(payload)
         state.person_id = payload.personId;
-        localStorage.setItem("person_id", payload);
+        localStorage.setItem("person_id", payload.personId);
         state.official_id = payload.officialId;
-        localStorage.setItem("official_id", payload);
+        localStorage.setItem("official_id", payload.officialId);
         state.person_name = payload.personName;
-        localStorage.setItem("person_name", payload);
+        localStorage.setItem("person_name", payload.personName);
     },
 
     SET_ACCUSATION_ID: (state, payload) => {
@@ -507,11 +505,11 @@ const actions = {
         return new Promise((resolve, reject) => {
             payload["accusationId"] = context.getters.CUR_ACCUSATION;
             payload["bishop"] = context.getters.CUR_OFFICIAL;
+            console.log(payload);
             axios({ url: '/accusations/add', data: payload, method: 'POST', headers: { "Authorization": "Bearer " + localStorage.getItem("token") } })
                 .then(resp => {
                     console.log(resp);
                     if (resp.status == 200) {
-                        ///////////FIXME добавить вызов обновления табрицы record-ов
                         resolve(resp);
                     } else {
                         var err = { message: resp.message };

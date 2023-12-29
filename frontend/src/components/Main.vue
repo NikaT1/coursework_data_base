@@ -3,13 +3,16 @@
         <Header />
         <div class="main-background">
             <div class="background">
-                <div v-if="new_inq" class="table-name">
-                    Создание нового инквизиционного процесса
+                <div v-if="new_inq">
+                    <div class="table-name">Создание нового инквизиционного процесса</div>
                     <ArgsBlockInq v-if="new_inq" class="div-block" v-model:p_locality="p_locality" v-model:p_bible="p_bible" />
 
                 </div>
-                <div v-if="main_info" class="table-name div-block">
+                <div  v-if="main_info" class="table-name">
                     Возможные действия для Инквизитора
+                </div>
+                <div v-if="main_info" class="div-block">
+
                     <ArgsBlockInq v-if="new_inq" class="div-block" v-model:p_locality="p_locality" v-model:p_bible="p_bible" />
 
                 </div>
@@ -41,6 +44,8 @@
     import { mapState } from 'vuex';
     import DataTable from 'primevue/datatable';
     import Column from 'primevue/column';
+    import websocketStore from "../store/websocketStore";
+
     export default {
         components: {
             Footer,
@@ -66,6 +71,7 @@
                 main_info: true,
                 p_bible: null,
                 p_locality: null,
+                update_info: null,
                 columns: [
                     { field: 'startTime', header: 'Дата начала' },
                     { field: 'locality', header: 'Местность' },
@@ -75,8 +81,20 @@
                 ],
             }
         },
+
         created() {
             this.$store.dispatch('GET_ALL_INQUISITIONS');
+            websocketStore.subscribe("/user/" + this.person_id + "/notification", function (notification) {
+                console.log(JSON.parse(notification.body));
+                this.update_info = JSON.parse(notification.body).content;
+            });
+        },
+        watch: {
+            update_info(val) {
+                if (val.isUpdated == true) {
+                    this.makeUpdate();
+                }
+            },
         },
         computed: mapState({
             data: state => state.inquisition.inq_table_data,
@@ -85,6 +103,11 @@
         methods: {
             handleClose() {
                 localStorage.removeItem("token");
+            },
+            makeUpdate() {
+                this.$store.dispatch('GET_ALL_INQUISITIONS');
+                ///.then(()=>this.data = this.cur_data); для других компонентов
+                this.update_info = null;
             },
             goBackToMain() {
                 this.new_inq = false;
@@ -158,6 +181,10 @@
     }
 </script>
 <style>
+    .p-dropdown-label {
+        width: 100%;
+    }
+
     .background {
         margin: 0 auto;
         padding: 5px 5px 5px 5px;
@@ -166,15 +193,6 @@
         flex-direction: column;
         justify-content: center;
     }
-    .background div {
-        
-        display: inline-block;
-    }
-
-
-    .main-background {
-        
-    }
 
     .title {
         text-align: center;
@@ -182,10 +200,12 @@
 
 
     .table-name {
+        text-align: center;
         color: #6d747f;
         font-size: 15px;
         padding: 5px;
         font-weight: bold;
+        padding: 1%;
     }
 
     #main-div {
@@ -204,5 +224,10 @@
         justify-content: center;
         display: flex;
         margin: 0 auto;
+    }
+
+    .simple-text {
+        padding: 0% 0% 0% 1%;
+        font-size: 14px;
     }
 </style>

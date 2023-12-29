@@ -44,7 +44,6 @@
     import Calendar from 'primevue/calendar';
     import InputText from 'primevue/inputtext';
     import { mapState } from 'vuex';
-    import websocketStore from "../../../store/websocketStore";
 
     export default {
         name: "AccountBlock",
@@ -97,13 +96,10 @@
                     this.$store.dispatch('CREATE_NEW_ACCOUNT', { name, surname, birthDate, personGender, locality, username, password })
                         .then(resp => {
                             console.log(resp);
-                            websocketStore.subscribe("/user/" + this.person_id + "/notification", function (notification) {
-                                console.log(JSON.parse(notification.body));
-                                this.$store.dispatch('SET_UPDATE_INFO', JSON.parse(notification.body));
-                            });
+
                             this.$store.dispatch('GET_CUR_INQ')
                                 .then(() => this.$router.push({ name: 'main-inquisitor-page' }));
-                           
+
                         },
                             err => (this.showError(err)));
                 } else {
@@ -114,9 +110,9 @@
             getStringDate(date) {
                 let str_date = date.getFullYear() + "-";
                 if (date.getMonth() < 10) {
-                    str_date = str_date + "0" + (date.getMonth() + 1) + "-"; 
+                    str_date = str_date + "0" + (date.getMonth() + 1) + "-";
                 } else {
-                    str_date = str_date + (date.getMonth() + 1) + "-"; 
+                    str_date = str_date + (date.getMonth() + 1) + "-";
                 }
                 if (date.getDate() < 10) {
                     str_date = str_date + "0" + date.getDate();
@@ -133,10 +129,6 @@
                         .then(resp => {
                             console.log(resp);
 
-                            websocketStore.subscribe("/user/" + this.person_id + "/notification", function (notification) {
-                                console.log(JSON.parse(notification.body));
-                                return JSON.parse(notification.body);
-                            });
                             this.$store.dispatch('GET_CUR_INQ')
                                 .then(() => this.$router.push({ name: 'main-inquisitor-page' }));
 
@@ -200,5 +192,16 @@
 
 <style scoped>
 
-    
+    #account {
+        min-height: 60%;
+        margin: 3%;
+    }
+
+        #account div {
+            padding: 1%;
+        }
+
+    .title {
+        padding: 5%;
+    }
 </style>

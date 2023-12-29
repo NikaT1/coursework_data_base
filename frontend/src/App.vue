@@ -7,8 +7,12 @@
 </template>
 
 <script>
+    import websocketStore from "./store/websocketStore";
     export default {
         name: 'App',
+        created() {
+            websocketStore.connect();
+        },
     }
 </script>
 <style>

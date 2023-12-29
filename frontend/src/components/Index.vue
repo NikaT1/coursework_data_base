@@ -22,8 +22,6 @@
     import TextBlock from "@/components/pcomponents/blocks/TextBlock";
     import AccountBlock from "@/components/pcomponents/blocks/AccountBlock";
     import Footer from "@/components/pcomponents/blocks/Footer";
-    import websocketStore from "../store/websocketStore";
-
     export default {
         components: {
             Footer,
@@ -42,7 +40,6 @@
             localStorage.removeItem('token');
             localStorage.removeItem('role');
             localStorage.removeItem('step');
-            websocketStore.connect();
 
         },
 
@@ -56,6 +53,14 @@
     }
 </script>
 
-<style >
+<style scoped>
+    .div-block {
+        min-height: 60%;
+        margin: 3%;
+    }
+
+        .div-block div {
+            padding: 1%;
+        }
 
 </style>

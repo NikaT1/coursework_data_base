@@ -1,12 +1,12 @@
 <template>
-    <div>
+    <div id="main-div">
         <Header />
         <div class="main-background">
             <div class="table-name">
                 В данный момент в вашей местности не идет инквизиция
             </div>
 
-            <div class="div-block table-name">
+            <div class="table-name">
                 Список сводов в библии:
             </div>
 

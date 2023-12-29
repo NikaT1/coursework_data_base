@@ -1,17 +1,17 @@
 <template>
-    <div>
+    <div id="main-div">
         <Header />
-        <div class="main-background div-block">
-            <div v-if="main_inf" class="div-block table-name">
+        <div class="main-background">
+            <div v-if="main_inf" class="table-name">
                 Результаты обработки дел - назначенные наказания 
             </div>
-            <div class="div-block" id="div-inline">
-                <div v-if="main_inf" class="div-inline" id="div-buttons">
+            <div id="div-inline">
+                <div v-if="main_inf">
                     <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:connectAcc="startDis" />
                 </div>
       
             </div>
-            <div class="div-block table-name">
+            <div class="table-name">
                 Назначенные наказания:
             </div>
         </div>
@@ -63,11 +63,7 @@
         computed: mapState({
             cur_data: state => state.inquisition.queue_for_punishment,
         }),
-        watch: {
-            selectedData(val) {
-                console.log(val);
-            }
-        },
+       
         methods: {
             handleClose() {
                 localStorage.removeItem("token");

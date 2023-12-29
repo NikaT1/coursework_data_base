@@ -1,16 +1,16 @@
 <template>
-    <div>
+    <div id="main-div">
         <Header />
-        <div class="main-background div-block">
+        <div class="main-background">
             <div v-if="closed == false" class="table-name">
                 Идет процесс разрешения дел
             </div>
             <div v-if="closed == true" class="table-name">
                 Инквизиционный процесс окончен
             </div>
-            <div class="background" id="div-inline">
+            <div id="div-inline">
                 <div v-if="closed == false">
-                    <div>
+                    <div class="simple-text">
                         Выберите дело (кликнув по нужной строке в таблице) и нажмите на "отправить на следующий этап"
                     </div>
                     <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:doNextStep="doNextStep" />
@@ -19,10 +19,10 @@
                     <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:doNextStep="doNextStep" />
                 </div>
             </div>
-            <div v-if="closed == false" class="div-block table-name">
+            <div v-if="closed == false" class="table-name">
                 Список дел:
             </div>
-            <div v-if="closed == true" class="div-block table-name">
+            <div v-if="closed == true" class="table-name">
                 Итоги:
             </div>
         </div>

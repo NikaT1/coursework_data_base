@@ -1,23 +1,30 @@
 <template>
-  <div class="info-div background">
-    <p><slot></slot></p>
-    <Button v-bind:msg="button_msg" @click="$emit('click')"/>
-  </div>
+    <div class="info-div background">
+        <p><slot></slot></p>
+        <ButtonsBlock v-bind:buttons="buttons" v-on:click="click" />
+    </div>
 </template>
 
 <script>
-import Button from "@/components/pcomponents/interactiveElements/Button";
+    import ButtonsBlock from "@/components/pcomponents/blocks/ButtonsBlock";
 
-export default {
-  name: "TextBlock",
-  components: {
-    Button
-  },
-  props: ['button_msg'],
-}
+    export default {
+        name: "TextBlock",
+        components: {
+            ButtonsBlock
+        },
+        data() {
+            return {
+                buttons: [
+                    { msg: this.button_msg, command: "click" },
+                ],
+
+            }
+        },
+        props: ['button_msg'],
+    }
 
 </script>
 
 <style scoped>
-
 </style>

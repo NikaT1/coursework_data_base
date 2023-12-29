@@ -16,6 +16,7 @@
 <script>
     import { mapState } from 'vuex';
     import Dropdown from 'primevue/dropdown';
+    
     export default {
         name: "ArgsBlockInq",
         components: {
@@ -51,7 +52,9 @@
 </script>
 
 <style scoped>
-
+    * {
+        padding: 0% 0% 1% 1%;
+    }
     .background {
         background: rgba(255, 255, 255, 0.7);
         -webkit-background-size: cover;

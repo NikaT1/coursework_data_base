@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div  id="main-div">
         <Header />
         <div class="main-background">
             <div v-if="main_inf" class="table-name">
@@ -8,22 +8,22 @@
             <div v-if="new_rec" class="table-name">
                 Привязка сводов к доносу
             </div>
-            <div class="background" id="div-inline">
+            <div id="div-inline">
 
-                <ArgsBlockCase v-if="new_rec" class="div-block" v-model:p_commandments="p_commandments" />
+                <ArgsBlockCase v-if="new_rec" v-model:p_commandments="p_commandments" />
                 <div v-if="is_inq && main_inf">
-                    <div>Для привязки доноса к сводам кликните в таблице на нужный донос и нажмите "утвердить донос" </div>
+                    <div class="simple-text">Для привязки доноса к сводам кликните в таблице на нужный донос и нажмите "утвердить донос" </div>
                     <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:connectAcc="connectAcc" v-on:startGeneratingCases="startGeneratingCases" />
                 </div>
                 <div v-if="is_bish && main_inf">
-                    <div>Для привязки доноса к сводам кликните в таблице на нужный донос и нажмите "утвердить донос" </div>
+                    <div  class="simple-text">Для привязки доноса к сводам кликните в таблице на нужный донос и нажмите "утвердить донос" </div>
                     <ButtonsBlock v-bind:buttons="buttons_for_bish" v-on:goBack="goBack" v-on:connectAcc="connectAcc" />
                 </div>
                 <div v-if="new_rec">
                     <ButtonsBlock v-bind:buttons="buttons_for_connect" v-on:goBackToMain="goBackToMain" v-on:doConnect="doConnect" />
                 </div>
             </div>
-            <div class="div-block table-name">
+            <div class="table-name">
                 Список необработанных доносов:
             </div>
         </div>
@@ -179,5 +179,6 @@
         }
     }
 </script>
-<style>
+<style scoped>
+
 </style>

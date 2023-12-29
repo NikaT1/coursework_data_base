@@ -1,32 +1,32 @@
 <template>
-    <div>
+    <div id="main-div">
         <Header />
-        <div class="main-background div-block">
-            <div v-if="main_inf" class="div-block table-name">
+        <div class="main-background">
+            <div v-if="main_inf" class="table-name">
                 Процесс проведения пыток
             </div>
-            <div v-if="is_empty" class="div-block table-name">
+            <div v-if="is_empty" class="table-name">
                 Очередь на пытки пока что пуста!
             </div>
-            <div v-if="new_rec" class="div-block table-name">
+            <div v-if="new_rec" class="table-name">
                 Добавление результата
             </div>
-            <div v-if="new_rec" class="div-block table-name">
+            <div v-if="new_rec" class="table-name">
                 Статус: {{msg}}
             </div>
-            <div v-if="main_inf" class="div-block table-name">
+            <div v-if="main_inf" class="simple-text">
                 Для проведения пытки кликните в таблице на нужное дело и нажмите "провести пытку"
             </div>
-            <div class="div-block" id="div-inline">
-                <ArgsBlockDiscussion v-if="new_rec" class="div-block" v-model:p_description="p_description" v-model:p_result="p_result" />
-                <div v-if="main_inf" class="div-inline" id="div-buttons">
+            <div id="div-inline">
+                <ArgsBlockDiscussion v-if="new_rec" v-model:p_description="p_description" v-model:p_result="p_result" />
+                <div v-if="main_inf" >
                     <ButtonsBlock v-bind:buttons="buttons_for_inq" v-on:goBack="goBack" v-on:startDis="startDis" />
                 </div>
-                <div v-if="new_rec" class="div-inline" id="div-buttons">
+                <div v-if="new_rec">
                     <ButtonsBlock v-bind:buttons="buttons_for_connect" v-on:goBackToMain="goBackToMain" v-on:finishDis="finishDis" />
                 </div>
             </div>
-            <div class="div-block table-name">
+            <div class="table-name">
                 Очередь дел на пытку:
             </div>
         </div>

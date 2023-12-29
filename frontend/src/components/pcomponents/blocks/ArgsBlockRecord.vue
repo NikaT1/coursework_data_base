@@ -74,5 +74,7 @@
 </script>
 
 <style scoped>
-
+    * {
+        padding: 0% 0% 1% 1%;
+    }
 </style>

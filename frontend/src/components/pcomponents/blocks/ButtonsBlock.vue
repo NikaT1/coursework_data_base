@@ -21,6 +21,7 @@ export default {
 <style scoped>
     .buttons {
         justify-content: center;
+        width: 100%;
     }
     .buttons-inline {
         display: inline-block;

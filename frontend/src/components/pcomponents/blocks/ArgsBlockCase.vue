@@ -44,7 +44,9 @@
 </script>
 
 <style scoped>
-
+    *{
+        padding: 1%;
+    }
     .background {
         background: rgba(255, 255, 255, 0.7);
         -webkit-background-size: cover;
